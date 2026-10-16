@@ -2,8 +2,9 @@ FROM node:24-alpine AS build
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci --no-audit --no-fund
-COPY index.html ./
+COPY index.html tsconfig.json ./
 COPY src ./src
+COPY tools/generate-validators.mjs ./tools/generate-validators.mjs
 COPY contracts ./contracts
 RUN npm run build
 FROM node:24-alpine

@@ -7,3 +7,4 @@ AGENTS.md
 .local/
 playwright-report/
 test-results/
+src/generated/
