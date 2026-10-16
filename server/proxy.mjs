@@ -47,6 +47,16 @@ export async function handleProxy(req, res, url, s, routes) {
         error: { code: "IDEMPOTENCY_REQUIRED", message: "缺少有效的幂等键" },
       });
     headers["Idempotency-Key"] = key;
+    if (path === "/v1/member-statistics") {
+      if (s.role !== "operator")
+        return json(res, 403, { error: { code: "PERMISSION_DENIED" } });
+      headers["X-Source-Signature"] = createHmac(
+        "sha256",
+        process.env.LOCAL_SOURCE_KEY,
+      )
+        .update(raw)
+        .digest("hex");
+    }
     if (path === "/v1/events" || path === "/v1/refunds") {
       if (s.role !== "operator")
         return json(res, 403, {

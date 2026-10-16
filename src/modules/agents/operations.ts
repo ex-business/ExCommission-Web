@@ -18,4 +18,8 @@ export const agentsOperations: string[][] = [
     "POST",
     "/v1/agent-status-change-requests",
   ],
+  ["agents", "代理目录", "代理总表及下线明细", "GET", "/v1/agent-directory"],
+  ["agents", "代理目录", "指定代理团队", "GET", "/v1/agents/{id}/team"],
+  ["agents", "代理目录", "会员团队接口", "GET", "/v1/me/team"],
+  ["agents", "代理目录", "接收会员统计", "POST", "/v1/member-statistics"],
 ];

@@ -111,6 +111,31 @@ test("未知代理路径不能访问任意后端资源", async () => {
     404,
   );
 });
+test("会员统计仅由申请身份按原字节签名转发", async () => {
+  const raw = JSON.stringify({
+    user_id: "u1",
+    currency: "USD",
+    deposit_minor: "10",
+  });
+  const r = await fetch(base + "/api/v1/member-statistics", {
+    method: "POST",
+    headers: {
+      Cookie: cookie,
+      Origin: base,
+      "X-CSRF-Token": csrf,
+      "Idempotency-Key": "stats-key",
+    },
+    body: raw,
+  });
+  assert.equal(r.status, 200);
+  const x = received.at(-1);
+  const { createHmac } = await import("node:crypto");
+  assert.equal(x.raw, raw);
+  assert.equal(
+    x.headers["x-source-signature"],
+    createHmac("sha256", "source-test-key").update(raw).digest("hex"),
+  );
+});
 test("退出令会话失效", async () => {
   assert.equal(
     (

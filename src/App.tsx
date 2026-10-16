@@ -8,6 +8,7 @@ import { Layout } from "./components/Layout";
 import { OperationPanel, type Seed } from "./modules/OperationPanel";
 import { ResourceIndex } from "./modules/ResourceIndex";
 import { CommissionReview } from "./modules/finance/CommissionReview";
+import { AgentDirectory } from "./modules/agents/AgentDirectory";
 import { MemberCommissions } from "./modules/finance/MemberCommissions";
 export default function App() {
   const [session, setSession] = useState<Session | null>(null),
@@ -134,7 +135,9 @@ export default function App() {
           </button>
         ))}
       </div>
-      {op.title === "我的佣金" ? (
+      {op.title === "代理总表及下线明细" ? (
+        <AgentDirectory onExpired={() => setSession(null)} />
+      ) : op.title === "我的佣金" ? (
         <MemberCommissions
           session={session}
           onExpired={() => setSession(null)}
