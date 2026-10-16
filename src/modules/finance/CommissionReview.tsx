@@ -13,6 +13,12 @@ const statusNames: Record<string, string> = {
   QUEUED: "待派发",
   LINKED: "已生成付款，待核验渠道",
   BLOCKED: "需要处理",
+  CLAIMABLE: "待领取",
+  PROCESSING: "领取处理中",
+  CLAIMED: "已领取",
+  FAILED: "领取失败",
+  RECONCILIATION_EXCEPTION: "核验异常",
+  PREPARING: "准备中",
 };
 export function displayMoney(value: string, currency: string) {
   const e = precision[currency];
@@ -51,7 +57,8 @@ export function CommissionReview({
     [results, setResults] = useState<Row[]>([]),
     [draft, setDraft] = useState<Row | null>(null),
     [amount, setAmount] = useState(""),
-    [draftRemark, setDraftRemark] = useState("");
+    [draftRemark, setDraftRemark] = useState(""),
+    [deliveryMode, setDeliveryMode] = useState("MEMBER_CLAIM");
   const last = useRef({ body: "", key: "" });
   const id = (r: Row) => (tab === "reviews" ? r.approval_id : r.instruction_id);
   async function guarded(action: () => Promise<void>) {
@@ -136,6 +143,7 @@ export function CommissionReview({
   }
   function open(r: Row, edit = false) {
     setDraft({ ...r, editing: edit });
+    setDeliveryMode(edit ? r.delivery_mode || "DIRECT" : "MEMBER_CLAIM");
     const val = edit ? r.amount.minor_units : r.total_minor;
     const cur = edit ? r.amount.currency : r.currency;
     setAmount(displayMoney(val, cur).split(" ")[0]);
@@ -158,6 +166,7 @@ export function CommissionReview({
         );
       else
         await mutate("/v1/payout-orders", {
+          delivery_mode: deliveryMode,
           statement_id: draft.statement_id,
           expected_statement_revision: draft.statement_revision,
           amount: money,
@@ -360,8 +369,13 @@ export function CommissionReview({
                 </td>
                 <td>
                   {statusNames[
-                    tab === "reviews" ? r.approval_status : r.status
-                  ] || (tab === "reviews" ? r.approval_status : r.status)}
+                    tab === "reviews"
+                      ? r.approval_status
+                      : r.claim_status || r.status
+                  ] ||
+                    (tab === "reviews"
+                      ? r.approval_status
+                      : r.claim_status || r.status)}
                   {r.error_code && <small>{r.error_code}</small>}
                 </td>
                 <td>
@@ -410,7 +424,7 @@ export function CommissionReview({
                           </button>
                         </>
                       )}
-                      {["DRAFT", "BLOCKED"].includes(r.status) && (
+                      {["DRAFT", "BLOCKED", "CLAIMABLE"].includes(r.status) && (
                         <button
                           disabled={busy}
                           onClick={() => act("CANCEL", [r])}
@@ -435,6 +449,19 @@ export function CommissionReview({
       {draft && (
         <div role="dialog" aria-label="派发金额编辑" className="review-editor">
           <h3>{draft.editing ? "调整派发" : "准备派发"}</h3>
+          {!draft.editing && (
+            <label>
+              派发方式
+              <select
+                aria-label="派发方式"
+                value={deliveryMode}
+                onChange={(e) => setDeliveryMode(e.target.value)}
+              >
+                <option value="MEMBER_CLAIM">会员主动领取</option>
+                <option value="DIRECT">后台直接派发</option>
+              </select>
+            </label>
+          )}
           <label>
             本次派发金额
             <input
@@ -453,7 +480,9 @@ export function CommissionReview({
               onChange={(e) => setDraftRemark(e.target.value)}
             />
           </label>
-          <p>少派部分仍保留佣金权益。保存为草稿后，需要明确提交派发。</p>
+          <p>
+            少派部分仍保留佣金权益。保存后需提交；会员领取模式提交后进入待领取，由会员本人操作。
+          </p>
           <button disabled={busy} onClick={save}>
             保存草稿
           </button>

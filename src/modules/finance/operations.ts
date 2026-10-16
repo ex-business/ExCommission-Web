@@ -87,4 +87,12 @@ export const financeOperations: string[][] = [
     "POST",
     "/v1/risk-holds/{id}/release-requests",
   ],
+  ["finance", "会员佣金", "我的佣金", "GET", "/v1/me/commissions"],
+  [
+    "finance",
+    "会员佣金",
+    "领取佣金接口",
+    "POST",
+    "/v1/me/commission-orders/{id}/claim",
+  ],
 ];

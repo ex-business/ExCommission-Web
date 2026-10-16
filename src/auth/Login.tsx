@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { request } from "../lib/api";
 export type Session = {
-  role: "operator" | "approver";
+  role: "operator" | "approver" | "member";
   subject: string;
   csrf: string;
 };
 export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
   const [role, setRole] = useState("operator"),
     [password, setPassword] = useState(""),
+    [username, setUsername] = useState(""),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
   return (
@@ -32,7 +33,11 @@ export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
               (
                 await request("/auth/login", {
                   method: "POST",
-                  body: { role, password },
+                  body: {
+                    role,
+                    password,
+                    ...(role === "member" ? { username } : {}),
+                  },
                 })
               ).data,
             );
@@ -55,8 +60,21 @@ export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
           >
             <option value="operator">业务申请人</option>
             <option value="approver">独立审批人</option>
+            <option value="member">会员</option>
           </select>
         </label>
+        {role === "member" && (
+          <label className="field">
+            会员账号
+            <input
+              aria-label="会员账号"
+              autoComplete="username"
+              required
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </label>
+        )}
         <label className="field">
           登录密码
           <input

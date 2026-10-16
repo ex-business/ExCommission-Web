@@ -48,3 +48,5 @@ docker compose up -d --build
 `node tools/commission-review-acceptance.mjs` 启动隔离临时页面服务并进行真实浏览器交互测试（模拟HTTP），结束自动停止测试进程。`tools/verify-review-contracts.mjs` 可校验后端脱敏HTTP证据；本次55个后端真实HTTP响应与25个成功请求体通过。后端MySQL资金闭环与浏览器模拟分别验收，不混称真实银行到账。
 
 生产构建和10项测试通过；Docker引擎当前500，新后端/新代理的运行实例联部署尚未完成。浏览器现有服务可能仍使用旧接口允许清单与旧后端，不能据构建通过宣称新功能已经上线。
+
+会员佣金：支持可信会员账号登录、本人结算列表及主动领取。待领取才显示领取按钮，处理中、已领取、取消、失败与核验异常均按后端状态展示；后台可选择会员领取或直接派发。会员登录需先在后端配置真实用户绑定，令牌不返回浏览器。运行 `node tools/member-claims-acceptance.mjs` 可验证会员页面交互。

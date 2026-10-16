@@ -26,9 +26,15 @@ export async function handleProxy(req, res, url, s, routes) {
         message: "付款回调仅由受信渠道提交；管理端可核验原付款",
       },
     });
+  if (s.role === "member" && !path.startsWith("/v1/me/"))
+    return json(res, 403, {
+      error: { code: "PERMISSION_DENIED", message: "会员仅可访问本人的佣金" },
+    });
   const headers = {
     Authorization:
-      "Bearer " + process.env["LOCAL_" + s.role.toUpperCase() + "_TOKEN"],
+      "Bearer " +
+      (s.backendToken ||
+        process.env["LOCAL_" + s.role.toUpperCase() + "_TOKEN"]),
     "X-Request-ID": randomBytes(16).toString("hex"),
   };
   let raw;

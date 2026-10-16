@@ -8,6 +8,7 @@ import { Layout } from "./components/Layout";
 import { OperationPanel, type Seed } from "./modules/OperationPanel";
 import { ResourceIndex } from "./modules/ResourceIndex";
 import { CommissionReview } from "./modules/finance/CommissionReview";
+import { MemberCommissions } from "./modules/finance/MemberCommissions";
 export default function App() {
   const [session, setSession] = useState<Session | null>(null),
     [loading, setLoading] = useState(true),
@@ -48,6 +49,31 @@ export default function App() {
   }
   if (loading) return <div className="loading-page">正在读取本地会话…</div>;
   if (!session) return <Login onLogin={setSession} />;
+  if (session.role === "member")
+    return (
+      <main className="review-workspace">
+        <h1>我的佣金</h1>
+        <button
+          onClick={async () => {
+            try {
+              await request("/auth/logout", {
+                method: "POST",
+                body: {},
+                csrf: session.csrf,
+              });
+            } finally {
+              setSession(null);
+            }
+          }}
+        >
+          退出登录
+        </button>
+        <MemberCommissions
+          session={session}
+          onExpired={() => setSession(null)}
+        />
+      </main>
+    );
   const sectionOps = operations.filter(
     (o) => o.section === op.section && o.group === op.group,
   );
@@ -108,7 +134,12 @@ export default function App() {
           </button>
         ))}
       </div>
-      {op.title === "佣金审核与派发" ? (
+      {op.title === "我的佣金" ? (
+        <MemberCommissions
+          session={session}
+          onExpired={() => setSession(null)}
+        />
+      ) : op.title === "佣金审核与派发" ? (
         <CommissionReview
           session={session}
           onExpired={() => setSession(null)}

@@ -25,11 +25,55 @@ export async function handleAuth(req, res, url, s) {
         },
       });
     const input = JSON.parse(await body(req));
-    const role = ["operator", "approver"].includes(input.role)
+    const role = ["operator", "approver", "member"].includes(input.role)
       ? input.role
       : "";
     const password = process.env["WEB_" + role.toUpperCase() + "_PASSWORD"];
-    if (!role || !secretEquals(input.password, password)) {
+    let backendToken,
+      subject = "local-" + role;
+    let valid =
+      role && role !== "member" && secretEquals(input.password, password);
+    if (
+      role === "member" &&
+      typeof input.username === "string" &&
+      input.username.length <= 128 &&
+      typeof input.password === "string" &&
+      input.password.length <= 1024
+    ) {
+      const backend = process.env.BACKEND_URL || "http://127.0.0.1:18080";
+      const result = await fetch(new URL("/v1/auth/login", backend), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: input.username,
+          password: input.password,
+        }),
+        redirect: "error",
+        signal: AbortSignal.timeout(10000),
+      });
+      if (result.ok) {
+        const login = await result.json();
+        if (typeof login.access_token === "string") {
+          const me = await fetch(new URL("/v1/auth/me", backend), {
+            headers: { Authorization: "Bearer " + login.access_token },
+            redirect: "error",
+            signal: AbortSignal.timeout(10000),
+          });
+          if (me.ok) {
+            const p = await me.json();
+            valid =
+              typeof p.member_user_id === "string" &&
+              p.member_user_id !== "" &&
+              p.permissions?.includes("member:read");
+            if (valid) {
+              backendToken = login.access_token;
+              subject = p.subject_id;
+            }
+          }
+        }
+      }
+    }
+    if (!valid) {
       attempt.count++;
       attempts.set(ip, attempt);
       return json(res, 401, {
@@ -39,13 +83,19 @@ export async function handleAuth(req, res, url, s) {
     if (s) sessions.delete(s.id);
     const id = randomBytes(32).toString("hex"),
       csrf = randomBytes(24).toString("hex");
-    sessions.set(id, { role, csrf, expires: Date.now() + 3600000 });
+    sessions.set(id, {
+      role,
+      csrf,
+      subject,
+      backendToken,
+      expires: Date.now() + 3600000,
+    });
     attempts.delete(ip);
     res.setHeader(
       "Set-Cookie",
       `ec_session=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=3600`,
     );
-    return json(res, 200, { role, csrf, subject: "local-" + role });
+    return json(res, 200, { role, csrf, subject });
   }
   if (url.pathname === "/auth/session") {
     if (!s)
@@ -55,7 +105,7 @@ export async function handleAuth(req, res, url, s) {
     return json(res, 200, {
       role: s.role,
       csrf: s.csrf,
-      subject: "local-" + s.role,
+      subject: s.subject,
     });
   }
   if (url.pathname === "/auth/logout" && req.method === "POST") {

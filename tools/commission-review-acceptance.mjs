@@ -180,7 +180,8 @@ try {
     .click();
   await p.getByRole("button", { name: "查询列表", exact: true }).click();
   await p.getByRole("button", { name: "准备派发", exact: true }).click();
-  await p.getByLabel("本次派发金额").fill("30.00");
+  await p.getByLabel("派发方式").selectOption("DIRECT");
+ await p.getByLabel("本次派发金额").fill("30.00");
   await p.getByRole("button", { name: "保存草稿", exact: true }).click();
   await p.getByLabel("选择 i2", { exact: true }).check();
   await p.getByRole("button", { name: "批量提交派发", exact: true }).click();

@@ -1,0 +1,124 @@
+import { useRef, useState } from "react";
+import { request, ApiError } from "../../lib/api";
+import type { Session } from "../../auth/Login";
+import { displayMoney } from "./CommissionReview";
+type Order = {
+  instruction_id: string;
+  amount_minor: string;
+  revision: number;
+  claim_status: string;
+};
+type Statement = {
+  statement_id: string;
+  period: string;
+  currency: string;
+  total_minor: string;
+  review_status: string;
+  orders: Order[];
+};
+const names: Record<string, string> = {
+  WAITING_REVIEW: "待审核",
+  CANCELLED: "取消派发",
+  APPROVED: "审核通过",
+  PREPARING: "准备中",
+  CLAIMABLE: "待领取",
+  PROCESSING: "领取处理中",
+  CLAIMED: "已领取",
+  FAILED: "领取失败",
+  RECONCILIATION_EXCEPTION: "核验异常",
+};
+export function MemberCommissions({
+  session,
+  onExpired,
+}: {
+  session: Session;
+  onExpired: () => void;
+}) {
+  const [rows, setRows] = useState<Statement[]>([]),
+    [next, setNext] = useState<string | null>(null),
+    [busy, setBusy] = useState(false),
+    [error, setError] = useState("");
+  const keys = useRef(new Map<string, string>());
+  async function guard(fn: () => Promise<void>) {
+    setBusy(true);
+    setError("");
+    try {
+      await fn();
+    } catch (e) {
+      if (e instanceof ApiError && e.status === 401) onExpired();
+      setError(e instanceof Error ? e.message : "操作失败");
+    } finally {
+      setBusy(false);
+    }
+  }
+  async function load(after = "") {
+    const r = await request(
+      "/v1/me/commissions?limit=50" +
+        (after ? "&after_id=" + encodeURIComponent(after) : ""),
+    );
+    setRows(r.data.rows);
+    setNext(r.data.next_after_id);
+  }
+  async function claim(order: Order) {
+    await guard(async () => {
+      const fingerprint = order.instruction_id + ":" + order.revision;
+      let key = keys.current.get(fingerprint);
+      if (!key) {
+        key = crypto.randomUUID();
+        keys.current.set(fingerprint, key);
+      }
+      await request(
+        "/v1/me/commission-orders/" +
+          encodeURIComponent(order.instruction_id) +
+          "/claim",
+        {
+          method: "POST",
+          body: { expected_revision: order.revision },
+          csrf: session.csrf,
+          key,
+        },
+      );
+      await load();
+    });
+  }
+  return (
+    <section aria-label="本人佣金">
+      <h2>佣金领取</h2>
+      <button disabled={busy} onClick={() => guard(() => load())}>
+        刷新我的佣金
+      </button>
+      {error && <p role="alert">{error}</p>}
+      <p>仅显示本人佣金。领取受理后请刷新确认结果；结果未知时保留原单核验。</p>
+      {rows.map((s) => (
+        <article key={s.statement_id}>
+          <h3>
+            {s.period} · {displayMoney(s.total_minor, s.currency)}
+          </h3>
+          <p>{names[s.review_status] || s.review_status}</p>
+          {s.orders.length === 0 && s.review_status === "APPROVED" && (
+            <p>派发准备中</p>
+          )}
+          {s.orders.map((o) => (
+            <div key={o.instruction_id}>
+              <span>
+                {displayMoney(o.amount_minor, s.currency)} ·{" "}
+                {names[o.claim_status] || o.claim_status}
+              </span>
+              {o.claim_status === "CLAIMABLE" && (
+                <button disabled={busy} onClick={() => claim(o)}>
+                  领取佣金
+                </button>
+              )}
+            </div>
+          ))}
+        </article>
+      ))}
+      {!rows.length && <p>暂无记录，请刷新查询。</p>}
+      {next && (
+        <button disabled={busy} onClick={() => guard(() => load(next))}>
+          下一页
+        </button>
+      )}
+    </section>
+  );
+}
