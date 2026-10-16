@@ -31,4 +31,13 @@ export const systemOperations: string[][] = [
     "/v1/platform-setting-requests",
   ],
   ["system", "通知收件箱", "本地通知", "GET", "/v1/notifications"],
+  ["system", "站点代理", "站点代理配置", "GET", "/v1/site-agent-config"],
+  ["system", "站点代理", "站点方案与场馆", "GET", "/v1/site-agent-options"],
+  [
+    "system",
+    "站点代理",
+    "提交站点代理配置",
+    "POST",
+    "/v1/site-agent-config-requests",
+  ],
 ];

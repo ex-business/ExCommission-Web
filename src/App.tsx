@@ -8,6 +8,7 @@ import { Layout } from "./components/Layout";
 import { OperationPanel, type Seed } from "./modules/OperationPanel";
 import { ResourceIndex } from "./modules/ResourceIndex";
 import { CommissionReview } from "./modules/finance/CommissionReview";
+import { SiteAgentConfig } from "./modules/sites/SiteAgentConfig";
 import { AgentDirectory } from "./modules/agents/AgentDirectory";
 import { MemberCommissions } from "./modules/finance/MemberCommissions";
 export default function App() {
@@ -135,7 +136,13 @@ export default function App() {
           </button>
         ))}
       </div>
-      {op.title === "代理总表及下线明细" ? (
+      {op.title === "站点代理配置" ? (
+        <SiteAgentConfig
+          session={session}
+          onExpired={() => setSession(null)}
+          onApproval={(id) => navigate("审批详情", { params: { id } })}
+        />
+      ) : op.title === "代理总表及下线明细" ? (
         <AgentDirectory onExpired={() => setSession(null)} />
       ) : op.title === "我的佣金" ? (
         <MemberCommissions
