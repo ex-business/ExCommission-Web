@@ -52,7 +52,8 @@ export function OperationPanel({
     [confirm, setConfirm] = useState(false),
     [step, setStep] = useState(0),
     [json, setJson] = useState(false),
-    [requestId, setRequestId] = useState<string | null>(null);
+    [requestId, setRequestId] = useState<string | null>(null),
+    [totp, setTotp] = useState("");
   const mounted = useRef(true);
   useEffect(
     () => () => {
@@ -70,6 +71,7 @@ export function OperationPanel({
     setResult(undefined);
     setError(undefined);
     setErrors([]);
+    setTotp("");
   };
   function prepare() {
     const problems: string[] = [];
@@ -114,6 +116,7 @@ export function OperationPanel({
         body: op.method === "GET" ? undefined : body,
         csrf: session.csrf,
         key,
+        totp,
       });
       if (!mounted.current) return;
       setRequestId(r.requestId);
@@ -285,6 +288,21 @@ export function OperationPanel({
               </ul>
             </div>
           )}
+          {op.method === "POST" &&
+            (op.path.includes("/approvals/") ||
+              op.path === "/v1/site-agent-config-requests") && (
+              <label>
+                谷歌验证码（站点配置批准或恢复时必填）
+                <input
+                  aria-label="谷歌验证码"
+                  autoComplete="one-time-code"
+                  inputMode="numeric"
+                  maxLength={6}
+                  value={totp}
+                  onChange={(e) => setTotp(e.target.value)}
+                />
+              </label>
+            )}
           <div className="form-actions">
             <button className="primary" disabled={busy}>
               {busy

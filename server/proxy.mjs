@@ -37,6 +37,12 @@ export async function handleProxy(req, res, url, s, routes) {
         process.env["LOCAL_" + s.role.toUpperCase() + "_TOKEN"]),
     "X-Request-ID": randomBytes(16).toString("hex"),
   };
+  if (req.headers["x-totp-code"] !== undefined) {
+    const code = req.headers["x-totp-code"];
+    if (typeof code !== "string" || !/^\d{6}$/.test(code))
+      return json(res, 400, { error: { code: "INVALID_TOTP_FORMAT" } });
+    headers["X-TOTP-Code"] = code;
+  }
   let raw;
   if (req.method !== "GET") {
     raw = await body(req);

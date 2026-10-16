@@ -44,6 +44,8 @@ try {
     if (req.method() === "POST") {
       submitted = req.postDataJSON();
       assert.ok(req.headers()["idempotency-key"]);
+      assert.equal(req.headers()["x-totp-code"], "123456");
+      assert.equal(req.postDataJSON().totp, undefined);
       data = { approval_id: "site-approval", object_hash: "hash", revision: 0 };
     } else if (path === "/v1/site-agent-config") {
       data = {
@@ -83,6 +85,7 @@ try {
   await p.getByLabel("启用站点代理").check();
   await p.getByLabel("场馆 A", { exact: true }).check();
   await p.getByLabel("站点配置变更原因").fill("开通代理");
+  await p.getByLabel("谷歌验证码", { exact: true }).fill("123456");
   await p.getByRole("button", { name: "提交站点配置审批" }).click();
   await p.getByText(/已提交审批：site-approval/).waitFor();
   assert.equal(submitted.expected_revision, 3);

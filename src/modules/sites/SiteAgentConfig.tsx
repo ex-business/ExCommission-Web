@@ -16,6 +16,7 @@ export function SiteAgentConfig({
     [plan, setPlan] = useState(""),
     [venues, setVenues] = useState<string[]>([]),
     [reason, setReason] = useState(""),
+    [totp, setTotp] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [approval, setApproval] = useState("");
@@ -63,8 +64,10 @@ export function SiteAgentConfig({
         body,
         csrf: session.csrf,
         key: last.current.key,
+        totp,
       });
       setApproval(r.data.approval_id);
+      setTotp("");
     });
   }
   const choices = options.filter((o) => o.event_type !== "MILESTONE_REACHED");
@@ -144,11 +147,28 @@ export function SiteAgentConfig({
               onChange={(e) => setReason(e.target.value)}
             />
           </label>
+          <label>
+            谷歌验证码
+            <input
+              aria-label="谷歌验证码"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              value={totp}
+              onChange={(e) => setTotp(e.target.value)}
+            />
+          </label>
           <p>
             提交申请后由独立审批人确认生效。关闭后停止新的奖励与领取，已发生的付款结果仍正常核验。
           </p>
           <button
-            disabled={busy || !plan || !reason || (enabled && !venues.length)}
+            disabled={
+              busy ||
+              !plan ||
+              !reason ||
+              !/^\d{6}$/.test(totp) ||
+              (enabled && !venues.length)
+            }
             onClick={save}
           >
             提交站点配置审批

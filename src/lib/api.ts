@@ -3,6 +3,7 @@ export type ApiOptions = {
   body?: unknown;
   csrf?: string;
   key?: string;
+  totp?: string;
 };
 export class ApiError extends Error {
   data: any;
@@ -11,7 +12,7 @@ export class ApiError extends Error {
 }
 export async function request(
   path: string,
-  { method = "GET", body, csrf, key }: ApiOptions = {},
+  { method = "GET", body, csrf, key, totp }: ApiOptions = {},
 ) {
   const r = await fetch(path, {
     method,
@@ -19,6 +20,7 @@ export async function request(
       ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
       ...(csrf ? { "X-CSRF-Token": csrf } : {}),
       ...(key ? { "Idempotency-Key": key } : {}),
+      ...(totp ? { "X-TOTP-Code": totp } : {}),
     },
     body: body === undefined ? undefined : JSON.stringify(body),
   });

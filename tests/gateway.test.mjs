@@ -136,6 +136,35 @@ test("会员统计仅由申请身份按原字节签名转发", async () => {
     createHmac("sha256", "source-test-key").update(raw).digest("hex"),
   );
 });
+test("谷歌验证码仅经请求头转发且格式受限", async () => {
+  let r = await fetch(base + "/api/v1/site-agent-config-requests", {
+    method: "POST",
+    headers: {
+      Cookie: cookie,
+      Origin: base,
+      "X-CSRF-Token": csrf,
+      "Idempotency-Key": "totp-key",
+      "X-TOTP-Code": "123456",
+    },
+    body: '{"enabled":false}',
+  });
+  assert.equal(r.status, 200);
+  const x = received.at(-1);
+  assert.equal(x.headers["x-totp-code"], "123456");
+  assert.equal(x.raw, '{"enabled":false}');
+  r = await fetch(base + "/api/v1/site-agent-config-requests", {
+    method: "POST",
+    headers: {
+      Cookie: cookie,
+      Origin: base,
+      "X-CSRF-Token": csrf,
+      "Idempotency-Key": "totp-key",
+      "X-TOTP-Code": "not-a-code",
+    },
+    body: "{}",
+  });
+  assert.equal(r.status, 400);
+});
 test("退出令会话失效", async () => {
   assert.equal(
     (
