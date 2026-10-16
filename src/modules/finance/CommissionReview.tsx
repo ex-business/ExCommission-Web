@@ -58,7 +58,8 @@ export function CommissionReview({
     [draft, setDraft] = useState<Row | null>(null),
     [amount, setAmount] = useState(""),
     [draftRemark, setDraftRemark] = useState(""),
-    [deliveryMode, setDeliveryMode] = useState("MEMBER_CLAIM");
+    [deliveryMode, setDeliveryMode] = useState("MEMBER_CLAIM"),
+    [channel, setChannel] = useState("wallet");
   const last = useRef({ body: "", key: "" });
   const id = (r: Row) => (tab === "reviews" ? r.approval_id : r.instruction_id);
   async function guarded(action: () => Promise<void>) {
@@ -143,6 +144,7 @@ export function CommissionReview({
   }
   function open(r: Row, edit = false) {
     setDraft({ ...r, editing: edit });
+    setChannel(edit ? r.channel_id : "wallet");
     setDeliveryMode(edit ? r.delivery_mode || "DIRECT" : "MEMBER_CLAIM");
     const val = edit ? r.amount.minor_units : r.total_minor;
     const cur = edit ? r.amount.currency : r.currency;
@@ -170,7 +172,7 @@ export function CommissionReview({
           statement_id: draft.statement_id,
           expected_statement_revision: draft.statement_revision,
           amount: money,
-          channel_id: "sandbox",
+          channel_id: channel,
           remark: draftRemark,
         });
       setDraft(null);
@@ -459,6 +461,19 @@ export function CommissionReview({
               >
                 <option value="MEMBER_CLAIM">会员主动领取</option>
                 <option value="DIRECT">后台直接派发</option>
+              </select>
+            </label>
+          )}
+          {!draft.editing && (
+            <label>
+              收款位置
+              <select
+                aria-label="收款位置"
+                value={channel}
+                onChange={(e) => setChannel(e.target.value)}
+              >
+                <option value="wallet">真金钱包</option>
+                <option value="sandbox">沙箱通道（测试）</option>
               </select>
             </label>
           )}

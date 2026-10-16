@@ -95,4 +95,7 @@ export const financeOperations: string[][] = [
     "POST",
     "/v1/me/commission-orders/{id}/claim",
   ],
+  ["finance", "会员佣金", "真金钱包", "GET", "/v1/me/wallets"],
+  ["finance", "会员佣金", "钱包交易历史", "GET", "/v1/me/wallet-transactions"],
+  ["finance", "会员佣金", "钱包账变记录", "GET", "/v1/me/wallet-changes"],
 ];

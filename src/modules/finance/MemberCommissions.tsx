@@ -38,6 +38,9 @@ export function MemberCommissions({
     [next, setNext] = useState<string | null>(null),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  const [wallets, setWallets] = useState<any[]>([]),
+    [entries, setEntries] = useState<any[]>([]),
+    [historyKind, setHistoryKind] = useState("");
   const keys = useRef(new Map<string, string>());
   async function guard(fn: () => Promise<void>) {
     setBusy(true);
@@ -84,6 +87,56 @@ export function MemberCommissions({
   return (
     <section aria-label="本人佣金">
       <h2>佣金领取</h2>
+      <button
+        disabled={busy}
+        onClick={() =>
+          guard(async () => {
+            const r = await request("/v1/me/wallets");
+            setWallets(r.data.rows);
+          })
+        }
+      >
+        查看真金钱包
+      </button>
+      {wallets.map((v) => (
+        <p key={v.currency}>
+          真金余额：{displayMoney(v.balance_minor, v.currency)}
+        </p>
+      ))}
+      {[
+        ["wallet-transactions", "交易历史"],
+        ["wallet-changes", "账变记录"],
+      ].map(([kind, label]) => (
+        <button
+          key={kind}
+          disabled={busy}
+          onClick={() =>
+            guard(async () => {
+              const r = await request("/v1/me/" + kind + "?limit=50");
+              setEntries(r.data.rows);
+              setHistoryKind(label);
+            })
+          }
+        >
+          {label}
+        </button>
+      ))}
+      {historyKind && (
+        <section aria-label={historyKind}>
+          <h3>{historyKind}</h3>
+          {entries.map((v) => (
+            <p key={v.transaction_id}>
+              {v.created_at} · {displayMoney(v.amount_minor, v.currency)}
+              {v.balance_before_minor !== undefined
+                ? " · " +
+                  displayMoney(v.balance_before_minor, v.currency) +
+                  " → " +
+                  displayMoney(v.balance_after_minor, v.currency)
+                : ""}
+            </p>
+          ))}
+        </section>
+      )}
       <button disabled={busy} onClick={() => guard(() => load())}>
         刷新我的佣金
       </button>

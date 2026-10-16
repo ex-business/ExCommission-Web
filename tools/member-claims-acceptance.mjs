@@ -55,6 +55,39 @@ try {
         json: { data: { instruction_id: "i1", claim_status: "PROCESSING" } },
       });
     }
+    if (url.pathname === "/v1/me/wallets")
+      return route.fulfill({
+        json: {
+          data: {
+            rows: [
+              {
+                currency: "USD",
+                balance_minor: "5000",
+                revision: 1,
+                wallet_type: "REAL_MONEY",
+              },
+            ],
+          },
+        },
+      });
+    if (url.pathname.startsWith("/v1/me/wallet-"))
+      return route.fulfill({
+        json: {
+          data: {
+            rows: [
+              {
+                transaction_id: "t1",
+                currency: "USD",
+                amount_minor: "5000",
+                balance_before_minor: "0",
+                balance_after_minor: "5000",
+                created_at: "2026-10-17T00:00:00Z",
+              },
+            ],
+            next_after_id: null,
+          },
+        },
+      });
     return route.fulfill({
       json: {
         data: {
@@ -117,6 +150,15 @@ try {
       0,
     );
   }
+  await p.getByRole("button", { name: "查看真金钱包", exact: true }).click();
+  await p.getByText("真金余额：50.00 USD", { exact: true }).waitFor();
+  await p.getByRole("button", { name: "交易历史", exact: true }).click();
+  await p.getByRole("region", { name: "交易历史" }).waitFor();
+  await p.getByRole("button", { name: "账变记录", exact: true }).click();
+  await p
+    .getByRole("region", { name: "账变记录" })
+    .getByText(/0.00 USD → 50.00 USD/)
+    .waitFor();
   assert.deepEqual(errors, []);
   console.log(
     "PASS: member-only page, pending review, owner claim with CSRF/idempotency, processing suppresses repeated action, confirmed success/failure/cancellation/exception labels; mocked HTTP browser test",
