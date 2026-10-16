@@ -47,7 +47,6 @@ export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
           }
         }}
       >
-        <span className="eyebrow">管理后台</span>
         <h2>账号登录</h2>
         <p className="muted">请选择身份并输入登录密码</p>
         <label className="field">
