@@ -1,4 +1,17 @@
 export const financeOperations: string[][] = [
+  ["finance", "佣金审核", "佣金审核与派发", "GET", "/v1/commission-reviews"],
+  [
+    "finance",
+    "佣金审核",
+    "批量审核接口",
+    "POST",
+    "/v1/commission-review-batches",
+  ],
+  ["finance", "佣金审核", "派发草稿列表", "GET", "/v1/payout-orders"],
+  ["finance", "佣金审核", "准备派发草稿", "POST", "/v1/payout-orders"],
+  ["finance", "佣金审核", "派发草稿详情", "GET", "/v1/payout-orders/{id}"],
+  ["finance", "佣金审核", "修改派发草稿", "PUT", "/v1/payout-orders/{id}"],
+  ["finance", "佣金审核", "批量派发接口", "POST", "/v1/payout-order-batches"],
   ["finance", "佣金计算", "接收沙箱事件", "POST", "/v1/events"],
   ["finance", "佣金计算", "事件详情", "GET", "/v1/events/{id}"],
   ["finance", "佣金计算", "计算任务", "GET", "/v1/calculation-tasks/{id}"],

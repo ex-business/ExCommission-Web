@@ -7,6 +7,7 @@ import { saveIndex } from "./lib/storage";
 import { Layout } from "./components/Layout";
 import { OperationPanel, type Seed } from "./modules/OperationPanel";
 import { ResourceIndex } from "./modules/ResourceIndex";
+import { CommissionReview } from "./modules/finance/CommissionReview";
 export default function App() {
   const [session, setSession] = useState<Session | null>(null),
     [loading, setLoading] = useState(true),
@@ -107,18 +108,25 @@ export default function App() {
           </button>
         ))}
       </div>
-      <OperationPanel
-        key={op.key + serial}
-        op={op}
-        session={session}
-        seed={seed}
-        onNavigate={navigate}
-        onResult={(data) => {
-          saveIndex(resourceLinks(data));
-          setIndexVersion((v) => v + 1);
-        }}
-        onExpired={() => setSession(null)}
-      />
+      {op.title === "佣金审核与派发" ? (
+        <CommissionReview
+          session={session}
+          onExpired={() => setSession(null)}
+        />
+      ) : (
+        <OperationPanel
+          key={op.key + serial}
+          op={op}
+          session={session}
+          seed={seed}
+          onNavigate={navigate}
+          onResult={(data) => {
+            saveIndex(resourceLinks(data));
+            setIndexVersion((v) => v + 1);
+          }}
+          onExpired={() => setSession(null)}
+        />
+      )}
     </Layout>
   );
 }

@@ -30,12 +30,12 @@ test("V1全部操作有管理入口或明确的渠道专用边界", async () => 
     ))
       actual.push(op[3] + " " + op[4]);
   }
-  assert.equal(actual.length, 58);
-  assert.equal(new Set(actual).size, 58);
+  assert.ok(actual.length >= 65);
+  assert.equal(new Set(actual).size, actual.length);
   const expected = Object.entries(spec.paths).flatMap(([path, ops]) =>
     Object.keys(ops).map((m) => m.toUpperCase() + " " + path),
   );
-  assert.equal(expected.length, 59);
+  assert.equal(expected.length, actual.length+1);
   assert.deepEqual(
     expected.filter((x) => !actual.includes(x)),
     ["POST /v1/payment-callbacks/{channel_id}"],

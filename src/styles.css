@@ -1036,3 +1036,5 @@ footer {
 .page-heading h1 {
   margin-top: 0;
 }
+
+.review-filters,.review-actions{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin:18px 0}.review-filters label{display:grid;gap:6px}.review-workspace textarea{display:block;min-height:70px;width:min(600px,100%)}.review-table{overflow:auto}.review-table table{width:100%;border-collapse:collapse}.review-table td,.review-table th{text-align:left;padding:14px;border-bottom:1px solid #e3e7ed;vertical-align:top}.review-table small{display:block;color:#697386;max-width:250px;overflow-wrap:anywhere}.review-table button{margin:3px}.review-editor{padding:22px;background:#f3f7ff;border:1px solid #ccd9ec;margin-top:20px}.review-editor label{display:block;margin:12px 0}
