@@ -30,9 +30,11 @@ const names: Record<string, string> = {
 export function MemberCommissions({
   session,
   onExpired,
+  disabled = false,
 }: {
   session: Session;
   onExpired: () => void;
+  disabled?: boolean;
 }) {
   const [rows, setRows] = useState<Statement[]>([]),
     [next, setNext] = useState<string | null>(null),
@@ -158,7 +160,7 @@ export function MemberCommissions({
                 {names[o.claim_status] || o.claim_status}
               </span>
               {o.claim_status === "CLAIMABLE" && (
-                <button disabled={busy} onClick={() => claim(o)}>
+                <button disabled={busy || disabled} onClick={() => claim(o)}>
                   领取佣金
                 </button>
               )}

@@ -5,6 +5,21 @@ export type ApiOptions = {
   key?: string;
   totp?: string;
 };
+const messages: Record<string, string> = {
+  SITE_AGENT_DISABLED: "代理奖励与领取已暂停，请稍后再试。",
+  STATE_CONFLICT: "当前状态不允许此操作，已有邀请归属不能更改。",
+  REVISION_CONFLICT: "记录已更新，请刷新后重试。",
+  STALE_APPROVAL: "审核依据已更新，请刷新并重新确认。",
+  INSUFFICIENT_BALANCE: "可用佣金余额不足。",
+  FUNDS_FROZEN: "相关佣金暂被冻结，请联系管理员。",
+  PERMISSION_DENIED: "当前账号暂无此操作权限。",
+  NOT_FOUND: "记录不存在或不属于当前账号。",
+  TOTP_REQUIRED: "请输入本人谷歌验证码。",
+  TOTP_INVALID: "谷歌验证码不正确或已过期。",
+  TOTP_REPLAY: "此验证码已用于其他操作，请等待新验证码。",
+  TOTP_RATE_LIMITED: "验证码尝试过于频繁，请稍后重试。",
+  TOTP_NOT_CONFIGURED: "尚未配置本人谷歌验证，请联系管理员完成绑定。",
+};
 export class ApiError extends Error {
   data: any;
   status = 0;
@@ -27,7 +42,9 @@ export async function request(
   const type = r.headers.get("content-type") || "";
   const data = type.includes("json") ? await r.json() : await r.text();
   if (!r.ok) {
-    const e = new ApiError(data?.error?.message || "请求未完成");
+    const e = new ApiError(
+      messages[data?.error?.code] || data?.error?.message || "请求未完成",
+    );
     e.data = data;
     e.status = r.status;
     e.requestId = r.headers.get("x-request-id") || data?.request_id;

@@ -10,6 +10,7 @@ import { ResourceIndex } from "./modules/ResourceIndex";
 import { CommissionReview } from "./modules/finance/CommissionReview";
 import { SiteAgentConfig } from "./modules/sites/SiteAgentConfig";
 import { AgentDirectory } from "./modules/agents/AgentDirectory";
+import { MemberPortal } from "./modules/member/MemberPortal";
 import { MemberCommissions } from "./modules/finance/MemberCommissions";
 export default function App() {
   const [session, setSession] = useState<Session | null>(null),
@@ -53,28 +54,21 @@ export default function App() {
   if (!session) return <Login onLogin={setSession} />;
   if (session.role === "member")
     return (
-      <main className="review-workspace">
-        <h1>我的佣金</h1>
-        <button
-          onClick={async () => {
-            try {
-              await request("/auth/logout", {
-                method: "POST",
-                body: {},
-                csrf: session.csrf,
-              });
-            } finally {
-              setSession(null);
-            }
-          }}
-        >
-          退出登录
-        </button>
-        <MemberCommissions
-          session={session}
-          onExpired={() => setSession(null)}
-        />
-      </main>
+      <MemberPortal
+        session={session}
+        onExpired={() => setSession(null)}
+        onLogout={async () => {
+          try {
+            await request("/auth/logout", {
+              method: "POST",
+              body: {},
+              csrf: session.csrf,
+            });
+          } finally {
+            setSession(null);
+          }
+        }}
+      />
     );
   const sectionOps = operations.filter(
     (o) => o.section === op.section && o.group === op.group,

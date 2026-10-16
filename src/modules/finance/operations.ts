@@ -98,4 +98,16 @@ export const financeOperations: string[][] = [
   ["finance", "会员佣金", "真金钱包", "GET", "/v1/me/wallets"],
   ["finance", "会员佣金", "钱包交易历史", "GET", "/v1/me/wallet-transactions"],
   ["finance", "会员佣金", "钱包账变记录", "GET", "/v1/me/wallet-changes"],
+  ["finance", "会员佣金", "本人收益汇总", "GET", "/v1/me/earnings"],
+  ["finance", "会员佣金", "本人推荐奖励", "GET", "/v1/me/rewards"],
+  ["finance", "会员佣金", "已生效代理规则", "GET", "/v1/me/agent-rules"],
+  ["finance", "会员佣金", "读取本人邀请链接", "GET", "/v1/me/referral-link"],
+  ["finance", "会员佣金", "生成本人邀请链接", "POST", "/v1/me/referral-links"],
+  [
+    "finance",
+    "会员佣金",
+    "确认本人邀请归属",
+    "POST",
+    "/v1/me/referral-binding",
+  ],
 ];

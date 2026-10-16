@@ -55,6 +55,23 @@ try {
         json: { data: { instruction_id: "i1", claim_status: "PROCESSING" } },
       });
     }
+    if (url.pathname === "/v1/me/agent-rules")
+      return route.fulfill({
+        json: {
+          data: {
+            rows: [],
+            agent_enabled: true,
+            configured: true,
+            is_agent: true,
+          },
+        },
+      });
+    if (url.pathname === "/v1/me/rewards")
+      return route.fulfill({
+        json: { data: { rows: [], next_after_id: null } },
+      });
+    if (url.pathname === "/v1/me/earnings")
+      return route.fulfill({ json: { data: { rows: [] } } });
     if (url.pathname === "/v1/me/wallets")
       return route.fulfill({
         json: {
@@ -122,6 +139,7 @@ try {
     });
   });
   await p.goto(base);
+  await p.getByRole("button", { name: "我的收益", exact: true }).click();
   assert.equal(
     await p.getByRole("button", { name: "查询列表", exact: true }).count(),
     0,
