@@ -20,9 +20,6 @@ export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
           管理系统
         </h1>
         <p>方案、代理、结算与付款</p>
-        <div className="login-flow">
-          方案配置 / 佣金结算 / 审批管理 / 数据报表
-        </div>
       </div>
       <form
         className="login-card"
@@ -79,7 +76,6 @@ export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
         <button className="primary full" disabled={busy}>
           {busy ? "登录中…" : "登录"}
         </button>
-        <small>测试环境。申请与审批由不同账号操作。</small>
       </form>
     </div>
   );
