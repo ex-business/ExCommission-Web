@@ -1,0 +1,361 @@
+{
+  "time": "2026-10-16T05:40:57.345Z",
+  "mode": "浏览器请求序列化及OpenAPI输入校验；全部拦截，不发送后端，不代表领域集成验收",
+  "cases": [
+    {
+      "case": "修订草稿",
+      "method": "PUT",
+      "path": "/v1/plans/{id}/draft",
+      "result": "PASS"
+    },
+    {
+      "case": "试算验证",
+      "method": "POST",
+      "path": "/v1/simulations",
+      "result": "PASS"
+    },
+    {
+      "case": "申请发布",
+      "method": "POST",
+      "path": "/v1/plans/{id}/publication-requests",
+      "result": "PASS"
+    },
+    {
+      "case": "版本列表",
+      "method": "GET",
+      "path": "/v1/plans/{id}/versions",
+      "result": "PASS"
+    },
+    {
+      "case": "版本详情",
+      "method": "GET",
+      "path": "/v1/plans/{id}/versions/{version_id}",
+      "result": "PASS"
+    },
+    {
+      "case": "申请回退",
+      "method": "POST",
+      "path": "/v1/plans/{id}/rollback-requests",
+      "result": "PASS"
+    },
+    {
+      "case": "查找用户",
+      "method": "GET",
+      "path": "/v1/users/lookup",
+      "result": "PASS"
+    },
+    {
+      "case": "同步用户",
+      "method": "POST",
+      "path": "/v1/user-sync-jobs",
+      "result": "PASS"
+    },
+    {
+      "case": "同步结果",
+      "method": "GET",
+      "path": "/v1/user-sync-jobs/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "创建代理",
+      "method": "POST",
+      "path": "/v1/agents",
+      "result": "PASS"
+    },
+    {
+      "case": "代理详情",
+      "method": "GET",
+      "path": "/v1/agents/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "历史祖先链",
+      "method": "GET",
+      "path": "/v1/agents/{id}/ancestors",
+      "result": "PASS"
+    },
+    {
+      "case": "申请关系迁移",
+      "method": "POST",
+      "path": "/v1/relationship-change-requests",
+      "result": "PASS"
+    },
+    {
+      "case": "申请资格变更",
+      "method": "POST",
+      "path": "/v1/grade-change-requests",
+      "result": "PASS"
+    },
+    {
+      "case": "等级评估",
+      "method": "POST",
+      "path": "/v1/grade-evaluations",
+      "result": "PASS"
+    },
+    {
+      "case": "申请状态变更",
+      "method": "POST",
+      "path": "/v1/agent-status-change-requests",
+      "result": "PASS"
+    },
+    {
+      "case": "接收沙箱事件",
+      "method": "POST",
+      "path": "/v1/events",
+      "result": "PASS"
+    },
+    {
+      "case": "事件详情",
+      "method": "GET",
+      "path": "/v1/events/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "计算任务",
+      "method": "GET",
+      "path": "/v1/calculation-tasks/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "计算轨迹",
+      "method": "GET",
+      "path": "/v1/calculation-tasks/{id}/trace",
+      "result": "PASS"
+    },
+    {
+      "case": "恢复原任务",
+      "method": "POST",
+      "path": "/v1/calculation-tasks/{id}/resume",
+      "result": "PASS"
+    },
+    {
+      "case": "权益明细",
+      "method": "GET",
+      "path": "/v1/entitlements/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "生成结算",
+      "method": "POST",
+      "path": "/v1/statement-runs",
+      "result": "PASS"
+    },
+    {
+      "case": "结算详情",
+      "method": "GET",
+      "path": "/v1/statements/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "提交结算审批",
+      "method": "POST",
+      "path": "/v1/statements/{id}/submission",
+      "result": "PASS"
+    },
+    {
+      "case": "创建沙箱付款",
+      "method": "POST",
+      "path": "/v1/payments",
+      "result": "PASS"
+    },
+    {
+      "case": "付款详情",
+      "method": "GET",
+      "path": "/v1/payments/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "核验原付款",
+      "method": "POST",
+      "path": "/v1/payments/{id}/verification",
+      "result": "PASS"
+    },
+    {
+      "case": "发起对账",
+      "method": "POST",
+      "path": "/v1/reconciliation-runs",
+      "result": "PASS"
+    },
+    {
+      "case": "审批详情",
+      "method": "GET",
+      "path": "/v1/approvals/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "审批决定",
+      "method": "POST",
+      "path": "/v1/approvals/{id}/decisions",
+      "result": "PASS"
+    },
+    {
+      "case": "撤回申请",
+      "method": "POST",
+      "path": "/v1/approvals/{id}/cancellation",
+      "result": "PASS"
+    },
+    {
+      "case": "恢复审批执行",
+      "method": "POST",
+      "path": "/v1/approvals/{id}/execution-retries",
+      "result": "PASS"
+    },
+    {
+      "case": "提交累计退款",
+      "method": "POST",
+      "path": "/v1/refunds",
+      "result": "PASS"
+    },
+    {
+      "case": "退款详情",
+      "method": "GET",
+      "path": "/v1/refunds/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "债务详情",
+      "method": "GET",
+      "path": "/v1/debts/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "申请追回",
+      "method": "POST",
+      "path": "/v1/recovery-requests",
+      "result": "PASS"
+    },
+    {
+      "case": "事实修订历史",
+      "method": "GET",
+      "path": "/v1/calculation-tasks/{id}/adjustments",
+      "result": "PASS"
+    },
+    {
+      "case": "申请事实更正",
+      "method": "POST",
+      "path": "/v1/adjustment-requests",
+      "result": "PASS"
+    },
+    {
+      "case": "冻结权益",
+      "method": "POST",
+      "path": "/v1/risk-holds",
+      "result": "PASS"
+    },
+    {
+      "case": "冻结详情",
+      "method": "GET",
+      "path": "/v1/risk-holds/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "提交申诉",
+      "method": "POST",
+      "path": "/v1/risk-holds/{id}/appeals",
+      "result": "PASS"
+    },
+    {
+      "case": "申请解除冻结",
+      "method": "POST",
+      "path": "/v1/risk-holds/{id}/release-requests",
+      "result": "PASS"
+    },
+    {
+      "case": "查询报表",
+      "method": "GET",
+      "path": "/v1/reports/{kind}",
+      "result": "PASS"
+    },
+    {
+      "case": "创建导出",
+      "method": "POST",
+      "path": "/v1/report-exports",
+      "result": "PASS"
+    },
+    {
+      "case": "导出详情",
+      "method": "GET",
+      "path": "/v1/report-exports/{id}",
+      "result": "PASS"
+    },
+    {
+      "case": "下载快照",
+      "method": "GET",
+      "path": "/v1/report-exports/{id}/download",
+      "result": "PASS"
+    },
+    {
+      "case": "主体权限",
+      "method": "GET",
+      "path": "/v1/identity/subjects/{id}/permissions",
+      "result": "PASS"
+    },
+    {
+      "case": "申请权限变更",
+      "method": "POST",
+      "path": "/v1/permission-change-requests",
+      "result": "PASS"
+    },
+    {
+      "case": "审计日志",
+      "method": "GET",
+      "path": "/v1/audit-logs",
+      "result": "PASS"
+    },
+    {
+      "case": "安全事件处理",
+      "method": "POST",
+      "path": "/v1/security-events/{id}/handling-records",
+      "result": "PASS"
+    },
+    {
+      "case": "当前目录",
+      "method": "GET",
+      "path": "/v1/platform/catalogs",
+      "result": "PASS"
+    },
+    {
+      "case": "组件与连接",
+      "method": "GET",
+      "path": "/v1/platform/components",
+      "result": "PASS"
+    },
+    {
+      "case": "申请设置变更",
+      "method": "POST",
+      "path": "/v1/platform-setting-requests",
+      "result": "PASS"
+    },
+    {
+      "case": "本地通知",
+      "method": "GET",
+      "path": "/v1/notifications",
+      "result": "PASS"
+    }
+  ],
+  "continued_from_index": 3,
+  "prior_execution": {
+    "reason": "首轮前三项通过；修订草稿测试数据中的最低付款填值修正后，从第四项续跑，未重复前三项。",
+    "cases": [
+      {
+        "case": "创建方案",
+        "method": "POST",
+        "path": "/v1/plans",
+        "result": "PASS"
+      },
+      {
+        "case": "读取方案",
+        "method": "GET",
+        "path": "/v1/plans/{id}",
+        "result": "PASS"
+      },
+      {
+        "case": "读取草稿",
+        "method": "GET",
+        "path": "/v1/plans/{id}/draft",
+        "result": "PASS"
+      }
+    ]
+  },
+  "total_unique_passed": 58
+}

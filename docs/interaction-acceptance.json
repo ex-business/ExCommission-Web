@@ -1,0 +1,54 @@
+{
+  "time": "2026-10-16T05:37:28.644Z",
+  "mode": "浏览器桩协议，付款请求被拦截，不发送后端",
+  "cases": [
+    {
+      "case": "规则结构切换 / PERCENT",
+      "result": "PASS"
+    },
+    {
+      "case": "规则结构切换 / FIXED",
+      "result": "PASS"
+    },
+    {
+      "case": "规则结构切换 / UNIT_PRICE",
+      "result": "PASS"
+    },
+    {
+      "case": "规则结构切换 / INDEPENDENT",
+      "result": "PASS"
+    },
+    {
+      "case": "规则结构切换 / DIFFERENTIAL",
+      "result": "PASS"
+    },
+    {
+      "case": "规则结构切换 / MARGINAL",
+      "result": "PASS"
+    },
+    {
+      "case": "规则结构切换 / HIGHEST_RATE",
+      "result": "PASS"
+    },
+    {
+      "case": "规则结构切换 / WEIGHTED",
+      "result": "PASS"
+    },
+    {
+      "case": "缺失字段不得进入提交核对",
+      "result": "PASS"
+    },
+    {
+      "case": "桩协议 / 超大金额字符串无精度损失 / UNKNOWN不冒充成功",
+      "result": "PASS"
+    },
+    {
+      "case": "桩协议 / 刷新后原输入沿用原幂等键 / 仅存摘要不存载荷",
+      "result": "PASS"
+    },
+    {
+      "case": "桩协议 / 修订冲突如实展示并清除旧结果",
+      "result": "PASS"
+    }
+  ]
+}

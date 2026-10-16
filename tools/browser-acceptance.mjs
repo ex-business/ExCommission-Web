@@ -1,7 +1,7 @@
 import { chromium } from "@playwright/test";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import assert from "node:assert/strict";
-import {fileURLToPath} from "node:url";
+import { fileURLToPath } from "node:url";
 const root = new URL("../", import.meta.url);
 const env = Object.fromEntries(
   (await readFile(new URL(".env", root), "utf8"))
@@ -58,55 +58,56 @@ try {
         text
           .slice(text.indexOf("=") + 1)
           .trim()
-          .replace(/;$/, "").replace(/,\s*([\]}])/g,"$1"),
+          .replace(/;$/, "")
+          .replace(/,\s*([\]}])/g, "$1"),
       ),
     );
   }
-  if(!process.env.WEB_TEST_SKIP_BASELINE){
-  for (const [group, section, title] of definitions) {
-    await select(title);
-    assert.equal(await page.locator(".editor h2").innerText(), title);
-    assert.equal(
-      await page
-        .locator("body")
-        .innerText()
-        .then((t) => t.includes("undefined")),
-      false,
-      "undefined on " + title,
-    );
-    evidence.push({
-      case: "操作页面 / " + group + " / " + title,
-      result: "PASS",
-    });
-  }
-  // 实际只读接口，不修改现有业务数据。
-  for (const title of ["当前目录", "组件与连接", "本地通知", "审计日志"]) {
-    await select(title);
+  if (!process.env.WEB_TEST_SKIP_BASELINE) {
+    for (const [group, section, title] of definitions) {
+      await select(title);
+      assert.equal(await page.locator(".editor h2").innerText(), title);
+      assert.equal(
+        await page
+          .locator("body")
+          .innerText()
+          .then((t) => t.includes("undefined")),
+        false,
+        "undefined on " + title,
+      );
+      evidence.push({
+        case: "操作页面 / " + group + " / " + title,
+        result: "PASS",
+      });
+    }
+    // 实际只读接口，不修改现有业务数据。
+    for (const title of ["当前目录", "组件与连接", "本地通知", "审计日志"]) {
+      await select(title);
+      await page.getByRole("button", { name: "查询", exact: true }).click();
+      await page.locator(".request-id").waitFor();
+      assert.equal(await page.locator(".error-box").count(), 0, title);
+      evidence.push({ case: "真实后端查询 / " + title, result: "PASS" });
+    }
+    await select("查询报表");
     await page.getByRole("button", { name: "查询", exact: true }).click();
     await page.locator(".request-id").waitFor();
-    assert.equal(await page.locator(".error-box").count(), 0, title);
-    evidence.push({ case: "真实后端查询 / " + title, result: "PASS" });
-  }
-  await select("查询报表");
-  await page.getByRole("button", { name: "查询", exact: true }).click();
-  await page.locator(".request-id").waitFor();
-  assert.equal(await page.locator(".error-box").count(), 0);
-  await page.screenshot({
-    path: fileURLToPath(new URL("报表页面.png", output)),
-    fullPage: true,
-  });
-  evidence.push({ case: "真实报表与不可用指标说明", result: "PASS" });
-  await select("审批决定");
-  await page.getByLabel("资源编号", { exact: true }).fill("missing-approval");
-  await page.getByLabel("审批对象摘要", { exact: true }).fill("missing-hash");
-  await page
-    .getByLabel("业务原因", { exact: true })
-    .fill("页面验收：不存在资源必须明确失败");
-  await page.getByRole("button", { name: "核对并提交" }).click();
-  await page.getByRole("dialog").waitFor();
-  await page.getByRole("button", { name: "返回修改", exact: true }).click();
-  assert.equal(await page.getByRole("dialog").count(), 0);
-  evidence.push({ case: "写操作提交前核对与取消", result: "PASS" });
+    assert.equal(await page.locator(".error-box").count(), 0);
+    await page.screenshot({
+      path: fileURLToPath(new URL("报表页面.png", output)),
+      fullPage: true,
+    });
+    evidence.push({ case: "真实报表与不可用指标说明", result: "PASS" });
+    await select("审批决定");
+    await page.getByLabel("资源编号", { exact: true }).fill("missing-approval");
+    await page.getByLabel("审批对象摘要", { exact: true }).fill("missing-hash");
+    await page
+      .getByLabel("业务原因", { exact: true })
+      .fill("页面验收：不存在资源必须明确失败");
+    await page.getByRole("button", { name: "核对并提交" }).click();
+    await page.getByRole("dialog").waitFor();
+    await page.getByRole("button", { name: "返回修改", exact: true }).click();
+    assert.equal(await page.getByRole("dialog").count(), 0);
+    evidence.push({ case: "写操作提交前核对与取消", result: "PASS" });
   }
   // 合同验收：仅新增一个唯一编号的沙箱草稿，不修改既有对象或账务。
   const plan = "web-qa-" + Date.now();
@@ -208,7 +209,14 @@ try {
     path: fileURLToPath(new URL("验收故障定位.png", output)),
     fullPage: true,
   });
-  await writeFile(new URL("docs/browser-progress.json",root),JSON.stringify({time:new Date().toISOString(),cases:evidence,error:String(e)},null,2));
+  await writeFile(
+    new URL("docs/browser-progress.json", root),
+    JSON.stringify(
+      { time: new Date().toISOString(), cases: evidence, error: String(e) },
+      null,
+      2,
+    ),
+  );
   console.error(e);
   process.exitCode = 1;
 } finally {

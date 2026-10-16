@@ -1,3 +1,4 @@
+import { commandKey } from "../lib/idempotency";
 import { steps, PlanStep } from "./plans/PlanStep";
 import { nextActions } from "./workflow";
 import { notes, defaults } from "./formDefaults";
@@ -52,9 +53,6 @@ export function OperationPanel({
     [step, setStep] = useState(0),
     [json, setJson] = useState(false),
     [requestId, setRequestId] = useState<string | null>(null);
-  const command = useRef<{ fingerprint: string; key: string } | undefined>(
-    undefined,
-  );
   const mounted = useRef(true);
   useEffect(
     () => () => {
@@ -72,7 +70,6 @@ export function OperationPanel({
     setResult(undefined);
     setError(undefined);
     setErrors([]);
-    command.current = undefined;
   };
   function prepare() {
     const problems: string[] = [];
@@ -93,6 +90,8 @@ export function OperationPanel({
     setConfirm(false);
     setBusy(true);
     setError(undefined);
+    setResult(undefined);
+    setRequestId(null);
     let path = op.path;
     const query = new URLSearchParams();
     for (const p of parameters) {
@@ -104,15 +103,17 @@ export function OperationPanel({
       }
     }
     if (query.size) path += "?" + query;
-    const fingerprint = op.key + path + JSON.stringify(body);
-    if (!command.current || command.current.fingerprint !== fingerprint)
-      command.current = { fingerprint, key: crypto.randomUUID() };
+    const key = await commandKey(
+      session.subject,
+      op.key,
+      path + JSON.stringify(body),
+    );
     try {
       const r = await request("/api" + path, {
         method: op.method,
         body: op.method === "GET" ? undefined : body,
         csrf: session.csrf,
-        key: command.current.key,
+        key,
       });
       if (!mounted.current) return;
       setRequestId(r.requestId);
@@ -298,7 +299,7 @@ export function OperationPanel({
           </div>
           <small className="muted">
             {op.method !== "GET"
-              ? "未修改输入的重试沿用同一幂等键；冲突先读取原资源，禁止盲目换键。"
+              ? "原输入重试沿用会话内同一幂等键；刷新后重新输入原内容仍可核验。冲突先读取原资源。"
               : "编号查询只返回当前授权资源。"}
           </small>
         </form>
