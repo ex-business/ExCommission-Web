@@ -112,8 +112,8 @@ async function fill() {
 }
 try {
   await p.goto(base);
-  await p.getByLabel("本地登录口令").fill(env.WEB_OPERATOR_PASSWORD);
-  await p.getByRole("button", { name: "进入工作台 →" }).click();
+  await p.getByLabel("登录密码").fill(env.WEB_OPERATOR_PASSWORD);
+  await p.getByRole("button", { name: "登录" }).click();
   for (current of ops.slice(Number(process.env.WEB_TEST_START || 0))) {
     const [, , title, method] = current;
     seen = false;

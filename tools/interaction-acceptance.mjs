@@ -31,8 +31,8 @@ async function submit() {
 }
 try {
   await p.goto(base);
-  await p.getByLabel("本地登录口令").fill(env.WEB_OPERATOR_PASSWORD);
-  await p.getByRole("button", { name: "进入工作台 →" }).click();
+  await p.getByLabel("登录密码").fill(env.WEB_OPERATOR_PASSWORD);
+  await p.getByRole("button", { name: "登录" }).click();
   await p.getByLabel("搜索功能").waitFor();
   await p.getByRole("button", { name: /收益规则/ }).click();
   const union = p.getByLabel("收益规则 1配置类型", { exact: true });

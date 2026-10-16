@@ -16,8 +16,8 @@ export function ResourceIndex({
       onToggle={(e) => setOpen(e.currentTarget.open)}
     >
       <summary>
-        本浏览器资源索引 <span className="badge">{entries.length}</span>
-        <span className="muted">仅记录已操作资源，不代表全量列表</span>
+        最近访问 <span className="badge">{entries.length}</span>
+        <span className="muted">仅显示当前浏览器访问过的记录</span>
       </summary>
       <div className="index-content">
         {entries.length ? (
@@ -38,12 +38,12 @@ export function ResourceIndex({
                 setOpen(false);
               }}
             >
-              清除本浏览器索引
+              清除访问记录
             </button>
           </>
         ) : (
           <p className="muted">
-            暂无资源。完成查询或创建后将记录资源编号，业务数据仍以后端为准。
+            暂无访问记录。查询或新建记录后，可在这里再次打开。
           </p>
         )}
       </div>

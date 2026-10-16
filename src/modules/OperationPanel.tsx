@@ -265,14 +265,14 @@ export function OperationPanel({
               schema={schema}
               value={body}
               onChange={setBody}
-              name="业务内容"
+              name="填写信息"
             />
           )}
           {!schema && !parameters.length && (
             <div className="empty">
               <div className="empty-icon">◎</div>
               <p>读取当前授权范围内的{op.title}</p>
-              <small>不会使用演示数据填充结果</small>
+              <small>点击查询查看记录</small>
             </div>
           )}
           {errors.length > 0 && (
@@ -299,15 +299,15 @@ export function OperationPanel({
           </div>
           <small className="muted">
             {op.method !== "GET"
-              ? "原输入重试沿用会话内同一幂等键；刷新后重新输入原内容仍可核验。冲突先读取原资源。"
-              : "编号查询只返回当前授权资源。"}
+              ? "重复提交相同内容不会重复处理。提示版本冲突时，请重新查询后再操作。"
+              : "请输入编号查询记录。"}
           </small>
         </form>
       </section>
       <section className="panel result-panel" aria-live="polite">
         <div className="panel-heading">
           <div>
-            <span className="eyebrow">服务端事实</span>
+            <span className="eyebrow">查询与操作记录</span>
             <h2>处理结果</h2>
           </div>
           {result && (
@@ -316,11 +316,11 @@ export function OperationPanel({
             </button>
           )}
         </div>
-        {busy && <div className="loading">正在读取服务端结果…</div>}
+        {busy && <div className="loading">查询中…</div>}
         {error && (
           <div className="error-box" role="alert">
             <ResultView value={error} />
-            <p>保留原资源、摘要和幂等键核验。失败不会显示为已生效。</p>
+            <p>请根据提示检查记录后再操作。付款结果未知时，请查询原付款单。</p>
           </div>
         )}
         {result ? (
@@ -335,7 +335,7 @@ export function OperationPanel({
             <div className="empty">
               <div className="empty-icon">▤</div>
               <p>等待查询或提交</p>
-              <small>修订、摘要、执行状态以实际响应为准</small>
+              <small>查询或提交后，结果显示在这里</small>
             </div>
           )
         )}
@@ -368,9 +368,12 @@ export function OperationPanel({
             aria-labelledby="confirm-title"
           >
             <h2 id="confirm-title">核对{op.title}</h2>
-            <p>当前身份：{session.subject} · 本地沙箱</p>
+            <p>
+              当前身份：
+              {session.role === "operator" ? "业务申请人" : "独立审批人"}
+            </p>
             <p className="info">
-              提交将由后端鉴权并执行。审批申请需由另一主体处理；付款仅为本地沙箱。
+              请确认以下内容。需要审批的操作，提交后由审批人处理。
             </p>
             <ResultView value={{ ...params, ...body }} />
             <div className="form-actions">

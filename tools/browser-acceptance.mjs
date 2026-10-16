@@ -32,9 +32,9 @@ async function login(role = "operator") {
   await page.goto(base);
   await page.getByLabel("登录身份").selectOption(role);
   await page
-    .getByLabel("本地登录口令")
+    .getByLabel("登录密码")
     .fill(env["WEB_" + role.toUpperCase() + "_PASSWORD"]);
-  await page.getByRole("button", { name: "进入工作台 →" }).click();
+  await page.getByRole("button", { name: "登录" }).click();
   await page.getByLabel("搜索功能").waitFor();
 }
 try {
@@ -168,8 +168,8 @@ try {
   evidence.push({ case: "真实报表快照 / 查询 / 鉴权下载", result: "PASS" });
   await page.getByRole("button", { name: "退出 / 切换身份" }).click();
   await page.getByLabel("登录身份").selectOption("approver");
-  await page.getByLabel("本地登录口令").fill(env.WEB_APPROVER_PASSWORD);
-  await page.getByRole("button", { name: "进入工作台 →" }).click();
+  await page.getByLabel("登录密码").fill(env.WEB_APPROVER_PASSWORD);
+  await page.getByRole("button", { name: "登录" }).click();
   await page.getByLabel("搜索功能").waitFor();
   await select("当前目录");
   await page.getByRole("button", { name: "查询", exact: true }).click();

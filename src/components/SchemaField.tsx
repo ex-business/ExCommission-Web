@@ -59,7 +59,7 @@ function JsonField({
           {error}
         </span>
       )}
-      <small>按代理编号或结构化事实录入；不填写凭据。</small>
+      <small>按代理编号填写对应信息。</small>
     </label>
   );
 }
@@ -159,7 +159,7 @@ export function SchemaField({
       <label className="field">
         {title}
         <input aria-label={title} value={String(s.const ?? "null")} readOnly />
-        <small>V1 固定约束</small>
+        <small>固定设置</small>
       </label>
     );
   if (s.type === "object" && s.properties)

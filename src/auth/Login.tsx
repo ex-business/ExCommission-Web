@@ -13,17 +13,15 @@ export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
   return (
     <div className="login-page">
       <div className="login-brand">
-        <div className="logo">
-          E<span>↗</span>
-        </div>
+        <div className="logo">佣</div>
         <h1>
-          让每一笔佣金
+          佣金分润
           <br />
-          有据可循。
+          管理系统
         </h1>
-        <p>ExCommission</p>
+        <p>方案、代理、结算与付款</p>
         <div className="login-flow">
-          业务事实 → 规则计算 → 结算审批 → 付款核验
+          方案配置 / 佣金结算 / 审批管理 / 数据报表
         </div>
       </div>
       <form
@@ -49,9 +47,9 @@ export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
           }
         }}
       >
-        <span className="eyebrow">本地管理工作台</span>
-        <h2>登录 ExCommission</h2>
-        <p className="muted">本地双身份沙箱 · 独立申请与审批</p>
+        <span className="eyebrow">管理后台</span>
+        <h2>账号登录</h2>
+        <p className="muted">请选择身份并输入登录密码</p>
         <label className="field">
           登录身份
           <select
@@ -64,9 +62,9 @@ export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
           </select>
         </label>
         <label className="field">
-          本地登录口令
+          登录密码
           <input
-            aria-label="本地登录口令"
+            aria-label="登录密码"
             type="password"
             autoComplete="current-password"
             required
@@ -80,12 +78,9 @@ export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
           </p>
         )}
         <button className="primary full" disabled={busy}>
-          {busy ? "登录中…" : "进入工作台 →"}
+          {busy ? "登录中…" : "登录"}
         </button>
-        <small>
-          口令位于本项目本地 .env 的 WEB_OPERATOR_PASSWORD /
-          WEB_APPROVER_PASSWORD。登录后不向浏览器暴露后端令牌。
-        </small>
+        <small>测试环境。申请与审批由不同账号操作。</small>
       </form>
     </div>
   );

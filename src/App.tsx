@@ -79,9 +79,7 @@ export default function App() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <span className="muted">
-          {operations.length} 项管理操作 · 1 项渠道回调独立接入
-        </span>
+        <span className="muted"></span>
       </div>
       {search && (
         <div className="search-results">

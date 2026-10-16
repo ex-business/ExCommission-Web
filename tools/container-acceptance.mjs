@@ -24,8 +24,8 @@ const errors = [];
 p.on("pageerror", (e) => errors.push(e.message));
 try {
   await p.goto(base);
-  await p.getByLabel("本地登录口令").fill(env.WEB_OPERATOR_PASSWORD);
-  await p.getByRole("button", { name: "进入工作台 →" }).click();
+  await p.getByLabel("登录密码").fill(env.WEB_OPERATOR_PASSWORD);
+  await p.getByRole("button", { name: "登录" }).click();
   await p.getByLabel("搜索功能").fill("当前目录");
   await p.locator(".search-results button").click();
   await p.getByRole("button", { name: "查询", exact: true }).click();

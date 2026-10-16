@@ -19,14 +19,12 @@ export function Layout({
     <div className="app-shell">
       <aside className="sidebar">
         <a className="brand" href="#plans">
-          <span className="logo small-logo">
-            E<span>↗</span>
-          </span>
+          <span className="logo small-logo">佣</span>
           <span>
-            ExCommission<small>佣金与分润管理</small>
+            佣金分润<small>管理系统</small>
           </span>
         </a>
-        <div className="nav-label">工作空间</div>
+        <div className="nav-label">管理后台</div>
         <nav aria-label="主导航">
           {groups.map((g) => (
             <div className="nav-group" key={g.id}>
@@ -71,21 +69,21 @@ export function Layout({
           ))}
         </nav>
         <div className="sidebar-footer">
-          <span className="status-dot" /> 本地沙箱环境
+          <span className="status-dot" /> 本地测试环境
           <small>
-            UTC 日历 · 双身份审批
+            结算时区：UTC
             <br />
-            真实身份与银行渠道未接入
+            付款仅用于测试
           </small>
         </div>
       </aside>
       <div className="main-shell">
         <header className="topbar">
           <span>
-            工作空间 <span className="muted"> / </span> {group.name}
+            管理后台 <span className="muted"> / </span> {group.name}
           </span>
           <div>
-            <span className="scope-pill">local-sandbox / commission</span>
+            <span className="scope-pill">本地应用</span>
             <span className="avatar">
               {session.role === "operator" ? "申" : "审"}
             </span>
@@ -100,16 +98,14 @@ export function Layout({
         <main>
           <div className="page-heading">
             <div>
-              <span className="eyebrow">EXCOMMISSION / V1</span>
               <h1>{op.section}</h1>
               <p>{group.desc}</p>
             </div>
-            <span className="badge local-badge">● 本地沙箱</span>
+            <span className="badge local-badge">● 测试环境</span>
           </div>
           {children}
           <footer>
-            ExCommission-Web · 标准 V1{" "}
-            <span>批准不等于执行成功 · 沙箱结果不代表真实银行到账</span>
+            佣金分润管理系统 <span></span>
           </footer>
         </main>
       </div>
