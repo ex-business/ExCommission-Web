@@ -1,0 +1,26 @@
+{
+  "time": "2026-10-16T05:41:56.038Z",
+  "base": "http://127.0.0.1:18180",
+  "cases": [
+    {
+      "case": "容器HTTP健康",
+      "result": "PASS"
+    },
+    {
+      "case": "容器匿名请求隔离",
+      "result": "PASS"
+    },
+    {
+      "case": "容器浏览器登录与Go后端目录联通",
+      "result": "PASS"
+    },
+    {
+      "case": "容器会话刷新与HttpOnly Cookie",
+      "result": "PASS"
+    },
+    {
+      "case": "生产构建脚本与严格CSP兼容",
+      "result": "PASS"
+    }
+  ]
+}

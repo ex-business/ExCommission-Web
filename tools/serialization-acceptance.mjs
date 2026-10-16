@@ -164,15 +164,13 @@ try {
   console.error("操作：" + current?.[2], e);
   console.error(await p.locator(".error-box").allTextContents());
   console.error(
-    await p
-      .locator(".editor input:invalid")
-      .evaluateAll((xs) =>
-        xs.map((x) => ({
-          name: x.getAttribute("aria-label"),
-          value: x.value,
-          reason: x.validationMessage,
-        })),
-      ),
+    await p.locator(".editor input:invalid").evaluateAll((xs) =>
+      xs.map((x) => ({
+        name: x.getAttribute("aria-label"),
+        value: x.value,
+        reason: x.validationMessage,
+      })),
+    ),
   );
   await writeFile(
     new URL("docs/serialization-progress.json", root),
