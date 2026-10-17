@@ -1,3 +1,4 @@
+import { CommissionRuleSummary } from "../../affiliate/CommissionRuleSummary";
 import { useState } from "react";
 import { toMinor } from "../../affiliate/money";
 import { useMemberLocale } from "./locale";
@@ -66,7 +67,9 @@ export function PublishedRules({ presentation }: { presentation: Row }) {
           </tbody>
         </table>
       </div>
-      <h3>{t("等级与三层返佣比例")}</h3>
+      <h3>
+        {t(c.commission_policy ? "等级与返佣规则" : "等级与三层返佣比例")}
+      </h3>
       <div className="table-wrap">
         <table>
           <thead>
@@ -74,7 +77,9 @@ export function PublishedRules({ presentation }: { presentation: Row }) {
               <th>{t("等级")}</th>
               <th>{t("有效直属")}</th>
               <th>{t("日有效业务量")}</th>
-              <th>{t("一级 / 二级 / 三级")}</th>
+              <th>
+                {t(c.commission_policy ? "返佣规则" : "一级 / 二级 / 三级")}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -84,9 +89,18 @@ export function PublishedRules({ presentation }: { presentation: Row }) {
                 <td>{l.qualified_members}</td>
                 <td>{money(l.daily_valid_bet_minor)}</td>
                 <td>
-                  {l.rates_ppm
-                    .map((r: number) => amount(String(r), 4) + "%")
-                    .join(" / ")}
+                  {c.commission_policy ? (
+                    <CommissionRuleSummary
+                      policy={c.commission_policy}
+                      level={l.level}
+                      scale={c.currency_scale}
+                      currency={c.currency}
+                    />
+                  ) : (
+                    l.rates_ppm
+                      .map((r: number) => amount(String(r), 4) + "%")
+                      .join(" / ")
+                  )}
                 </td>
               </tr>
             ))}

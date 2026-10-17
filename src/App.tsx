@@ -1,3 +1,6 @@
+import { planTemplate } from "./modules/plans/template";
+import { AdminCommissionCalculator } from "./modules/affiliate/AdminCommissionCalculator";
+import { DataIngestion } from "./modules/ingestion/DataIngestion";
 import { GuestAffiliate } from "./modules/member/affiliate/GuestAffiliate";
 import { useEffect, useState } from "react";
 import { operations as allOperations } from "./catalog";
@@ -137,7 +140,13 @@ export default function App() {
           </button>
         ))}
       </div>
-      {op.title === "已授权站点代理配置" ? (
+      {op.title === "数据接入配置" ? (
+        <DataIngestion
+          session={session}
+          onExpired={() => setSession(null)}
+          onApproval={(id) => navigate("审批详情", { params: { id } })}
+        />
+      ) : op.title === "已授权站点代理配置" ? (
         <AffiliateSiteCatalog
           session={session}
           onExpired={() => setSession(null)}
@@ -154,11 +163,20 @@ export default function App() {
           session={session}
           onExpired={() => setSession(null)}
         />
-      ) : op.title === "推荐返佣配置" ? (
+      ) : op.title === "推荐返佣配置" || op.title === "方案变更预检接口" ? (
         <AffiliateConfig
           session={session}
           onExpired={() => setSession(null)}
           onApproval={(id) => navigate("审批详情", { params: { id } })}
+          onIndependentPlan={(currency) =>
+            navigate("创建方案", {
+              body: {
+                ...structuredClone(planTemplate),
+                currency,
+                name: "独立代理方案",
+              },
+            })
+          }
         />
       ) : op.title === "站点代理配置" ? (
         <SiteAgentConfig
@@ -168,6 +186,8 @@ export default function App() {
         />
       ) : op.title === "代理总表及下线明细" ? (
         <AgentDirectory onExpired={() => setSession(null)} />
+      ) : op.title === "佣金计算器" ? (
+        <AdminCommissionCalculator />
       ) : op.title === "我的佣金" ? (
         <MemberCommissions
           session={session}

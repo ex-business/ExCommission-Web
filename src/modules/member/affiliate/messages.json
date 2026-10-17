@@ -448,7 +448,7 @@
     "es": "Depósitos acumulados"
   },
   "有效业务量": {
-    "en": "Eligible volume",
+    "en": "Valid volume",
     "es": "Volumen válido"
   },
   "达标时间": {
@@ -574,7 +574,7 @@
   },
   "层级": {
     "en": "Depth",
-    "es": "Profundidad"
+    "es": "Nivel"
   },
   "已领佣金": {
     "en": "Claimed commissions",
@@ -1331,5 +1331,69 @@
   "否": {
     "en": "No",
     "es": "No"
+  },
+  "返佣层级": {
+    "en": "Commission depth",
+    "es": "Niveles de comisión"
+  },
+  "计算方式": {
+    "en": "Calculation method",
+    "es": "Método de cálculo"
+  },
+  "比例": {
+    "en": "Percentage",
+    "es": "Porcentaje"
+  },
+  "固定金额": {
+    "en": "Fixed amount",
+    "es": "Importe fijo"
+  },
+  "阶梯累进": {
+    "en": "Progressive tiers",
+    "es": "Tramos progresivos"
+  },
+  "公式": {
+    "en": "Formula",
+    "es": "Fórmula"
+  },
+  "距离下一级": {
+    "en": "Next grade",
+    "es": "Próximo rango"
+  },
+  "还需有效人数": {
+    "en": "Additional qualified members",
+    "es": "Miembros válidos adicionales"
+  },
+  "还需有效业务量": {
+    "en": "Additional valid volume",
+    "es": "Volumen válido adicional"
+  },
+  "返佣规则": {
+    "en": "Commission rules",
+    "es": "Reglas de comisión"
+  },
+  "等级与返佣规则": {
+    "en": "Grades and commission rules",
+    "es": "Rangos y reglas de comisión"
+  },
+  "本层有效业务量": {
+    "en": "Valid volume at this depth",
+    "es": "Volumen válido de este nivel"
+  },
+  "当前层级": {
+    "en": "Current depth",
+    "es": "Nivel actual"
+  },
+  "取较小值": {
+    "en": "Minimum",
+    "es": "Mínimo"
+  },
+  "取较大值": {
+    "en": "Maximum",
+    "es": "Máximo"
+  },
+  "上限": {
+    "en": "Cap",
+    "es": "Límite"
   }
 }

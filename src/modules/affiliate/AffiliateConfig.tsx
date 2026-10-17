@@ -1,5 +1,11 @@
+import { CommissionRuleSummary } from "./CommissionRuleSummary";
+import {
+  CommissionPolicyEditor,
+  alignPolicy,
+  type CommissionPolicy,
+} from "./CommissionPolicyEditor";
 import { RiskRules, type RiskRule } from "./RiskRules";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Session } from "../../auth/Login";
 import { ApiError, request } from "../../lib/api";
 import { MoneyInput } from "./MoneyInput";
@@ -14,6 +20,7 @@ type Level = {
 };
 type Step = { step: number; additional_members: number; reward_minor: string };
 export type Config = {
+  commission_policy?: CommissionPolicy;
   social?: { platform: string; enabled: boolean }[];
   extension?: {
     disabled_entry: string;
@@ -73,8 +80,10 @@ export function AffiliateConfig({
   onExpired,
   onApproval,
   siteTarget,
+  onIndependentPlan,
 }: {
   siteTarget?: { tenant_id: string; app_id: string };
+  onIndependentPlan?: (currency: string) => void;
   session: Session;
   onExpired: () => void;
   onApproval: (id: string) => void;
@@ -89,6 +98,10 @@ export function AffiliateConfig({
     [approval, setApproval] = useState(""),
     [reviewID, setReviewID] = useState(""),
     [review, setReview] = useState<any>(null);
+  const [preview, setPreview] = useState<any>();
+  useEffect(() => {
+    setPreview(undefined);
+  }, [config]);
   const last = useRef({ body: "", key: "" });
   async function run(fn: () => Promise<void>) {
     setBusy(true);
@@ -147,12 +160,31 @@ export function AffiliateConfig({
     });
   }
   function patch(key: keyof Config, value: any) {
-    setConfig((c) => ({ ...c, [key]: value }));
+    setConfig((c) => {
+      const next = { ...c, [key]: value };
+      if (next.commission_policy)
+        next.commission_policy = alignPolicy(
+          next.commission_policy,
+          next.levels,
+        );
+      return next;
+    });
   }
   async function save(e: React.FormEvent) {
     e.preventDefault();
     if (!state) return;
     await run(async () => {
+      const original = state.current?.config;
+      if (
+        original &&
+        (config.currency !== original.currency ||
+          config.currency_scale !== original.currency_scale ||
+          config.timezone !== original.timezone ||
+          config.grade_period !== original.grade_period)
+      )
+        throw new Error(
+          "这些变更需要新建独立方案，不能覆盖原方案。请先做方案变更预检。",
+        );
       const body = { config, expected_revision: state.revision, reason };
       const text = JSON.stringify(body);
       if (last.current.body !== text)
@@ -173,7 +205,7 @@ export function AffiliateConfig({
     });
   }
   const fixed = !!state?.configured;
-  const unit = `最小货币单位（${config.currency}，${config.currency_scale}位小数）`;
+
   return (
     <section aria-label="推荐返佣配置">
       <h2>推荐返佣配置</h2>
@@ -184,8 +216,7 @@ export function AffiliateConfig({
         </p>
       )}
       <p>
-        配置等级、三层比例及推荐和受邀奖励；金额使用{unit}，例如两位小数时 5000
-        表示 50.00。
+        配置等级、返佣规则及推荐和受邀奖励；金额按正常货币单位填写，比例按百分比填写。
       </p>
       <button disabled={busy} onClick={load}>
         读取推荐返佣配置
@@ -356,7 +387,7 @@ export function AffiliateConfig({
                 {currencies.length ? (
                   <select
                     aria-label="推荐返佣主货币"
-                    disabled={fixed}
+                    disabled={fixed && !!siteTarget}
                     value={config.currency}
                     onChange={(e) => {
                       const selected = currencies.find(
@@ -380,7 +411,7 @@ export function AffiliateConfig({
                   <input
                     aria-label="推荐返佣主货币"
                     required
-                    disabled={fixed}
+                    disabled={fixed && !!siteTarget}
                     value={config.currency}
                     onChange={(e) => patch("currency", e.target.value)}
                   />
@@ -405,7 +436,7 @@ export function AffiliateConfig({
                 <input
                   aria-label="站点统计时区"
                   required
-                  disabled={fixed}
+                  disabled={fixed && !!siteTarget}
                   value={config.timezone}
                   onChange={(e) => patch("timezone", e.target.value)}
                 />
@@ -413,7 +444,7 @@ export function AffiliateConfig({
               <label>
                 代理有效会员统计范围
                 <select
-                  disabled={fixed}
+                  disabled={fixed && !!siteTarget}
                   value={config.grade_period}
                   onChange={(e) => patch("grade_period", e.target.value)}
                 >
@@ -424,9 +455,61 @@ export function AffiliateConfig({
                 </select>
               </label>
               <p>
-                货币、精度、时区和统计范围在首次生效后固定。等级人数只算直属达标会员，日有效业务量包含下线三层。
+                旧方案币种、精度、时区和统计周期不直接改写；变更这些字段需新建独立方案，旧方案保留结清。等级人数统计直属达标会员，业务量统计配置的返佣层级。
               </p>
             </fieldset>
+            {!siteTarget && (
+              <fieldset disabled={busy || !!state.scheduled}>
+                <legend>变更预检与独立方案</legend>
+                <button
+                  type="button"
+                  onClick={() =>
+                    run(async () => {
+                      const r = await request("/v1/affiliate/config-preview", {
+                        method: "POST",
+                        body: {
+                          config,
+                          expected_revision: state.revision,
+                          reason: reason || "方案变更预检",
+                        },
+                        csrf: session.csrf,
+                        key: crypto.randomUUID(),
+                      });
+                      setPreview(r.data);
+                    })
+                  }
+                >
+                  方案变更预检
+                </button>
+                {preview && (
+                  <div role="status">
+                    <p>
+                      {preview.requires_independent_plan
+                        ? "需要新建独立方案：新方案使用独立编号、币种和日历，旧权益保留结清，不自动兑换或重算。"
+                        : "可沿用配置独立审批发布新版本。"}
+                    </p>
+                    <p>
+                      返佣层级：{preview.commission_depth} · 当前修订：
+                      {preview.revision}
+                    </p>
+                    <p>
+                      最早生效时间：
+                      {new Date(
+                        preview.earliest_effective_from,
+                      ).toLocaleString()}
+                    </p>
+                    {preview.requires_independent_plan && onIndependentPlan && (
+                      <button
+                        type="button"
+                        onClick={() => onIndependentPlan(config.currency)}
+                      >
+                        去创建独立方案
+                      </button>
+                    )}
+                  </div>
+                )}
+              </fieldset>
+            )}
             {(
               [
                 ["grade_condition", "代理等级有效会员条件"],
@@ -462,8 +545,18 @@ export function AffiliateConfig({
               </fieldset>
             ))}
             <fieldset disabled={busy || !!state.scheduled}>
-              <legend>代理等级与三层返佣</legend>
+              <legend>代理等级与返佣</legend>
+              <CommissionPolicyEditor
+                value={config.commission_policy}
+                levels={config.levels}
+                scale={config.currency_scale}
+                currency={config.currency}
+                onChange={(value) => patch("commission_policy", value)}
+              />
               <p>
+                {config.commission_policy
+                  ? "下方三层比例仅保留旧版配置，启用扩展后按上方规则计算。"
+                  : ""}{" "}
                 金额使用 {config.currency}
                 ，比例填写百分比（如0.25表示0.25%）。同一业务日全部有效业务量使用当日最终等级结算。
               </p>
@@ -532,6 +625,7 @@ export function AffiliateConfig({
                             <MoneyInput
                               label={`Lv${i}第${depth + 1}层比例百分比`}
                               maxMinor="1000000"
+                              disabled={!!config.commission_policy}
                               value={String(v.rates_ppm[depth])}
                               scale={4}
                               allowZero
@@ -814,9 +908,15 @@ export function ConfigSummary({ config: c }: { config: Config }) {
               <th>等级</th>
               <th>人数</th>
               <th>日有效业务量</th>
-              <th>1层比例</th>
-              <th>2层比例</th>
-              <th>3层比例</th>
+              {c.commission_policy ? (
+                <th colSpan={3}>返佣规则</th>
+              ) : (
+                <>
+                  <th>1层比例</th>
+                  <th>2层比例</th>
+                  <th>3层比例</th>
+                </>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -825,9 +925,20 @@ export function ConfigSummary({ config: c }: { config: Config }) {
                 <td>Lv{l.level}</td>
                 <td>{l.qualified_members}</td>
                 <td>{amount(l.daily_valid_bet_minor, c.currency_scale)}</td>
-                {l.rates_ppm.map((r, i) => (
-                  <td key={i}>{amount(String(r), 4)}%</td>
-                ))}
+                {c.commission_policy ? (
+                  <td colSpan={3}>
+                    <CommissionRuleSummary
+                      policy={c.commission_policy}
+                      level={l.level}
+                      scale={c.currency_scale}
+                      currency={c.currency}
+                    />
+                  </td>
+                ) : (
+                  l.rates_ppm.map((r, i) => (
+                    <td key={i}>{amount(String(r), 4)}%</td>
+                  ))
+                )}
               </tr>
             ))}
           </tbody>

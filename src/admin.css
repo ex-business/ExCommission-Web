@@ -222,3 +222,150 @@
     flex-basis: 40%;
   }
 }
+/* 数据接入只配置映射和密钥引用；长事件分组沿用管理页样式。 */
+.admin-content .ingestion-editor {
+  border: 0;
+  padding: 0;
+}
+.admin-content .ingestion-source {
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid #e1e6ed;
+  border-radius: 6px;
+}
+.admin-content .ingestion-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 20px;
+}
+.admin-content .ingestion-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.admin-content .ingestion-fields label:has(> input[type="checkbox"]) {
+  flex-direction: row;
+  align-items: center;
+}
+.admin-content .ingestion-rule {
+  border: 0;
+}
+.admin-content .ingestion-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.admin-content .ingestion-workspace pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 760px) {
+  .admin-content .ingestion-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* 折叠保留图标栏与展开入口，仅改变布局，不卸载业务页面。 */
+.app-shell.menu-collapsed .sidebar {
+  width: 72px;
+}
+.app-shell.menu-collapsed .main-shell {
+  margin-left: 72px;
+  width: calc(100% - 72px);
+}
+.menu-collapsed .brand {
+  padding: 0;
+  justify-content: center;
+}
+.menu-collapsed .brand-title,
+.menu-collapsed .nav-label,
+.menu-collapsed .nav-title,
+.menu-collapsed .nav-arrow {
+  display: none;
+}
+.menu-collapsed .sidebar nav {
+  padding: 12px 10px;
+}
+.menu-collapsed .nav-main {
+  justify-content: center;
+  padding: 13px 0;
+  gap: 0;
+}
+.sidebar .nav-main .nav-icon {
+  display: inline-flex;
+  width: 22px;
+  flex-shrink: 0;
+}
+.navigation-icon {
+  display: block;
+  flex-shrink: 0;
+}
+.sidebar .nav-arrow .navigation-icon {
+  width: 15px;
+  height: 15px;
+  transition: transform 150ms;
+}
+.sidebar .nav-arrow.is-open .navigation-icon {
+  transform: rotate(90deg);
+}
+.topbar .topbar-location {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.topbar .menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  flex-shrink: 0;
+  background: #fff;
+  color: #334155;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+}
+.topbar .menu-toggle:hover {
+  background: #edf3ff;
+  color: #225ed7;
+}
+.topbar .menu-toggle:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+@media (max-width: 650px) {
+  .app-shell.menu-collapsed .sidebar {
+    position: fixed;
+    border-right: 1px solid var(--line);
+  }
+  .menu-collapsed .sidebar nav {
+    display: block;
+  }
+}
+
+/* 扩展方案按等级收纳，避免多层规则挤入原等级表。 */
+.admin-content .commission-policy {
+  margin: 16px 0;
+}
+.admin-content .commission-policy summary {
+  cursor: pointer;
+  padding: 12px 0;
+  font-weight: 600;
+}
+.admin-content .commission-policy fieldset {
+  margin: 10px 0;
+  padding: 14px;
+}
+.admin-content .tier-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.admin-content .formula-editor {
+  border-left: 2px solid #dbe4ef;
+  margin: 8px 0 8px 12px;
+  padding-left: 12px;
+}

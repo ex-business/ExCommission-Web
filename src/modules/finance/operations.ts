@@ -2,9 +2,9 @@ export const financeOperations: string[][] = [
   [
     "finance",
     "会员佣金",
-    "本人佣金计算器",
+    "佣金计算器",
     "GET",
-    "/v1/me/affiliate/calculator",
+    "/v1/affiliate/calculator",
   ],
   ["finance", "佣金审核", "佣金审核与派发", "GET", "/v1/commission-reviews"],
   [

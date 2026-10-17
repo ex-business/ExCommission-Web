@@ -35,10 +35,14 @@ test("V1全部操作有管理入口或明确的渠道专用边界", async () => 
   const expected = Object.entries(spec.paths).flatMap(([path, ops]) =>
     Object.keys(ops).map((m) => m.toUpperCase() + " " + path),
   );
-  assert.equal(expected.length, actual.length + 2);
+  assert.equal(expected.length, actual.length + 3);
   assert.deepEqual(
-    expected.filter((x) => !actual.includes(x)),
-    ["POST /v1/payment-callbacks/{channel_id}","GET /v1/affiliate/public-presentation"],
+    expected.filter((x) => !actual.includes(x)).sort(),
+    [
+      "POST /v1/payment-callbacks/{channel_id}",
+      "GET /v1/affiliate/public-presentation",
+      "GET /v1/me/affiliate/calculator",
+    ].sort(),
   );
   assert.ok(actual.every((x) => expected.includes(x)));
 });

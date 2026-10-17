@@ -1,3 +1,4 @@
+import { CommissionRuleSummary } from "../../affiliate/CommissionRuleSummary";
 import { RewardHistory } from "./RewardHistory";
 import { useMemberLocale } from "./locale";
 import { CommissionCalculator } from "./CommissionCalculator";
@@ -381,7 +382,13 @@ export function AffiliateRewards({
                 <th>{t("等级")}</th>
                 <th>{t("有效直属")}</th>
                 <th>{t("日有效业务量")}</th>
-                <th>{t("一级 / 二级 / 三级")}</th>
+                <th>
+                  {t(
+                    config.commission_policy
+                      ? "返佣规则"
+                      : "一级 / 二级 / 三级",
+                  )}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -391,9 +398,18 @@ export function AffiliateRewards({
                   <td>{row.qualified_members}</td>
                   <td>{amount(row.daily_valid_bet_minor, scale)}</td>
                   <td>
-                    {row.rates_ppm
-                      .map((r: number) => `${amount(String(r), 4)}%`)
-                      .join(" / ")}
+                    {config.commission_policy ? (
+                      <CommissionRuleSummary
+                        policy={config.commission_policy}
+                        level={row.level}
+                        scale={scale}
+                        currency={config.currency}
+                      />
+                    ) : (
+                      row.rates_ppm
+                        .map((r: number) => `${amount(String(r), 4)}%`)
+                        .join(" / ")
+                    )}
                   </td>
                 </tr>
               ))}
@@ -417,21 +433,32 @@ export function AffiliateRewards({
             ))}
           </select>
         </label>
-        <p>
-          {t("最高佣金比例")}{" "}
-          {amount(
-            String(
-              Math.max(
-                ...(config.levels.find(
-                  (level: Row) =>
-                    level.level === (selectedLevel ?? grade.level),
-                )?.rates_ppm || [0]),
-              ),
-            ),
-            4,
-          )}
-          %
-        </p>
+        {config.commission_policy ? (
+          <CommissionRuleSummary
+            policy={config.commission_policy}
+            level={selectedLevel ?? grade.level}
+            scale={scale}
+            currency={config.currency}
+          />
+        ) : (
+          <>
+            <p>
+              {t("最高佣金比例")}{" "}
+              {amount(
+                String(
+                  Math.max(
+                    ...(config.levels.find(
+                      (level: Row) =>
+                        level.level === (selectedLevel ?? grade.level),
+                    )?.rates_ppm || [0]),
+                  ),
+                ),
+                4,
+              )}
+              %
+            </p>
+          </>
+        )}
         <p>
           {t("推荐奖励总额")}{" "}
           {amount(
@@ -475,7 +502,13 @@ export function AffiliateRewards({
           ))}
         </div>
       </section>
-      <CommissionCalculator scale={scale} currency={config.currency} />
+      <CommissionCalculator
+        key={`${view.configuration.revision}:${config.currency}:${scale}:${config.commission_policy?.depth || 3}`}
+        revision={view.configuration.revision}
+        scale={scale}
+        currency={config.currency}
+        depth={config.commission_policy?.depth || 3}
+      />
       <RewardHistory
         scale={scale}
         reloadKey={historyVersion}

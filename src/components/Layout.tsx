@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { groups, operations, type Operation } from "../catalog";
+import { NavigationIcon } from "./NavigationIcon";
 import type { Session } from "../auth/Login";
 export function Layout({
   op,
@@ -14,16 +15,22 @@ export function Layout({
   onLogout: () => void;
   children: ReactNode;
 }) {
+  const [menuCollapsed, setMenuCollapsed] = useState(false);
+  const [expandedGroup, setExpandedGroup] = useState<string | null>(op.group);
+  // 导航展开状态与业务选择分离，折叠菜单不跳页、不清空尚未提交的表单。
+  useEffect(() => {
+    setExpandedGroup(op.group);
+  }, [op.group]);
   const group = groups.find((g) => g.id === op.group)!;
   // 身份接入只决定接口授权，保留原后台全部业务菜单，避免功能入口因登录方式改变而丢失。
   const navOps = operations;
   const navGroups = groups;
   return (
-    <div className="app-shell">
-      <aside className="sidebar">
+    <div className={"app-shell" + (menuCollapsed ? " menu-collapsed" : "")}>
+      <aside className="sidebar" id="business-navigation">
         <a className="brand" href="#agents">
           <span className="logo small-logo">佣</span>
-          <span>
+          <span className="brand-title">
             {session.ops ? "代理业务" : "佣金分润"}
             <small>管理系统</small>
           </span>
@@ -34,16 +41,35 @@ export function Layout({
             <div className="nav-group" key={g.id}>
               <button
                 className={"nav-main " + (op.group === g.id ? "active" : "")}
-                onClick={() => onSelect(navOps.find((o) => o.group === g.id)!)}
+                aria-label={g.name}
+                title={menuCollapsed ? g.name : undefined}
+                aria-expanded={!menuCollapsed && expandedGroup === g.id}
+                aria-controls={"nav-sections-" + g.id}
+                onClick={() => {
+                  // 收起时保留图标入口，点击图标先展开栏目，不触发业务导航。
+                  if (menuCollapsed) {
+                    setMenuCollapsed(false);
+                    setExpandedGroup(g.id);
+                  } else
+                    setExpandedGroup((current) =>
+                      current === g.id ? null : g.id,
+                    );
+                }}
               >
-                <span>{g.icon}</span>
-                {g.name}
-                <span className="nav-arrow">
-                  {op.group === g.id ? "⌄" : "›"}
+                <span className="nav-icon">
+                  <NavigationIcon name={g.id} />
+                </span>
+                <span className="nav-title">{g.name}</span>
+                <span
+                  className={
+                    "nav-arrow" + (expandedGroup === g.id ? " is-open" : "")
+                  }
+                >
+                  <NavigationIcon name="chevron" />
                 </span>
               </button>
-              {op.group === g.id && (
-                <div className="subnav">
+              {!menuCollapsed && expandedGroup === g.id && (
+                <div className="subnav" id={"nav-sections-" + g.id}>
                   {[
                     ...new Set(
                       navOps
@@ -73,7 +99,18 @@ export function Layout({
       </aside>
       <div className="main-shell">
         <header className="topbar">
-          <span>
+          <span className="topbar-location">
+            <button
+              type="button"
+              className="menu-toggle"
+              aria-label={menuCollapsed ? "展开菜单" : "折叠菜单"}
+              aria-expanded={!menuCollapsed}
+              aria-controls="business-navigation"
+              title={menuCollapsed ? "展开菜单" : "折叠菜单"}
+              onClick={() => setMenuCollapsed((current) => !current)}
+            >
+              <NavigationIcon name={menuCollapsed ? "expand" : "collapse"} />
+            </button>
             管理后台 <span className="muted"> / </span> {group.name}
           </span>
           <div style={session.ops ? { whiteSpace: "nowrap" } : undefined}>

@@ -1,4 +1,47 @@
 export const systemOperations: string[][] = [
+  [
+    "system",
+    "数据接入",
+    "数据接入配置",
+    "GET",
+    "/v1/affiliate/ingestion/config",
+  ],
+  [
+    "system",
+    "扩展接入目录",
+    "接入密钥引用",
+    "GET",
+    "/v1/affiliate/ingestion/key-refs",
+  ],
+  [
+    "system",
+    "扩展接入目录",
+    "提交接入配置申请",
+    "POST",
+    "/v1/affiliate/ingestion/config-requests",
+  ],
+  [
+    "system",
+    "扩展接入目录",
+    "接入配置申请详情",
+    "GET",
+    "/v1/affiliate/ingestion/config-requests/{id}",
+  ],
+  [
+    "system",
+    "扩展接入目录",
+    "接入映射预览",
+    "POST",
+    "/v1/affiliate/ingestion/preview",
+  ],
+  [
+    "system",
+    "扩展接入目录",
+    "接入事实记录",
+    "GET",
+    "/v1/affiliate/ingestion/records",
+  ],
+
   ["system", "推荐返佣", "推荐返佣配置", "GET", "/v1/affiliate/config"],
   [
     "system",
@@ -249,5 +292,12 @@ export const systemOperations: string[][] = [
     "申请目标站点返佣配置",
     "POST",
     "/v1/affiliate/sites/{tenant}/{app}/config-requests",
+  ],
+  [
+    "system",
+    "推荐返佣",
+    "方案变更预检接口",
+    "POST",
+    "/v1/affiliate/config-preview",
   ],
 ];
