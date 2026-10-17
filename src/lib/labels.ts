@@ -104,7 +104,7 @@ export const labels: Record<string, string> = {
   object_ref: "资源引用",
   time_range: "时间范围",
   as_of: "固定快照时点",
-  kind: "报表 / 设置类型",
+  kind: "类型",
   configuration: "配置内容",
   component_type: "组件类型",
   component_id: "组件编号",
@@ -144,5 +144,39 @@ export const labels: Record<string, string> = {
   display_format: "显示格式",
   payment_channels: "付款渠道",
   timezone: "时区",
+  rows: "明细记录",
+  available_minor: "可用金额（最小单位）",
+  pending_minor: "待结算金额（最小单位）",
+  reserved_minor: "占用金额（最小单位）",
+  paid_minor: "已付金额（最小单位）",
+  debt_minor: "债务金额（最小单位）",
+  net_minor: "净额（最小单位）",
+  recovered_minor: "已追回金额（最小单位）",
+  task_id: "计算任务编号",
+  source_watermark: "来源水位",
+  currency_catalog_version: "币种目录版本",
+  metrics: "统计指标",
+  conversion_rate: "转化率",
+  profit: "利润",
 };
 export const label = (k: string) => labels[k] || k;
+
+// 只翻译可识别的枚举展示，选择提交仍使用原契约值；未知值原样展示以兼容扩展。
+const enumNames: Record<string, string> = {
+  earnings: "收益报表",
+  finance: "财务报表",
+  cost: "成本报表",
+  ALL_ACTIVE_AGENTS: "全部有效代理",
+  EXPLICIT_AGENT_IDS: "指定代理",
+  PREVIOUS_CALENDAR_MONTH: "上个自然月",
+  BUSINESS_DAY: "业务日",
+  DAILY: "每日",
+  ORDER_CONFIRMED: "订单确认",
+  FEE_CONFIRMED: "手续费确认",
+  TRADE_CLOSED: "交易结算",
+  MILESTONE_REACHED: "累计达标",
+  UNAVAILABLE_NO_ATTRIBUTION_SOURCE: "尚未接入归因来源",
+  UNAVAILABLE_NO_REVENUE_SOURCE: "尚未接入收入来源",
+};
+export const enumLabel = (value: string) =>
+  Object.hasOwn(enumNames, value) ? enumNames[value] : value;

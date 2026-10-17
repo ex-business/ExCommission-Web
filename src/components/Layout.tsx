@@ -128,7 +128,7 @@ export function Layout({
             </button>
           </div>
         </header>
-        <main>{children}</main>
+        <main className="admin-content">{children}</main>
       </div>
     </div>
   );

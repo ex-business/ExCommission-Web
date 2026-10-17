@@ -1,0 +1,224 @@
+/* 仅统一管理后台的排版，不覆盖会员端、登录页及各模块业务状态。 */
+.admin-content {
+  width: 100%;
+  padding: 24px 28px 40px;
+  min-width: 0;
+  color: #263449;
+  font-size: 14px;
+}
+.admin-content > .tabs {
+  gap: 4px;
+  flex-wrap: wrap;
+  overflow: visible;
+  margin-bottom: 20px;
+}
+.admin-content > .tabs button {
+  padding: 10px 14px;
+  font-size: 13px;
+}
+/* 查询条件和结果上下排列，报表及长表单使用完整内容宽度。 */
+.admin-content .admin-operation {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px;
+}
+.admin-content .result-panel {
+  position: static;
+  max-height: none;
+  overflow: visible;
+}
+.admin-content .panel,
+.admin-content > section:not(.af-admin),
+.admin-content .af-card {
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e1e6ed;
+  border-radius: 6px;
+  box-shadow: none;
+  min-width: 0;
+}
+.admin-content h2 {
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 0 0 18px;
+  font-weight: 600;
+}
+.admin-content h3 {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.admin-content p {
+  font-size: 13px;
+  line-height: 1.7;
+}
+.admin-content .panel-heading {
+  padding-bottom: 12px;
+  margin-bottom: 18px;
+}
+.admin-content .panel-heading h2 {
+  margin: 0;
+}
+.admin-content .info {
+  background: #f8fafc;
+  border-color: #e5e9ef;
+  color: #526175;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.admin-content button {
+  min-height: 34px;
+  font-size: 13px;
+  border-radius: 5px;
+}
+.admin-content input:not([type="checkbox"]):not([type="radio"]),
+.admin-content select,
+.admin-content textarea {
+  min-height: 36px;
+  font-size: 13px;
+  border-radius: 5px;
+  max-width: 100%;
+}
+.admin-content .parameter-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px 20px;
+  padding: 0 0 16px;
+  margin-bottom: 18px;
+}
+.admin-content .field {
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.admin-content fieldset {
+  min-width: 0;
+  border: 1px solid #e1e6ed;
+  border-radius: 5px;
+  margin: 16px 0;
+  padding: 16px;
+}
+.admin-content fieldset legend {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0 6px;
+}
+/* 专用配置页采用相同分组；保留全部条件、动态行和原禁用状态。 */
+.admin-content > section > form > fieldset,
+.admin-content > section > fieldset {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 20px;
+}
+.admin-content > section > form > fieldset > :not(label),
+.admin-content > section > fieldset > :not(label) {
+  grid-column: 1 / -1;
+}
+.admin-content > section > form > fieldset > label,
+.admin-content > section > fieldset > label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+}
+.admin-content label:has(> input[type="checkbox"]),
+.admin-content label:has(> input[type="radio"]) {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+}
+.admin-content input[type="checkbox"],
+.admin-content input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin: 0;
+}
+.admin-content .root-fields {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.admin-content .steps {
+  margin: 0 0 20px;
+  flex-wrap: wrap;
+}
+.admin-content .steps button {
+  font-size: 13px;
+  padding: 10px;
+}
+.admin-content .empty {
+  padding: 20px 12px;
+}
+.admin-content .af-admin {
+  gap: 16px;
+}
+.admin-content .af-admin header h2 {
+  margin-bottom: 0;
+}
+.admin-content .af-filters,
+.admin-content .review-filters {
+  gap: 12px 16px;
+  padding: 16px;
+  border: 1px solid #e1e6ed;
+  border-radius: 6px;
+  background: #fff;
+}
+.admin-content .af-summary {
+  padding: 12px 16px;
+  border-radius: 5px;
+  background: #f8fafc;
+  gap: 8px 20px;
+}
+.admin-content .af-summary strong {
+  flex-basis: 100%;
+  font-size: 13px;
+}
+.admin-content .af-table,
+.admin-content .review-table,
+.admin-content .table-scroll {
+  overflow: auto;
+  max-width: 100%;
+  border-radius: 5px;
+}
+.admin-content th,
+.admin-content td {
+  font-size: 13px;
+  padding: 11px 12px;
+}
+.admin-content .table-scroll th,
+.admin-content .table-scroll td {
+  white-space: nowrap;
+}
+.admin-content .form-actions {
+  margin-bottom: 0;
+  padding-top: 16px;
+}
+.admin-content .next-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.admin-content .next-actions h3 {
+  flex-basis: 100%;
+  margin-bottom: 0;
+}
+@media (max-width: 760px) {
+  .admin-content {
+    padding: 16px 14px 28px;
+  }
+  .admin-content .panel,
+  .admin-content > section:not(.af-admin),
+  .admin-content .af-card {
+    padding: 16px;
+  }
+  .admin-content .form-grid,
+  .admin-content > section > form > fieldset,
+  .admin-content > section > fieldset {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-content .steps button {
+    flex-basis: 40%;
+  }
+}

@@ -179,7 +179,7 @@ export function OperationPanel({
       </section>
     );
   return (
-    <div className="operation-layout">
+    <div className="operation-layout admin-operation">
       <section className="panel editor">
         <div className="panel-heading">
           <div>
@@ -349,7 +349,11 @@ export function OperationPanel({
         {error && (
           <div className="error-box" role="alert">
             <ResultView value={error} />
-            <p>请根据提示检查记录后再操作。付款结果未知时，请查询原付款单。</p>
+            <p>
+              {op.path.startsWith("/v1/payments")
+                ? "付款结果未知时，请查询原付款单。"
+                : "请核对输入和当前记录状态。"}
+            </p>
           </div>
         )}
         {result ? (

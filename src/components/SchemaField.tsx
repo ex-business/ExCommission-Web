@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { initial, label, resolveSchema, type Schema } from "../catalog";
+import { enumLabel } from "../lib/labels";
 type Props = {
   schema: Schema;
   value: any;
@@ -269,7 +270,9 @@ export function SchemaField({
           onChange={(e) => onChange(e.target.value)}
         >
           {s.enum.map((x: string) => (
-            <option key={x}>{x}</option>
+            <option key={x} value={x}>
+              {enumLabel(x)}
+            </option>
           ))}
         </select>
       </label>

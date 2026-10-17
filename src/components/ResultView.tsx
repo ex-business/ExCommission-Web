@@ -1,4 +1,5 @@
 import { label } from "../catalog";
+import { enumLabel } from "../lib/labels";
 const states: Record<string, string> = {
   PENDING: "待审批",
   APPROVED: "已批准",
@@ -19,9 +20,11 @@ const states: Record<string, string> = {
 export function ResultView({
   value,
   depth = 0,
+  field,
 }: {
   value: any;
   depth?: number;
+  field?: string;
 }) {
   if (value === null || value === undefined)
     return <span className="muted">空值</span>;
@@ -38,7 +41,8 @@ export function ResultView({
             : ""
         }
       >
-        {states[value] || String(value)}
+        {states[value] ||
+          (field === "kind" ? enumLabel(String(value)) : String(value))}
       </span>
     );
   if (Array.isArray(value)) {
@@ -60,7 +64,7 @@ export function ResultView({
                 <tr key={i}>
                   {keys.map((k) => (
                     <td key={k}>
-                      <ResultView value={row[k]} depth={depth + 1} />
+                      <ResultView value={row[k]} field={k} depth={depth + 1} />
                     </td>
                   ))}
                 </tr>
@@ -89,7 +93,7 @@ export function ResultView({
         >
           <dt>{label(k)}</dt>
           <dd>
-            <ResultView value={v} depth={depth + 1} />
+            <ResultView value={v} field={k} depth={depth + 1} />
           </dd>
         </div>
       ))}
