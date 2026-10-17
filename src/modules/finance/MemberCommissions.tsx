@@ -1,3 +1,4 @@
+import { useMemberLocale } from "../member/affiliate/locale";
 import { useRef, useState } from "react";
 import { request, ApiError } from "../../lib/api";
 import type { Session } from "../../auth/Login";
@@ -36,6 +37,7 @@ export function MemberCommissions({
   onExpired: () => void;
   disabled?: boolean;
 }) {
+  const { t, locale } = useMemberLocale();
   const [rows, setRows] = useState<Statement[]>([]),
     [next, setNext] = useState<string | null>(null),
     [busy, setBusy] = useState(false),
@@ -88,7 +90,7 @@ export function MemberCommissions({
   }
   return (
     <section aria-label="本人佣金">
-      <h2>佣金领取</h2>
+      <h2>{t("佣金领取")}</h2>
       <button
         disabled={busy}
         onClick={() =>
@@ -98,7 +100,7 @@ export function MemberCommissions({
           })
         }
       >
-        查看真金钱包
+        {t("查看真金钱包")}
       </button>
       {wallets.map((v) => (
         <p key={v.currency}>
@@ -106,8 +108,8 @@ export function MemberCommissions({
         </p>
       ))}
       {[
-        ["wallet-transactions", "交易历史"],
-        ["wallet-changes", "账变记录"],
+        ["wallet-transactions", t("交易历史")],
+        ["wallet-changes", t("账变记录")],
       ].map(([kind, label]) => (
         <button
           key={kind}
@@ -125,7 +127,9 @@ export function MemberCommissions({
       ))}
       {historyKind && (
         <section aria-label={historyKind}>
-          <h3>{historyKind}</h3>
+          <h3>
+            {t(historyKind === "wallet-changes" ? "账变记录" : "交易历史")}
+          </h3>
           {entries.map((v) => (
             <p key={v.transaction_id}>
               {v.created_at} · {displayMoney(v.amount_minor, v.currency)}
@@ -140,38 +144,42 @@ export function MemberCommissions({
         </section>
       )}
       <button disabled={busy} onClick={() => guard(() => load())}>
-        刷新我的佣金
+        {t("刷新我的佣金")}
       </button>
       {error && <p role="alert">{error}</p>}
-      <p>仅显示本人佣金。领取受理后请刷新确认结果；结果未知时保留原单核验。</p>
+      <p>
+        {t(
+          "仅显示本人佣金。领取受理后请刷新确认结果；结果未知时保留原单核验。",
+        )}
+      </p>
       {rows.map((s) => (
         <article key={s.statement_id}>
           <h3>
             {s.period} · {displayMoney(s.total_minor, s.currency)}
           </h3>
-          <p>{names[s.review_status] || s.review_status}</p>
+          <p>{t(names[s.review_status] || s.review_status)}</p>
           {s.orders.length === 0 && s.review_status === "APPROVED" && (
-            <p>派发准备中</p>
+            <p>{t("派发准备中")}</p>
           )}
           {s.orders.map((o) => (
             <div key={o.instruction_id}>
               <span>
                 {displayMoney(o.amount_minor, s.currency)} ·{" "}
-                {names[o.claim_status] || o.claim_status}
+                {t(names[o.claim_status] || o.claim_status)}
               </span>
               {o.claim_status === "CLAIMABLE" && (
                 <button disabled={busy || disabled} onClick={() => claim(o)}>
-                  领取佣金
+                  {t("领取佣金")}
                 </button>
               )}
             </div>
           ))}
         </article>
       ))}
-      {!rows.length && <p>暂无记录，请刷新查询。</p>}
+      {!rows.length && <p>{t("暂无记录，请刷新查询。")}</p>}
       {next && (
         <button disabled={busy} onClick={() => guard(() => load(next))}>
-          下一页
+          {t("下一页")}
         </button>
       )}
     </section>

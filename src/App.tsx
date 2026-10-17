@@ -8,6 +8,13 @@ import { Layout } from "./components/Layout";
 import { OperationPanel, type Seed } from "./modules/OperationPanel";
 import { ResourceIndex } from "./modules/ResourceIndex";
 import { CommissionReview } from "./modules/finance/CommissionReview";
+import { AffiliateSiteCatalog } from "./modules/affiliate/SiteCatalog";
+import { AgentBusinessReport } from "./modules/affiliate/AgentReport";
+import { BusinessRewards } from "./modules/affiliate/BusinessRewards";
+import {
+  AgentRewardSwitch,
+  BusinessSourceStatus,
+} from "./modules/affiliate/BusinessOperations";
 import { AffiliateConfig } from "./modules/affiliate/AffiliateConfig";
 import { SiteAgentConfig } from "./modules/sites/SiteAgentConfig";
 import { AgentDirectory } from "./modules/agents/AgentDirectory";
@@ -131,7 +138,20 @@ export default function App() {
           </button>
         ))}
       </div>
-      {op.title === "推荐返佣配置" ? (
+      {op.title === "已授权站点代理配置" ? (
+        <AffiliateSiteCatalog onExpired={() => setSession(null)} />
+      ) : op.section === "代理业务总表" ? (
+        <AgentBusinessReport onExpired={() => setSession(null)} />
+      ) : op.section === "代理业务奖励" ? (
+        <BusinessRewards session={session} onExpired={() => setSession(null)} />
+      ) : op.section === "代理日结" ? (
+        <BusinessSourceStatus onExpired={() => setSession(null)} />
+      ) : op.section === "代理奖励开关" ? (
+        <AgentRewardSwitch
+          session={session}
+          onExpired={() => setSession(null)}
+        />
+      ) : op.title === "推荐返佣配置" ? (
         <AffiliateConfig
           session={session}
           onExpired={() => setSession(null)}

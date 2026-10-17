@@ -154,6 +154,12 @@ export function OperationPanel({
   }
   const links = resourceLinks(result);
   const actions = nextActions(op, result, params, body);
+  // 身份、来源签名和历史扩展契约只供接入方参考，不能把后台表单变成代注册或伪造业务事实的入口。
+  if (op.section === "扩展接入目录" || op.path.startsWith("/v1/auth/") || op.path === "/v1/affiliate/business-facts" || op.path === "/v1/affiliate/source-watermarks") return (
+    <section className="panel"><h2>扩展接入说明</h2><p><code>{op.method} {op.path}</code></p>
+    <p>此接口由对应业务模块或受控来源调用。会员注册和登录请使用模拟用户项目的真实入口；事实与日结水位必须由来源服务签名提交。历史资格、阶梯和里程碑模块保留独立契约。</p>
+    <p>当前代理闭环请使用代理配置、奖励记录及代理总表页面，避免混用不同规则模块。</p></section>
+  );
   return (
     <div className="operation-layout">
       <section className="panel editor">

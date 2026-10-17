@@ -1,6 +1,11 @@
 import { randomBytes } from "node:crypto";
 import { json, body } from "./http.mjs";
 import { secretEquals } from "./security.mjs";
+import {
+  memberLoginURL,
+  sourceLogin,
+  revokeSourceToken,
+} from "./member-source.mjs";
 const sessions = new Map(),
   attempts = new Map();
 export function session(req) {
@@ -41,37 +46,45 @@ export async function handleAuth(req, res, url, s) {
       input.password.length <= 1024
     ) {
       const backend = process.env.BACKEND_URL || "http://127.0.0.1:18080";
-      const result = await fetch(new URL("/v1/auth/login", backend), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: input.username,
-          password: input.password,
-        }),
-        redirect: "error",
-        signal: AbortSignal.timeout(10000),
-      });
-      if (result.ok) {
-        const login = await result.json();
-        if (typeof login.access_token === "string") {
-          const me = await fetch(new URL("/v1/auth/me", backend), {
-            headers: { Authorization: "Bearer " + login.access_token },
-            redirect: "error",
-            signal: AbortSignal.timeout(10000),
-          });
-          if (me.ok) {
-            const p = await me.json();
-            valid =
-              typeof p.member_user_id === "string" &&
-              p.member_user_id !== "" &&
-              p.permissions?.includes("member:read");
-            if (valid) {
-              backendToken = login.access_token;
-              subject = p.subject_id;
-            }
+      // 配置真实会员来源后只使用该来源验证，失败不能回退为其他同名账号。
+      const source = await memberLoginURL();
+      let token;
+      if (source) {
+        token = await sourceLogin(source, input.username, input.password);
+      } else {
+        const result = await fetch(new URL("/v1/auth/login", backend), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: input.username,
+            password: input.password,
+          }),
+          redirect: "error",
+          signal: AbortSignal.timeout(10000),
+        });
+        if (result.ok) token = (await result.json()).access_token;
+      }
+      if (typeof token === "string") {
+        const me = await fetch(new URL("/v1/auth/me", backend), {
+          headers: { Authorization: "Bearer " + token },
+          redirect: "error",
+          signal: AbortSignal.timeout(10000),
+        });
+        if (me.ok) {
+          const p = await me.json();
+          valid =
+            typeof p.member_user_id === "string" &&
+            p.member_user_id !== "" &&
+            p.permissions?.includes("member:read");
+          if (valid) {
+            backendToken = token;
+            subject = p.subject_id;
           }
         }
       }
+      // 来源认证成功而佣金侧拒绝时，撤销未被接受的令牌，不能留下可复用会话。
+      if (!valid && source && token)
+        await revokeSourceToken(token).catch(() => {});
     }
     if (!valid) {
       attempt.count++;
@@ -112,6 +125,8 @@ export async function handleAuth(req, res, url, s) {
     if (!s || !secretEquals(req.headers["x-csrf-token"], s.csrf))
       return json(res, 403, { error: { code: "CSRF_REJECTED" } });
     sessions.delete(s.id);
+    // 无论来源是否暂不可用，本地会话立即失效；令牌本身仍有固定短有效期。
+    await revokeSourceToken(s.backendToken).catch(() => {});
     res.setHeader(
       "Set-Cookie",
       "ec_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0",

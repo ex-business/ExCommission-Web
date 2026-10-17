@@ -1,6 +1,7 @@
 import { randomBytes, createHmac } from "node:crypto";
 import { json, body } from "./http.mjs";
 import { secretEquals } from "./security.mjs";
+import { affiliateClaimContext } from "./affiliate-context.mjs";
 export async function handleProxy(req, res, url, s, routes) {
   if (!s)
     return json(res, 401, {
@@ -53,6 +54,11 @@ export async function handleProxy(req, res, url, s, routes) {
         error: { code: "IDEMPOTENCY_REQUIRED", message: "缺少有效的幂等键" },
       });
     headers["Idempotency-Key"] = key;
+    // 仅为会员本人领取签名；IP取实际连接，身份取服务端会话，绝不透传浏览器伪造的上下文。
+    // 签名绑定原始正文和查询路径，后端仍独立校验权限、幂等及奖励状态。
+    if (req.method === "POST" && path === "/v1/me/affiliate/claims" && s.role === "member") {
+      Object.assign(headers, affiliateClaimContext(req, s, path + url.search, raw, headers.Authorization));
+    }
     if (path === "/v1/member-statistics") {
       if (s.role !== "operator")
         return json(res, 403, { error: { code: "PERMISSION_DENIED" } });

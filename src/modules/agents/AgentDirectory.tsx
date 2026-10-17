@@ -1,3 +1,4 @@
+import { useMemberLocale } from "../member/affiliate/locale";
 import { useState } from "react";
 import { request, ApiError } from "../../lib/api";
 import { displayMoney } from "../finance/CommissionReview";
@@ -9,6 +10,7 @@ export function AgentDirectory({
   onExpired: () => void;
   member?: boolean;
 }) {
+  const { t, locale } = useMemberLocale();
   const [root, setRoot] = useState(""),
     [currency, setCurrency] = useState("USD"),
     [depth, setDepth] = useState(""),
@@ -40,22 +42,22 @@ export function AgentDirectory({
       setAsOf(r.data.as_of);
     } catch (e) {
       if (e instanceof ApiError && e.status === 401) onExpired();
-      setError(e instanceof Error ? e.message : "查询失败");
+      setError(e instanceof Error ? e.message : t("查询失败"));
     } finally {
       setBusy(false);
     }
   }
   const money = (r: Row, key: string) =>
-    r.statistics ? displayMoney(r.statistics[key], currency) : "尚未接入";
+    r.statistics ? displayMoney(r.statistics[key], currency) : t("尚未接入");
   return (
-    <section aria-label={member ? "我的团队" : "代理总表"}>
-      <h2>{member ? "我的团队" : "代理总表及下线明细"}</h2>
+    <section aria-label={member ? t("我的团队") : t("代理总表")}>
+      <h2>{member ? t("我的团队") : t("代理总表及下线明细")}</h2>
       <div className="review-filters">
         {!member && (
           <label>
-            下线所属代理
+            {t("下线所属代理")}
             <input
-              aria-label="下线所属代理"
+              aria-label={t("下线所属代理")}
               placeholder="留空查看代理总表"
               value={root}
               onChange={(e) => setRoot(e.target.value)}
@@ -63,9 +65,9 @@ export function AgentDirectory({
           </label>
         )}
         <label>
-          统计币种
+          {t("统计币种")}
           <select
-            aria-label="统计币种"
+            aria-label={t("统计币种")}
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
           >
@@ -75,36 +77,45 @@ export function AgentDirectory({
           </select>
         </label>
         <label>
-          下线层级
+          {t("下线层级")}
           <select
-            aria-label="下线层级"
+            aria-label={t("下线层级")}
             value={depth}
             onChange={(e) => setDepth(e.target.value)}
           >
-            <option value="">全部三层</option>
-            <option value="1">第一层</option>
-            <option value="2">第二层</option>
-            <option value="3">第三层</option>
+            <option value="">{t("全部三层")}</option>
+            <option value="1">{t("第一层")}</option>
+            <option value="2">{t("第二层")}</option>
+            <option value="3">{t("第三层")}</option>
           </select>
         </label>
         <button disabled={busy} onClick={() => load()}>
-          查询代理与团队
+          {t("查询代理与团队")}
         </button>
       </div>
       {error && <p role="alert">{error}</p>}
       {summary && (
-        <div aria-label="全部匹配汇总">
+        <div aria-label={t("全部匹配汇总")}>
           <p>
-            共 {summary.members} 人 · 缺少统计 {summary.missing_statistics} 人 ·{" "}
-            {summary.complete ? "数据完整" : "汇总仅含已接入数据"}
+            {t("共")}
+            {summary.members}
+            {t("人 · 缺少统计")}
+            {summary.missing_statistics}
+            {t("人 ·")}{" "}
+            {t(summary.complete ? "数据完整" : "汇总仅含已接入数据")}
           </p>
           <p>
-            存款 {displayMoney(summary.deposit_minor, currency)} · 提款{" "}
-            {displayMoney(summary.withdrawal_minor, currency)} · 投注{" "}
-            {displayMoney(summary.bet_minor, currency)} · 有效投注{" "}
-            {displayMoney(summary.valid_bet_minor, currency)}
+            {t("存款")}
+            {displayMoney(summary.deposit_minor, currency)}
+            {t("· 提款")} {displayMoney(summary.withdrawal_minor, currency)}
+            {t("· 投注")} {displayMoney(summary.bet_minor, currency)}
+            {t("· 有效投注")} {displayMoney(summary.valid_bet_minor, currency)}
           </p>
-          <small>截至 {asOf} 的累计数据，汇总覆盖全部匹配成员。</small>
+          <small>
+            {t("截至")}
+            {asOf}
+            {t("的累计数据，汇总覆盖全部匹配成员。")}
+          </small>
         </div>
       )}
       <div className="review-table">
@@ -112,9 +123,9 @@ export function AgentDirectory({
           <thead>
             <tr>
               {[
-                "会员",
+                t("会员"),
                 "代理",
-                "层级",
+                t("层级"),
                 "存款",
                 "提款",
                 "投注",
@@ -122,7 +133,7 @@ export function AgentDirectory({
                 "VIP",
                 ...(!member ? ["登录IP"] : []),
               ].map((x) => (
-                <th key={x}>{x}</th>
+                <th key={x}>{t(x)}</th>
               ))}
             </tr>
           </thead>
@@ -133,15 +144,15 @@ export function AgentDirectory({
                   {r.display_name}
                   <small>{r.user_id}</small>
                 </td>
-                <td>{r.agent_id || "普通会员"}</td>
+                <td>{r.agent_id || t("普通会员")}</td>
                 <td>{r.depth || "—"}</td>
                 <td>{money(r, "deposit_minor")}</td>
                 <td>{money(r, "withdrawal_minor")}</td>
                 <td>{money(r, "bet_minor")}</td>
                 <td>{money(r, "valid_bet_minor")}</td>
-                <td>{r.statistics?.vip || "未知"}</td>
+                <td>{r.statistics?.vip || t("未知")}</td>
                 {!member && (
-                  <td>{r.statistics?.login_ip || "未提供或无权限"}</td>
+                  <td>{r.statistics?.login_ip || t("未提供或无权限")}</td>
                 )}
               </tr>
             ))}
@@ -150,7 +161,7 @@ export function AgentDirectory({
       </div>
       {next && (
         <button disabled={busy} onClick={() => load(next)}>
-          下一页团队
+          {t("下一页团队")}
         </button>
       )}
     </section>

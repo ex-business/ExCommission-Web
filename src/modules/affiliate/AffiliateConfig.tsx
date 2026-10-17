@@ -1,6 +1,9 @@
+import { RiskRules, type RiskRule } from "./RiskRules";
 import { useRef, useState } from "react";
 import type { Session } from "../../auth/Login";
 import { ApiError, request } from "../../lib/api";
+import { MoneyInput } from "./MoneyInput";
+import { amount } from "./money";
 
 type Condition = { deposit_minor: string; valid_bet_minor: string };
 type Level = {
@@ -11,6 +14,7 @@ type Level = {
 };
 type Step = { step: number; additional_members: number; reward_minor: string };
 type Config = {
+  risk_rules?: RiskRule[];
   enabled: boolean;
   currency: string;
   currency_scale: number;
@@ -57,6 +61,7 @@ export function AffiliateConfig({
   const [state, setState] = useState<any>(null),
     [config, setConfig] = useState<Config>(blank),
     [venues, setVenues] = useState<any[]>([]),
+    [currencies, setCurrencies] = useState<any[]>([]),
     [reason, setReason] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
@@ -78,16 +83,32 @@ export function AffiliateConfig({
   }
   async function load() {
     await run(async () => {
-      const [a, b] = await Promise.all([
+      const [a, b, c] = await Promise.all([
         request("/v1/affiliate/config"),
         request("/v1/affiliate/venue-types"),
+        request("/v1/affiliate/currencies").catch((e) => {
+          if (e instanceof ApiError && e.status === 404) return null;
+          throw e;
+        }),
       ]);
       setState(a.data);
-      setConfig(
-        structuredClone(
-          a.data.scheduled?.config || a.data.current?.config || blank(),
-        ),
+      const next = structuredClone(
+        a.data.scheduled?.config || a.data.current?.config || blank(),
       );
+      const options = c?.data.rows || [];
+      setCurrencies(options);
+      if (
+        !a.data.configured &&
+        !a.data.scheduled &&
+        options.length &&
+        !options.some((v: any) => v.code === next.currency)
+      ) {
+        const preferred =
+          options.find((v: any) => v.code === "USD") || options[0];
+        next.currency = preferred.code;
+        next.currency_scale = preferred.currency_scale;
+      }
+      setConfig(next);
       setVenues(b.data.rows);
       setApproval("");
     });
@@ -182,6 +203,12 @@ export function AffiliateConfig({
           )}
           <form onSubmit={save}>
             <fieldset disabled={busy || !!state.scheduled}>
+              <RiskRules
+                value={config.risk_rules || []}
+                onChange={(v) => patch("risk_rules", v)}
+              />
+            </fieldset>
+            <fieldset disabled={busy || !!state.scheduled}>
               <legend>站点与统计周期</legend>
               <label>
                 <input
@@ -194,13 +221,38 @@ export function AffiliateConfig({
               </label>
               <label>
                 主货币
-                <input
-                  aria-label="推荐返佣主货币"
-                  required
-                  disabled={fixed}
-                  value={config.currency}
-                  onChange={(e) => patch("currency", e.target.value)}
-                />
+                {currencies.length ? (
+                  <select
+                    aria-label="推荐返佣主货币"
+                    disabled={fixed}
+                    value={config.currency}
+                    onChange={(e) => {
+                      const selected = currencies.find(
+                        (v) => v.code === e.target.value,
+                      );
+                      if (selected)
+                        setConfig((c) => ({
+                          ...c,
+                          currency: selected.code,
+                          currency_scale: selected.currency_scale,
+                        }));
+                    }}
+                  >
+                    {currencies.map((v) => (
+                      <option key={v.code} value={v.code}>
+                        {v.code}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    aria-label="推荐返佣主货币"
+                    required
+                    disabled={fixed}
+                    value={config.currency}
+                    onChange={(e) => patch("currency", e.target.value)}
+                  />
+                )}
               </label>
               <label>
                 货币小数位
@@ -209,7 +261,7 @@ export function AffiliateConfig({
                   min="0"
                   max="8"
                   required
-                  disabled={fixed}
+                  disabled={fixed || currencies.length > 0}
                   value={config.currency_scale}
                   onChange={(e) =>
                     patch("currency_scale", Number(e.target.value))
@@ -240,7 +292,7 @@ export function AffiliateConfig({
                 </select>
               </label>
               <p>
-                货币、精度、时区和统计范围在首次生效后固定。等级人数只算直属达标会员，日有效投注包含下线三层。
+                货币、精度、时区和统计范围在首次生效后固定。等级人数只算直属达标会员，日有效业务量包含下线三层。
               </p>
             </fieldset>
             {(
@@ -254,33 +306,23 @@ export function AffiliateConfig({
                 <legend>{title}</legend>
                 <label>
                   累计成功充值
-                  <input
-                    aria-label={`${title}充值`}
-                    required
-                    inputMode="numeric"
-                    pattern="[1-9][0-9]{0,37}"
+                  <MoneyInput
+                    label={`${title}充值`}
                     value={config[key].deposit_minor}
-                    onChange={(e) =>
-                      patch(key, {
-                        ...config[key],
-                        deposit_minor: e.target.value,
-                      })
+                    scale={config.currency_scale}
+                    onChange={(minor) =>
+                      patch(key, { ...config[key], deposit_minor: minor })
                     }
                   />
                 </label>
                 <label>
-                  累计有效投注
-                  <input
-                    aria-label={`${title}有效投注`}
-                    required
-                    inputMode="numeric"
-                    pattern="[1-9][0-9]{0,37}"
+                  累计有效业务量
+                  <MoneyInput
+                    label={`${title}有效业务量`}
                     value={config[key].valid_bet_minor}
-                    onChange={(e) =>
-                      patch(key, {
-                        ...config[key],
-                        valid_bet_minor: e.target.value,
-                      })
+                    scale={config.currency_scale}
+                    onChange={(minor) =>
+                      patch(key, { ...config[key], valid_bet_minor: minor })
                     }
                   />
                 </label>
@@ -290,8 +332,8 @@ export function AffiliateConfig({
             <fieldset disabled={busy || !!state.scheduled}>
               <legend>代理等级与三层返佣</legend>
               <p>
-                比例为百万分比，2500 表示
-                0.25%。同一业务日全部投注使用当日最终等级结算。
+                金额使用 {config.currency}
+                ，比例填写百分比（如0.25表示0.25%）。同一业务日全部有效业务量使用当日最终等级结算。
               </p>
               <div className="table-wrap">
                 <table>
@@ -299,10 +341,10 @@ export function AffiliateConfig({
                     <tr>
                       <th>等级</th>
                       <th>有效会员人数</th>
-                      <th>日有效投注</th>
-                      <th>1级比例</th>
-                      <th>2级比例</th>
-                      <th>3级比例</th>
+                      <th>日有效业务量</th>
+                      <th>1级比例（%）</th>
+                      <th>2级比例（%）</th>
+                      <th>3级比例（%）</th>
                       <th>操作</th>
                     </tr>
                   </thead>
@@ -336,21 +378,17 @@ export function AffiliateConfig({
                           />
                         </td>
                         <td>
-                          <input
-                            aria-label={`Lv${i}日有效投注`}
-                            required
-                            inputMode="numeric"
-                            pattern="(0|[1-9][0-9]{0,37})"
+                          <MoneyInput
+                            label={`Lv${i}日有效业务量`}
                             value={v.daily_valid_bet_minor}
-                            onChange={(e) =>
+                            scale={config.currency_scale}
+                            allowZero
+                            onChange={(minor) =>
                               patch(
                                 "levels",
                                 config.levels.map((x, n) =>
                                   n === i
-                                    ? {
-                                        ...x,
-                                        daily_valid_bet_minor: e.target.value,
-                                      }
+                                    ? { ...x, daily_valid_bet_minor: minor }
                                     : x,
                                 ),
                               )
@@ -359,14 +397,13 @@ export function AffiliateConfig({
                         </td>
                         {[0, 1, 2].map((depth) => (
                           <td key={depth}>
-                            <input
-                              aria-label={`Lv${i}第${depth + 1}层比例`}
-                              type="number"
-                              min="0"
-                              max="1000000"
-                              required
-                              value={v.rates_ppm[depth]}
-                              onChange={(e) =>
+                            <MoneyInput
+                              label={`Lv${i}第${depth + 1}层比例百分比`}
+                              maxMinor="1000000"
+                              value={String(v.rates_ppm[depth])}
+                              scale={4}
+                              allowZero
+                              onChange={(minor) =>
                                 patch(
                                   "levels",
                                   config.levels.map((x, n) =>
@@ -374,9 +411,7 @@ export function AffiliateConfig({
                                       ? {
                                           ...x,
                                           rates_ppm: x.rates_ppm.map((r, k) =>
-                                            k === depth
-                                              ? Number(e.target.value)
-                                              : r,
+                                            k === depth ? Number(minor) : r,
                                           ),
                                         }
                                       : x,
@@ -458,20 +493,16 @@ export function AffiliateConfig({
                   </label>
                   <label>
                     奖励金额
-                    <input
-                      aria-label={`阶梯${s.step}奖励`}
-                      required
-                      inputMode="numeric"
-                      pattern="[1-9][0-9]{0,37}"
+                    <MoneyInput
+                      label={`阶梯${s.step}奖励`}
                       disabled={i < (state.current?.config.steps.length || 0)}
                       value={s.reward_minor}
-                      onChange={(e) =>
+                      scale={config.currency_scale}
+                      onChange={(minor) =>
                         patch(
                           "steps",
                           config.steps.map((x, n) =>
-                            n === i
-                              ? { ...x, reward_minor: e.target.value }
-                              : x,
+                            n === i ? { ...x, reward_minor: minor } : x,
                           ),
                         )
                       }
@@ -500,15 +531,11 @@ export function AffiliateConfig({
               </button>
               <label>
                 受邀会员本人一次性奖励
-                <input
-                  aria-label="受邀本人奖励金额"
-                  required
-                  inputMode="numeric"
-                  pattern="[1-9][0-9]{0,37}"
+                <MoneyInput
+                  label="受邀本人奖励金额"
                   value={config.invitee_reward_minor}
-                  onChange={(e) =>
-                    patch("invitee_reward_minor", e.target.value)
-                  }
+                  scale={config.currency_scale}
+                  onChange={(minor) => patch("invitee_reward_minor", minor)}
                 />
               </label>
             </fieldset>
@@ -518,7 +545,7 @@ export function AffiliateConfig({
                 <label key={v.venue_type_id}>
                   <input
                     type="checkbox"
-                    aria-label={`返佣场馆${v.name}`}
+                    aria-label={`返佣场馆${v.icon_url && <img src={v.icon_url} alt="" width={24} height={24} />} {v.name}`}
                     checked={config.venue_type_ids.includes(v.venue_type_id)}
                     onChange={(e) =>
                       patch(
@@ -531,6 +558,9 @@ export function AffiliateConfig({
                       )
                     }
                   />
+                  {v.icon_url && (
+                    <img src={v.icon_url} alt="" width={24} height={24} />
+                  )}{" "}
                   {v.name}
                 </label>
               ))}
@@ -576,7 +606,7 @@ export function AffiliateConfig({
   );
 }
 
-function ConfigSummary({ config: c }: { config: Config }) {
+export function ConfigSummary({ config: c }: { config: Config }) {
   const period: Record<string, string> = {
     DAY: "自然日",
     WEEK: "自然周",
@@ -598,14 +628,14 @@ function ConfigSummary({ config: c }: { config: Config }) {
         推荐返佣：{c.enabled ? "开启" : "关闭"} · {c.currency} · 小数位{" "}
         {c.currency_scale} · {c.timezone} · {period[c.grade_period]}
       </p>
-      <p>以下金额均为最小货币单位。</p>
+      <p>金额单位：{c.currency}。</p>
       <div className="table-wrap">
         <table>
           <thead>
             <tr>
               <th>达标类型</th>
               <th>累计充值</th>
-              <th>累计有效投注</th>
+              <th>累计有效业务量</th>
             </tr>
           </thead>
           <tbody>
@@ -618,8 +648,8 @@ function ConfigSummary({ config: c }: { config: Config }) {
             ).map(([name, t]) => (
               <tr key={name}>
                 <td>{name}</td>
-                <td>{t.deposit_minor}</td>
-                <td>{t.valid_bet_minor}</td>
+                <td>{amount(t.deposit_minor, c.currency_scale)}</td>
+                <td>{amount(t.valid_bet_minor, c.currency_scale)}</td>
               </tr>
             ))}
           </tbody>
@@ -631,7 +661,7 @@ function ConfigSummary({ config: c }: { config: Config }) {
             <tr>
               <th>等级</th>
               <th>人数</th>
-              <th>日有效投注</th>
+              <th>日有效业务量</th>
               <th>1层比例</th>
               <th>2层比例</th>
               <th>3层比例</th>
@@ -642,9 +672,9 @@ function ConfigSummary({ config: c }: { config: Config }) {
               <tr key={l.level}>
                 <td>Lv{l.level}</td>
                 <td>{l.qualified_members}</td>
-                <td>{l.daily_valid_bet_minor}</td>
+                <td>{amount(l.daily_valid_bet_minor, c.currency_scale)}</td>
                 {l.rates_ppm.map((r, i) => (
-                  <td key={i}>{r / 10000}%</td>
+                  <td key={i}>{amount(String(r), 4)}%</td>
                 ))}
               </tr>
             ))}
@@ -654,12 +684,14 @@ function ConfigSummary({ config: c }: { config: Config }) {
       <ul>
         {c.steps.map((s) => (
           <li key={s.step}>
-            阶梯{s.step}：新增{s.additional_members}人，奖励{s.reward_minor}
+            阶梯{s.step}：新增{s.additional_members}人，奖励
+            {amount(s.reward_minor, c.currency_scale)} {c.currency}
           </li>
         ))}
       </ul>
       <p>
-        受邀本人奖励：{c.invitee_reward_minor}；参与场馆：
+        受邀本人奖励：{amount(c.invitee_reward_minor, c.currency_scale)}{" "}
+        {c.currency}；参与场馆：
         {c.venue_type_ids.map((id) => names[id] || id).join("、")}
       </p>
     </>

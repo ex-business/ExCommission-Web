@@ -6,7 +6,11 @@ export type Session = {
   csrf: string;
 };
 export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
-  const [role, setRole] = useState("operator"),
+  const [role, setRole] = useState(
+      new URLSearchParams(window.location.search).get("role") === "member"
+        ? "member"
+        : "operator",
+    ),
     [password, setPassword] = useState(""),
     [username, setUsername] = useState(""),
     [error, setError] = useState(""),
@@ -69,6 +73,7 @@ export function Login({ onLogin }: { onLogin: (s: Session) => void }) {
             <input
               aria-label="会员账号"
               autoComplete="username"
+              placeholder="会员项目中注册的邮箱"
               required
               value={username}
               onChange={(e) => setUsername(e.target.value)}

@@ -22,4 +22,18 @@ export const agentsOperations: string[][] = [
   ["agents", "代理目录", "指定代理团队", "GET", "/v1/agents/{id}/team"],
   ["agents", "代理目录", "会员团队接口", "GET", "/v1/me/team"],
   ["agents", "代理目录", "接收会员统计", "POST", "/v1/member-statistics"],
+  [
+    "agents",
+    "代理奖励开关",
+    "读取代理奖励开关",
+    "GET",
+    "/v1/affiliate/agents/{user_id}/reward-switch",
+  ],
+  [
+    "agents",
+    "代理奖励开关",
+    "修改代理奖励开关",
+    "POST",
+    "/v1/affiliate/agents/{user_id}/reward-switch",
+  ],
 ];

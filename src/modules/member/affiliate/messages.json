@@ -1,0 +1,963 @@
+{
+  "一级 / 二级 / 三级": {
+    "en": "Level 1 / 2 / 3",
+    "es": "Nivel 1 / 2 / 3"
+  },
+  "一键领取推荐与佣金": {
+    "en": "Claim referrals and commissions",
+    "es": "Cobrar referidos y comisiones"
+  },
+  "下一页奖励": {
+    "en": "Next rewards",
+    "es": "Siguientes recompensas"
+  },
+  "专属邀请二维码": {
+    "en": "Personal invitation QR code",
+    "es": "Código QR de invitación personal"
+  },
+  "专属邀请链接": {
+    "en": "Personal invitation link",
+    "es": "Enlace de invitación personal"
+  },
+  "今日三层有效业务量": {
+    "en": "Today's eligible volume across three levels",
+    "es": "Volumen válido de hoy en tres niveles"
+  },
+  "今日实绩预估，关账后按最终等级计算当天佣金。": {
+    "en": "Live estimate; daily commissions use the final grade after closing.",
+    "es": "Estimación actual; la comisión diaria usa el nivel final tras el cierre."
+  },
+  "代理奖励和领取已暂停，历史记录仍可查询。": {
+    "en": "Rewards and claims are paused. History remains available.",
+    "es": "Recompensas y cobros pausados. El historial sigue disponible."
+  },
+  "代理规则": {
+    "en": "Agent rules",
+    "es": "Reglas de agentes"
+  },
+  "会员功能": {
+    "en": "Member navigation",
+    "es": "Navegación de miembros"
+  },
+  "佣金中心": {
+    "en": "Commission center",
+    "es": "Centro de comisiones"
+  },
+  "保存邀请海报": {
+    "en": "Save invitation poster",
+    "es": "Guardar cartel de invitación"
+  },
+  "充值与有效业务量同时满足才解锁。达标时间由已确认业务事实记录。": {
+    "en": "Both deposit and eligible volume targets must be met. Qualification time comes from confirmed activity.",
+    "es": "Se deben cumplir las metas de depósito y volumen válido. La fecha proviene de actividad confirmada."
+  },
+  "全部条件同时达标后触发一次奖励，核算与审核结果以我的收益为准。": {
+    "en": "A reward unlocks once all conditions are met. See earnings for final calculation and review.",
+    "es": "La recompensa se desbloquea al cumplir todas las condiciones. Consulte los ingresos para el cálculo y revisión finales."
+  },
+  "全部领取": {
+    "en": "Claim all",
+    "es": "Cobrar todo"
+  },
+  "关闭": {
+    "en": "Close",
+    "es": "Cerrar"
+  },
+  "分享专属链接或二维码，邀请好友进入会员入口。": {
+    "en": "Invite friends using your personal link or QR code.",
+    "es": "Invite a amigos con su enlace personal o código QR."
+  },
+  "分享推广": {
+    "en": "Share invitation",
+    "es": "Compartir invitación"
+  },
+  "刷新": {
+    "en": "Refresh",
+    "es": "Actualizar"
+  },
+  "刷新推荐奖励": {
+    "en": "Refresh referral rewards",
+    "es": "Actualizar recompensas por referidos"
+  },
+  "刷新收益汇总": {
+    "en": "Refresh earnings",
+    "es": "Actualizar ingresos"
+  },
+  "复制邀请链接": {
+    "en": "Copy invitation link",
+    "es": "Copiar enlace de invitación"
+  },
+  "奖励新增和领取已暂停，历史权益保留。": {
+    "en": "New rewards and claims are paused. Existing rewards are retained.",
+    "es": "Nuevas recompensas y cobros pausados. Se conservan los derechos existentes."
+  },
+  "奖励记录": {
+    "en": "Reward history",
+    "es": "Historial de recompensas"
+  },
+  "奖励详情": {
+    "en": "Reward details",
+    "es": "Detalles de la recompensa"
+  },
+  "好友通过链接注册，系统自动确认邀请归属。": {
+    "en": "Friends registering through this link are linked automatically.",
+    "es": "Los amigos que se registran con este enlace quedan vinculados automáticamente."
+  },
+  "尚未开通代理资格，开通后可生成推广链接。": {
+    "en": "Activate agent eligibility to create an invitation link.",
+    "es": "Active su condición de agente para crear un enlace de invitación."
+  },
+  "已达到当前规则最高等级": {
+    "en": "Highest available grade reached",
+    "es": "Ha alcanzado el nivel máximo disponible"
+  },
+  "当前没有已发布的推荐奖励。": {
+    "en": "No published referral rewards yet.",
+    "es": "Todavía no hay recompensas por referidos publicadas."
+  },
+  "当前没有生效的代理方案。": {
+    "en": "No active agent plan.",
+    "es": "No hay un plan de agentes activo."
+  },
+  "我的代理中心": {
+    "en": "My agent center",
+    "es": "Mi centro de agentes"
+  },
+  "我的受邀达标进度": {
+    "en": "My invitee qualification progress",
+    "es": "Mi progreso de invitado"
+  },
+  "我的收益": {
+    "en": "My earnings",
+    "es": "Mis ingresos"
+  },
+  "我的团队": {
+    "en": "My team",
+    "es": "Mi equipo"
+  },
+  "推荐奖励": {
+    "en": "Referral rewards",
+    "es": "Recompensas por referidos"
+  },
+  "受邀奖励": {
+    "en": "Invitee reward",
+    "es": "Recompensa de invitado"
+  },
+  "每日佣金": {
+    "en": "Daily commission",
+    "es": "Comisión diaria"
+  },
+  "推荐与佣金": {
+    "en": "Referrals and commissions",
+    "es": "Referidos y comisiones"
+  },
+  "推荐阶梯": {
+    "en": "Referral tiers",
+    "es": "Tramos de referidos"
+  },
+  "收益以实际业务、审核及入账结果为准。": {
+    "en": "Earnings depend on confirmed activity, review and wallet credits.",
+    "es": "Los ingresos dependen de la actividad confirmada, revisión y abonos."
+  },
+  "日有效业务量": {
+    "en": "Daily eligible volume",
+    "es": "Volumen válido diario"
+  },
+  "时间": {
+    "en": "Time",
+    "es": "Fecha"
+  },
+  "暂不确认": {
+    "en": "Not now",
+    "es": "Ahora no"
+  },
+  "暂无佣金收益记录。": {
+    "en": "No commission earnings yet.",
+    "es": "Todavía no hay ingresos por comisiones."
+  },
+  "暂无奖励记录": {
+    "en": "No rewards yet",
+    "es": "Todavía no hay recompensas"
+  },
+  "有效直属": {
+    "en": "Qualified direct members",
+    "es": "Miembros directos válidos"
+  },
+  "本站尚未发布代理奖励规则，请稍后查看。": {
+    "en": "Agent reward rules have not been published. Please check later.",
+    "es": "Las reglas de recompensas aún no se han publicado. Consulte más tarde."
+  },
+  "查看": {
+    "en": "View",
+    "es": "Ver"
+  },
+  "查看团队与奖励，让每一笔佣金清楚可查。": {
+    "en": "Track your team, rewards and every commission.",
+    "es": "Consulte su equipo, recompensas y cada comisión."
+  },
+  "查看达标会员": {
+    "en": "View qualified members",
+    "es": "Ver miembros válidos"
+  },
+  "欢迎回来": {
+    "en": "Welcome back",
+    "es": "Bienvenido de nuevo"
+  },
+  "每一档使用新增达标会员；同一会员不会重复占用不同阶梯。": {
+    "en": "Each tier requires additional qualified members. A member counts toward one tier only.",
+    "es": "Cada tramo requiere nuevos miembros válidos. Cada miembro cuenta para un solo tramo."
+  },
+  "每笔奖励分别生成交易和账变，受邀奖励单独领取。": {
+    "en": "Each reward creates its own transaction. Claim invitee rewards separately.",
+    "es": "Cada recompensa genera su propia transacción. Cobre la recompensa de invitado por separado."
+  },
+  "状态": {
+    "en": "Status",
+    "es": "Estado"
+  },
+  "登录后确认本人邀请归属。已有代理身份或归属时不能通过此方式修改。": {
+    "en": "Confirm your invitation after login. Existing agent relationships cannot be changed here.",
+    "es": "Confirme su invitación tras iniciar sesión. Las relaciones existentes no se pueden cambiar aquí."
+  },
+  "确认本人邀请关系": {
+    "en": "Confirm my invitation",
+    "es": "Confirmar mi invitación"
+  },
+  "确认邀请关系": {
+    "en": "Confirm invitation",
+    "es": "Confirmar invitación"
+  },
+  "等级": {
+    "en": "Grade",
+    "es": "Nivel"
+  },
+  "类型": {
+    "en": "Type",
+    "es": "Tipo"
+  },
+  "系统分享": {
+    "en": "Share",
+    "es": "Compartir"
+  },
+  "累计成功充值": {
+    "en": "Total successful deposits",
+    "es": "Depósitos completados acumulados"
+  },
+  "累计有效业务量": {
+    "en": "Total eligible volume",
+    "es": "Volumen válido acumulado"
+  },
+  "详情": {
+    "en": "Details",
+    "es": "Detalles"
+  },
+  "退出登录": {
+    "en": "Log out",
+    "es": "Cerrar sesión"
+  },
+  "邀请同行 · 分享收益": {
+    "en": "Invite friends · Share rewards",
+    "es": "Invite a amigos · Comparta recompensas"
+  },
+  "金额": {
+    "en": "Amount",
+    "es": "Importe"
+  },
+  "领取服务暂未开放，已解锁奖励保留。": {
+    "en": "Claims are not available yet. Unlocked rewards are retained.",
+    "es": "Los cobros aún no están disponibles. Se conservan las recompensas desbloqueadas."
+  },
+  "待领取": {
+    "en": "Claimable",
+    "es": "Disponible para cobrar"
+  },
+  "已领取": {
+    "en": "Claimed",
+    "es": "Cobrado"
+  },
+  "待审核": {
+    "en": "Pending review",
+    "es": "Pendiente de revisión"
+  },
+  "已取消": {
+    "en": "Cancelled",
+    "es": "Cancelado"
+  },
+  "已审核通过的待领佣金": {
+    "en": "Approved commissions ready to claim",
+    "es": "Comisiones aprobadas disponibles"
+  },
+  "本人达标后，终身领取一次": {
+    "en": "Qualify and claim once per lifetime",
+    "es": "Cumpla las condiciones y cobre una sola vez"
+  },
+  "各阶梯独立解锁，每阶梯奖励一次": {
+    "en": "Unlock each tier once",
+    "es": "Desbloquee cada tramo una sola vez"
+  },
+  "处理中…": {
+    "en": "Processing…",
+    "es": "Procesando…"
+  },
+  "领取受邀奖励": {
+    "en": "Claim invitee reward",
+    "es": "Cobrar recompensa de invitado"
+  },
+  "领取全部待领": {
+    "en": "Claim all available",
+    "es": "Cobrar todo lo disponible"
+  },
+  "达标处理中": {
+    "en": "Qualification processing",
+    "es": "Procesando la calificación"
+  },
+  "进行中": {
+    "en": "In progress",
+    "es": "En curso"
+  },
+  "正在读取奖励与等级进度…": {
+    "en": "Loading rewards and grade progress…",
+    "es": "Cargando recompensas y progreso…"
+  },
+  "刷新专属二维码": {
+    "en": "Refresh personal QR code",
+    "es": "Actualizar código QR personal"
+  },
+  "生成专属邀请链接": {
+    "en": "Create invitation link",
+    "es": "Crear enlace de invitación"
+  },
+  "邀请链接已复制": {
+    "en": "Invitation link copied",
+    "es": "Enlace de invitación copiado"
+  },
+  "邀请海报已生成": {
+    "en": "Invitation poster created",
+    "es": "Cartel de invitación creado"
+  },
+  "邀请加入我的团队": {
+    "en": "Join my team",
+    "es": "Únase a mi equipo"
+  },
+  "扫码注册，开启代理之旅": {
+    "en": "Scan to register and become an agent",
+    "es": "Escanee para registrarse como agente"
+  },
+  "邀请码：{code}": {
+    "en": "Invitation code: {code}",
+    "es": "Código de invitación: {code}"
+  },
+  "佣金计算器": {
+    "en": "Commission calculator",
+    "es": "Calculadora de comisiones"
+  },
+  "使用已发布规则预估，业务量须已扣除去重及无效订单。实际收益以日结和审核为准。": {
+    "en": "Estimates use published rules. Enter volume after duplicate and invalid orders are removed. Actual earnings depend on daily closing and review.",
+    "es": "La estimación usa reglas publicadas. Introduzca el volumen tras excluir duplicados y órdenes no válidas. Los ingresos finales dependen del cierre y revisión."
+  },
+  "有效直属人数": {
+    "en": "Qualified direct members",
+    "es": "Número de miembros directos válidos"
+  },
+  "第{depth}层业务量": {
+    "en": "Level {depth} volume",
+    "es": "Volumen del nivel {depth}"
+  },
+  "计算中…": {
+    "en": "Calculating…",
+    "es": "Calculando…"
+  },
+  "计算预估佣金": {
+    "en": "Estimate commission",
+    "es": "Estimar comisión"
+  },
+  "预计等级": {
+    "en": "Estimated grade",
+    "es": "Nivel estimado"
+  },
+  "规则版本": {
+    "en": "Rule version",
+    "es": "Versión de reglas"
+  },
+  "预计佣金": {
+    "en": "Estimated commission",
+    "es": "Comisión estimada"
+  },
+  "请输入有效金额": {
+    "en": "Enter a valid amount",
+    "es": "Introduzca un importe válido"
+  },
+  "金额小数位超过主货币精度": {
+    "en": "Too many decimal places for this currency",
+    "es": "Demasiados decimales para esta moneda"
+  },
+  "金额超出范围": {
+    "en": "Amount is out of range",
+    "es": "Importe fuera de rango"
+  },
+  "当前等级": {
+    "en": "Current grade",
+    "es": "Nivel actual"
+  },
+  "下一等级": {
+    "en": "Next grade",
+    "es": "Siguiente nivel"
+  },
+  "今日实绩": {
+    "en": "Today's activity",
+    "es": "Actividad de hoy"
+  },
+  "实绩更新于": {
+    "en": "Activity updated at",
+    "es": "Actividad actualizada el"
+  },
+  "第{step}档 · 再推荐{members}人": {
+    "en": "Tier {step} · Refer {members} additional members",
+    "es": "Tramo {step} · Invite a {members} miembros adicionales"
+  },
+  "累计需要": {
+    "en": "Total required",
+    "es": "Total necesario"
+  },
+  "奖励": {
+    "en": "Reward",
+    "es": "Recompensa"
+  },
+  "达标于": {
+    "en": "Qualified at",
+    "es": "Calificado el"
+  },
+  "人": {
+    "en": "members",
+    "es": "miembros"
+  },
+  "奖励编号": {
+    "en": "Reward ID",
+    "es": "ID de recompensa"
+  },
+  "领取时间": {
+    "en": "Claimed at",
+    "es": "Fecha de cobro"
+  },
+  "领取 IP": {
+    "en": "Claim IP",
+    "es": "IP del cobro"
+  },
+  "累计充值": {
+    "en": "Total deposits",
+    "es": "Depósitos acumulados"
+  },
+  "有效业务量": {
+    "en": "Eligible volume",
+    "es": "Volumen válido"
+  },
+  "达标时间": {
+    "en": "Qualified at",
+    "es": "Fecha de calificación"
+  },
+  "到账提示": {
+    "en": "{kind} credited: {count} rewards. See wallet history.",
+    "es": "{kind} abonado: {count} recompensas. Consulte el historial.",
+    "zh-CN": "{kind}已到账，共{count}笔，可在钱包账变中查看。"
+  },
+  "奖励状态已变化，请刷新后重试。": {
+    "en": "Reward status changed. Refresh and retry.",
+    "es": "El estado ha cambiado. Actualice e inténtelo de nuevo."
+  },
+  "操作未完成": {
+    "en": "Operation failed",
+    "es": "La operación no se completó"
+  },
+  "当前浏览器无法生成海报": {
+    "en": "This browser cannot create a poster",
+    "es": "Este navegador no puede crear el cartel"
+  },
+  "海报生成失败": {
+    "en": "Poster creation failed",
+    "es": "No se pudo crear el cartel"
+  },
+  "最低派发金额：": {
+    "en": "Minimum payout:",
+    "es": "Pago mínimo:"
+  },
+  "已领取：": {
+    "en": "Claimed:",
+    "es": "Cobrado:"
+  },
+  "待领取：": {
+    "en": "Claimable:",
+    "es": "Disponible:"
+  },
+  "结算中：": {
+    "en": "Settling:",
+    "es": "En liquidación:"
+  },
+  "下一页": {
+    "en": "Next page",
+    "es": "Página siguiente"
+  },
+  "下一页团队": {
+    "en": "Next team page",
+    "es": "Siguiente página del equipo"
+  },
+  "下线层级": {
+    "en": "Team depth",
+    "es": "Profundidad del equipo"
+  },
+  "下线所属代理": {
+    "en": "Parent agent",
+    "es": "Agente superior"
+  },
+  "仅显示本人佣金。领取受理后请刷新确认结果；结果未知时保留原单核验。": {
+    "en": "Only your commissions are shown. Refresh after claiming; verify the original order if the result is unknown.",
+    "es": "Solo se muestran sus comisiones. Actualice tras cobrar; si el resultado es incierto, verifique la orden original."
+  },
+  "会员": {
+    "en": "Member",
+    "es": "Miembro"
+  },
+  "会员 / 代理": {
+    "en": "Member / agent",
+    "es": "Miembro / agente"
+  },
+  "会员编号": {
+    "en": "Member ID",
+    "es": "ID del miembro"
+  },
+  "佣金领取": {
+    "en": "Commission claims",
+    "es": "Cobro de comisiones"
+  },
+  "充值 / 提现": {
+    "en": "Deposits / withdrawals",
+    "es": "Depósitos / retiros"
+  },
+  "全部三层": {
+    "en": "All three levels",
+    "es": "Los tres niveles"
+  },
+  "冻结 / 今日预估佣金": {
+    "en": "Frozen / estimated today",
+    "es": "Congelado / estimación de hoy"
+  },
+  "冻结贡献 / 今日预估": {
+    "en": "Frozen contribution / estimate",
+    "es": "Contribución congelada / estimación"
+  },
+  "刷新我的佣金": {
+    "en": "Refresh my commissions",
+    "es": "Actualizar mis comisiones"
+  },
+  "单代理开关": {
+    "en": "Agent status",
+    "es": "Estado del agente"
+  },
+  "团队与贡献": {
+    "en": "Team and contributions",
+    "es": "Equipo y contribuciones"
+  },
+  "团队与贡献明细": {
+    "en": "Team and contribution details",
+    "es": "Detalles del equipo y contribuciones"
+  },
+  "团队提现 / 存提差": {
+    "en": "Team withdrawals / net deposits",
+    "es": "Retiros del equipo / depósitos netos"
+  },
+  "团队有效业务量": {
+    "en": "Team eligible volume",
+    "es": "Volumen válido del equipo"
+  },
+  "导出本次快照": {
+    "en": "Export this snapshot",
+    "es": "Exportar esta instantánea"
+  },
+  "层级": {
+    "en": "Depth",
+    "es": "Profundidad"
+  },
+  "已领佣金": {
+    "en": "Claimed commissions",
+    "es": "Comisiones cobradas"
+  },
+  "已领推荐 / 佣金": {
+    "en": "Claimed referrals / commissions",
+    "es": "Referidos / comisiones cobrados"
+  },
+  "开始日期": {
+    "en": "Start date",
+    "es": "Fecha de inicio"
+  },
+  "成为代理时间": {
+    "en": "Agent since",
+    "es": "Agente desde"
+  },
+  "按站点业务日期查询，默认今日。展示统计期末三层团队与有效会员；已冻结贡献和当前日预估分别显示。": {
+    "en": "Filter by business dates; defaults to today. Shows three team levels and qualified members at period end. Frozen contributions and live estimates are separate.",
+    "es": "Consulte por fechas operativas; hoy de forma predeterminada. Muestra tres niveles del equipo y miembros válidos al cierre. Se separan contribuciones congeladas y estimaciones actuales."
+  },
+  "排序": {
+    "en": "Sort by",
+    "es": "Ordenar por"
+  },
+  "明细": {
+    "en": "Details",
+    "es": "Detalles"
+  },
+  "暂无有直属会员的代理": {
+    "en": "No agents with direct members",
+    "es": "No hay agentes con miembros directos"
+  },
+  "暂无记录，请刷新查询。": {
+    "en": "No records. Refresh to query.",
+    "es": "Sin registros. Actualice para consultar."
+  },
+  "有效直属 / 团队": {
+    "en": "Qualified direct / team members",
+    "es": "Miembros válidos directos / equipo"
+  },
+  "查看真金钱包": {
+    "en": "View cash wallet",
+    "es": "Ver cartera de efectivo"
+  },
+  "查询": {
+    "en": "Search",
+    "es": "Buscar"
+  },
+  "查询代理与团队": {
+    "en": "Search agents and teams",
+    "es": "Buscar agentes y equipos"
+  },
+  "注册时间": {
+    "en": "Registered at",
+    "es": "Fecha de registro"
+  },
+  "派发准备中": {
+    "en": "Preparing distribution",
+    "es": "Preparando distribución"
+  },
+  "直属 / 团队": {
+    "en": "Direct / team",
+    "es": "Directos / equipo"
+  },
+  "直属 / 团队充值": {
+    "en": "Direct / team deposits",
+    "es": "Depósitos directos / del equipo"
+  },
+  "直属 / 团队有效量": {
+    "en": "Direct / team eligible volume",
+    "es": "Volumen válido directo / del equipo"
+  },
+  "直属人数": {
+    "en": "Direct members",
+    "es": "Miembros directos"
+  },
+  "第一层": {
+    "en": "Level 1",
+    "es": "Nivel 1"
+  },
+  "第二层": {
+    "en": "Level 2",
+    "es": "Nivel 2"
+  },
+  "第三层": {
+    "en": "Level 3",
+    "es": "Nivel 3"
+  },
+  "结束日期（不含）": {
+    "en": "End date (exclusive)",
+    "es": "Fecha final (excluida)"
+  },
+  "统计币种": {
+    "en": "Currency",
+    "es": "Moneda"
+  },
+  "领取佣金": {
+    "en": "Claim commission",
+    "es": "Cobrar comisión"
+  },
+  "首次达标时间": {
+    "en": "First qualified at",
+    "es": "Primera calificación"
+  },
+  "尚未接入": {
+    "en": "Not connected",
+    "es": "Sin conexión"
+  },
+  "代理总表": {
+    "en": "Agent report",
+    "es": "Informe de agentes"
+  },
+  "代理总表及下线明细": {
+    "en": "Agent report and team details",
+    "es": "Informe de agentes y detalles del equipo"
+  },
+  "代理业务总表": {
+    "en": "Agent business report",
+    "es": "Informe de actividad de agentes"
+  },
+  "团队充值": {
+    "en": "Team deposits",
+    "es": "Depósitos del equipo"
+  },
+  "提现": {
+    "en": "Withdrawals",
+    "es": "Retiros"
+  },
+  "存提差": {
+    "en": "Net deposits",
+    "es": "Depósitos netos"
+  },
+  "团队": {
+    "en": "Team",
+    "es": "Equipo"
+  },
+  "直属": {
+    "en": "Direct",
+    "es": "Directos"
+  },
+  "位代理": {
+    "en": "agents",
+    "es": "agentes"
+  },
+  "已领推荐": {
+    "en": "Claimed referrals",
+    "es": "Referidos cobrados"
+  },
+  "当前页汇总": {
+    "en": "Page totals",
+    "es": "Totales de la página"
+  },
+  "全部条件汇总": {
+    "en": "All matching totals",
+    "es": "Totales de todos los resultados"
+  },
+  "已冻结日结贡献": {
+    "en": "Frozen daily contributions",
+    "es": "Contribuciones diarias congeladas"
+  },
+  "今日预估贡献": {
+    "en": "Today's estimated contributions",
+    "es": "Contribuciones estimadas de hoy"
+  },
+  "已开启": {
+    "en": "Enabled",
+    "es": "Activado"
+  },
+  "已关闭": {
+    "en": "Disabled",
+    "es": "Desactivado"
+  },
+  "交易历史": {
+    "en": "Transaction history",
+    "es": "Historial de transacciones"
+  },
+  "账变记录": {
+    "en": "Balance changes",
+    "es": "Movimientos del saldo"
+  },
+  "取消派发": {
+    "en": "Distribution cancelled",
+    "es": "Distribución cancelada"
+  },
+  "审核通过": {
+    "en": "Approved",
+    "es": "Aprobado"
+  },
+  "准备中": {
+    "en": "Preparing",
+    "es": "Preparando"
+  },
+  "领取处理中": {
+    "en": "Claim processing",
+    "es": "Cobro en proceso"
+  },
+  "领取失败": {
+    "en": "Claim failed",
+    "es": "Cobro fallido"
+  },
+  "核验异常": {
+    "en": "Reconciliation issue",
+    "es": "Problema de conciliación"
+  },
+  "查询失败": {
+    "en": "Query failed",
+    "es": "Consulta fallida"
+  },
+  "观察于": {
+    "en": "Observed at",
+    "es": "Observado el"
+  },
+  "团队汇总按代理口径相加，跨代理团队成员可能重叠。": {
+    "en": "Team totals are summed per agent; members may overlap across teams.",
+    "es": "Los totales se suman por agente; los miembros pueden coincidir entre equipos."
+  },
+  "当前日数据尚未关账。": {
+    "en": "Today's data has not closed yet.",
+    "es": "Los datos de hoy aún no se han cerrado."
+  },
+  "开启": {
+    "en": "Enabled",
+    "es": "Activado"
+  },
+  "暂停": {
+    "en": "Paused",
+    "es": "En pausa"
+  },
+  "累计佣金": {
+    "en": "Total commissions",
+    "es": "Comisiones acumuladas"
+  },
+  "待审核结算": {
+    "en": "Pending review",
+    "es": "Liquidación pendiente de revisión"
+  },
+  "已结算余额": {
+    "en": "Settled balance",
+    "es": "Saldo liquidado"
+  },
+  "冻结余额": {
+    "en": "Frozen balance",
+    "es": "Saldo congelado"
+  },
+  "累计已发放": {
+    "en": "Total distributed",
+    "es": "Total distribuido"
+  },
+  "已追回": {
+    "en": "Recovered",
+    "es": "Recuperado"
+  },
+  "待抵扣": {
+    "en": "Pending deduction",
+    "es": "Deducción pendiente"
+  },
+  "记录日期按UTC查询，每次最多查询一年。": {
+    "en": "Dates use UTC. Query up to one year at a time.",
+    "es": "Las fechas usan UTC. Consulte hasta un año cada vez."
+  },
+  "奖励记录开始日期": {
+    "en": "Reward history start date",
+    "es": "Fecha inicial de recompensas"
+  },
+  "奖励记录结束日期": {
+    "en": "Reward history end date",
+    "es": "Fecha final de recompensas"
+  },
+  "查询奖励记录": {
+    "en": "Search reward history",
+    "es": "Consultar recompensas"
+  },
+  "直属一级": {
+    "en": "Direct level 1",
+    "es": "Nivel directo 1"
+  },
+  "第{depth}层": {
+    "en": "Level {depth}",
+    "es": "Nivel {depth}"
+  },
+  "（历史关系）": {
+    "en": " (historical relationship)",
+    "es": " (relación histórica)"
+  },
+  "未达标": {
+    "en": "Not qualified",
+    "es": "Sin calificar"
+  },
+  "不少于": {
+    "en": "At least",
+    "es": "Al menos"
+  },
+  "已达标": {
+    "en": "Qualified",
+    "es": "Calificado"
+  },
+  "人 · 已触发": {
+    "en": "members · Triggered",
+    "es": "miembros · Activado"
+  },
+  "共": {
+    "en": "Total",
+    "es": "Total"
+  },
+  "人 · 缺少统计": {
+    "en": "members · Missing statistics",
+    "es": "miembros · Sin estadísticas"
+  },
+  "人 ·": {
+    "en": "members ·",
+    "es": "miembros ·"
+  },
+  "存款": {
+    "en": "Deposits",
+    "es": "Depósitos"
+  },
+  "· 提款": {
+    "en": "· Withdrawals",
+    "es": "· Retiros"
+  },
+  "· 投注": {
+    "en": "· Bets",
+    "es": "· Apuestas"
+  },
+  "· 有效投注": {
+    "en": "· Eligible bets",
+    "es": "· Apuestas válidas"
+  },
+  "截至": {
+    "en": "As of",
+    "es": "A fecha de"
+  },
+  "的累计数据，汇总覆盖全部匹配成员。": {
+    "en": "cumulative data; totals cover all matching members.",
+    "es": "datos acumulados; los totales incluyen todos los miembros coincidentes."
+  },
+  "数据完整": {
+    "en": "Complete data",
+    "es": "Datos completos"
+  },
+  "汇总仅含已接入数据": {
+    "en": "Totals include connected data only",
+    "es": "Los totales solo incluyen datos conectados"
+  },
+  "代理": {
+    "en": "Agent",
+    "es": "Agente"
+  },
+  "提款": {
+    "en": "Withdrawals",
+    "es": "Retiros"
+  },
+  "投注": {
+    "en": "Bets",
+    "es": "Apuestas"
+  },
+  "有效投注": {
+    "en": "Eligible bets",
+    "es": "Apuestas válidas"
+  },
+  "登录IP": {
+    "en": "Login IP",
+    "es": "IP de acceso"
+  },
+  "普通会员": {
+    "en": "Regular member",
+    "es": "Miembro habitual"
+  },
+  "未知": {
+    "en": "Unknown",
+    "es": "Desconocido"
+  },
+  "未提供或无权限": {
+    "en": "Unavailable or not permitted",
+    "es": "No disponible o sin permiso"
+  },
+  "全部匹配汇总": {
+    "en": "All matching totals",
+    "es": "Totales de todos los resultados"
+  },
+  "非活动期": {
+    "en": "Inactive period",
+    "es": "Período inactivo"
+  }
+}
