@@ -1,3 +1,4 @@
+import { PublishedRules } from "./affiliate/PublishedRules";
 import {
   MemberLocaleProvider,
   MemberLanguage,
@@ -42,6 +43,8 @@ function MemberContent({
 }) {
   const { t, locale } = useMemberLocale();
   const [tab, setTab] = useState("rewards"),
+    [presentation, setPresentation] = useState<Row | null>(null),
+    [presentationReady, setPresentationReady] = useState(false),
     [rewards, setRewards] = useState<Row[]>([]),
     [rules, setRules] = useState<Row[]>([]),
     [earnings, setEarnings] = useState<Row[]>([]),
@@ -147,7 +150,7 @@ function MemberContent({
         const r = await request("/v1/me/earnings");
         setEarnings(r.data.rows);
       }
-      if (tab === "rules") {
+      if (tab === "rules" && !presentation) {
         const r = await request("/v1/me/agent-rules");
         setRules(r.data.rows);
         setEnabled(r.data.agent_enabled);
@@ -170,17 +173,45 @@ function MemberContent({
   }, [tab]);
   useEffect(() => {
     let active = true;
-    request("/v1/me/agent-rules")
-      .then((r) => {
+    async function initialize() {
+      try {
+        const r = await request("/v1/me/affiliate/presentation");
+        if (!active) return;
+        if (r.data.configured) {
+          setPresentation(r.data);
+          setEnabled(
+            r.data.site_enabled !== false &&
+              !!r.data.configuration?.config.enabled,
+          );
+          setPresentationReady(true);
+          return;
+        }
+      } catch (e) {
+        // 仅明确缺少扩展端口时回退；鉴权、网络或服务故障不能伪装成旧模式。
+        if (!(e instanceof ApiError && e.status === 404)) {
+          if (active) {
+            setError((e as Error).message);
+            if (e instanceof ApiError && e.status === 401) onExpired();
+          }
+          return;
+        }
+      }
+      try {
+        const r = await request("/v1/me/agent-rules");
         if (active) {
           setEnabled(r.data.agent_enabled);
           setIsAgent(r.data.is_agent);
           setRules(r.data.rows);
+          setPresentationReady(true);
         }
-      })
-      .catch((e) => {
-        if (e instanceof ApiError && e.status === 401) onExpired();
-      });
+      } catch (e) {
+        if (active) {
+          setError((e as Error).message);
+          if (e instanceof ApiError && e.status === 401) onExpired();
+        }
+      }
+    }
+    void initialize();
     return () => {
       active = false;
     };
@@ -218,258 +249,278 @@ function MemberContent({
           <h1>{t("我的代理中心")}</h1>
           <p>{t("查看团队与奖励，让每一笔佣金清楚可查。")}</p>
         </section>
-        {!enabled && (
-          <p className="member-banner" role="status">
-            {t("代理奖励和领取已暂停，历史记录仍可查询。")}
-          </p>
+        {!presentationReady && (
+          <p role="status">{error || t("正在读取代理入口配置…")}</p>
         )}
-        {invite && (
-          <section className="member-card">
-            <h2>{t("确认邀请关系")}</h2>
-            <p>
-              {t(
-                "登录后确认本人邀请归属。已有代理身份或归属时不能通过此方式修改。",
-              )}
-            </p>
-            <button disabled={busy || !enabled} onClick={bind}>
-              {t("确认本人邀请关系")}
-            </button>
-            <button onClick={() => setInvite("")}>{t("暂不确认")}</button>
-          </section>
+        {presentationReady && presentation?.entry_visible === false && (
+          <p role="status">{t("本站代理功能暂未开放。")}</p>
         )}
-        <nav className="member-tabs" aria-label={t("会员功能")}>
-          {tabs.map(([id, label]) => (
-            <button
-              key={id}
-              aria-selected={tab === id}
-              className={tab === id ? "active" : ""}
-              onClick={() => {
-                setTab(id);
-                setError("");
-                setNotice("");
-              }}
-            >
-              {t(label)}
-            </button>
-          ))}
-        </nav>
-        {error && (
-          <p role="alert" className="error-box">
-            {error}
-          </p>
-        )}
-        {notice && <p role="status">{notice}</p>}
-        {tab === "rewards" && (
-          <AffiliateRewards
-            session={session}
-            enabled={enabled}
-            onExpired={onExpired}
-            fallback={
-              <section aria-label={t("推荐奖励")} className="member-content">
-                <div className="member-heading">
-                  <h2>{t("推荐奖励")}</h2>
-                  <button disabled={busy} onClick={() => load()}>
-                    {t("刷新推荐奖励")}
-                  </button>
-                </div>
-                <p>
-                  {t(
-                    "全部条件同时达标后触发一次奖励，核算与审核结果以我的收益为准。",
-                  )}
-                </p>
-                <div className="member-grid">
-                  {rewards.map((r) => (
-                    <article className="member-card" key={r.program_id}>
-                      <span className="member-tag">
-                        {t(r.active ? "进行中" : "非活动期")}
-                      </span>
-                      <h3>{r.name}</h3>
-                      <ul>
-                        {r.conditions.map((c: Row) => (
-                          <li key={c.metric}>
-                            {c.metric}
-                            {t("不少于")}
-                            {decimal(c.threshold)} {c.unit}
-                          </li>
-                        ))}
-                      </ul>
-                      <p>
-                        {t("已达标")}
-                        {r.qualified_members}
-                        {t("人 · 已触发")} {r.triggered_members}
-                        {t("人")}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-                {!busy && !rewards.length && (
-                  <p className="member-empty">
-                    {t("当前没有已发布的推荐奖励。")}
-                  </p>
-                )}
-                {next && (
-                  <button disabled={busy} onClick={() => load(next)}>
-                    {t("下一页奖励")}
-                  </button>
-                )}
-              </section>
-            }
-          />
-        )}
-        {tab === "team" && (
-          <section className="member-content">
-            <AgentBusinessReport
-              member
-              onExpired={onExpired}
-              fallback={<AgentDirectory member onExpired={onExpired} />}
-            />
-          </section>
-        )}
-        {tab === "earnings" && (
-          <section className="member-content" aria-label={t("我的收益")}>
-            <div className="member-heading">
-              <h2>{t("我的收益")}</h2>
-              <button disabled={busy} onClick={() => load()}>
-                {t("刷新收益汇总")}
-              </button>
-            </div>
-            {earnings.map((r) => (
-              <div className="member-grid" key={r.currency}>
-                {[
-                  ["target_minor", "累计佣金"],
-                  ["pending_minor", "待审核结算"],
-                  ["available_minor", "已结算余额"],
-                  ["frozen_minor", "冻结余额"],
-                  ["reserved_minor", "领取处理中"],
-                  ["paid_minor", "累计已发放"],
-                  ["recovered_minor", "已追回"],
-                  ["debt_minor", "待抵扣"],
-                ].map(([field, label]) => (
-                  <article className="member-stat" key={field}>
-                    <small>{t(label)}</small>
-                    <strong>{displayMoney(r[field], r.currency)}</strong>
-                  </article>
-                ))}
-              </div>
-            ))}
-            {!earnings.length && !busy && (
-              <p className="member-empty">{t("暂无佣金收益记录。")}</p>
-            )}
-            <MemberCommissions
-              session={session}
-              onExpired={onExpired}
-              disabled={!enabled}
-            />
-          </section>
-        )}
-        {tab === "rules" && (
-          <section className="member-content" aria-label={t("代理规则")}>
-            <h2>{t("代理规则")}</h2>
-            {rules.map((r, i) => (
-              <article className="member-card" key={i}>
-                <h3>{r.plan_name}</h3>
-                <p>
-                  {t("最低派发金额：")}
-                  {displayMoney(r.minimum_payout_minor, r.currency)}
-                </p>
-                {r.rules.map((rule: Row, j: number) => (
-                  <div key={j}>
-                    <h4>{rule.name}</h4>
-                    <p>{rule.description}</p>
-                  </div>
-                ))}
-              </article>
-            ))}
-            {!rules.length && !busy && (
-              <p className="member-empty">{t("当前没有生效的代理方案。")}</p>
-            )}
-          </section>
-        )}
-        {tab === "share" && (
-          <section
-            className="member-content member-share"
-            aria-label={t("分享推广")}
-          >
-            <h2>{t("分享推广")}</h2>
-            {link?.url && new URL(link.url).searchParams.has("ic") && (
-              <p className="muted">
-                {t("好友通过链接注册，系统自动确认邀请归属。")}
+        {presentationReady && presentation?.entry_visible !== false && (
+          <>
+            {!enabled && (
+              <p className="member-banner" role="status">
+                {t("代理奖励和领取已暂停，历史记录仍可查询。")}
               </p>
             )}
-            {!isAgent && <p>{t("尚未开通代理资格，开通后可生成推广链接。")}</p>}
-            <p>{t("分享专属链接或二维码，邀请好友进入会员入口。")}</p>
-            <button
-              disabled={busy || !enabled || !isAgent}
-              onClick={() =>
-                guard(async () => {
-                  const r = await request("/v1/me/referral-links", {
-                    method: "POST",
-                    body: {},
-                    csrf: session.csrf,
-                    key: key("create-link"),
-                  });
-                  await showLink(r.data);
-                })
-              }
-            >
-              {link ? t("刷新专属二维码") : t("生成专属邀请链接")}
-            </button>
-            {link && (
-              <div className="member-card">
-                {qr && (
-                  <img
-                    className="member-qr"
-                    src={qr}
-                    alt={t("专属邀请二维码")}
-                    width={240}
-                    height={240}
-                  />
-                )}
-                <label>
-                  {t("专属邀请链接")}
-                  <input
-                    aria-label={t("专属邀请链接")}
-                    readOnly
-                    value={link.url}
-                  />
-                </label>
-                <div className="member-share-actions">
-                  <button
-                    disabled={!enabled || busy || !qr}
-                    onClick={() => guard(savePoster)}
-                  >
-                    {t("保存邀请海报")}
-                  </button>
-                  <button
-                    disabled={!enabled}
-                    onClick={() =>
-                      guard(async () => {
-                        await navigator.clipboard.writeText(link.url);
-                        setNotice(t("邀请链接已复制"));
-                      })
-                    }
-                  >
-                    {t("复制邀请链接")}
-                  </button>
-                  {typeof navigator.share === "function" && (
-                    <button
-                      disabled={!enabled}
-                      onClick={() =>
-                        guard(async () => {
-                          await navigator.share({
-                            title: t("邀请加入我的团队"),
-                            url: link.url,
-                          });
-                        })
-                      }
-                    >
-                      {t("系统分享")}
-                    </button>
+            {invite && (
+              <section className="member-card">
+                <h2>{t("确认邀请关系")}</h2>
+                <p>
+                  {t(
+                    "登录后确认本人邀请归属。已有代理身份或归属时不能通过此方式修改。",
                   )}
-                </div>
-              </div>
+                </p>
+                <button disabled={busy || !enabled} onClick={bind}>
+                  {t("确认本人邀请关系")}
+                </button>
+                <button onClick={() => setInvite("")}>{t("暂不确认")}</button>
+              </section>
             )}
-          </section>
+            <nav className="member-tabs" aria-label={t("会员功能")}>
+              {tabs.map(([id, label]) => (
+                <button
+                  key={id}
+                  aria-selected={tab === id}
+                  className={tab === id ? "active" : ""}
+                  onClick={() => {
+                    setTab(id);
+                    setError("");
+                    setNotice("");
+                  }}
+                >
+                  {t(label)}
+                </button>
+              ))}
+            </nav>
+            {error && (
+              <p role="alert" className="error-box">
+                {error}
+              </p>
+            )}
+            {notice && <p role="status">{notice}</p>}
+            {tab === "rewards" && (
+              <AffiliateRewards
+                session={session}
+                enabled={enabled}
+                onExpired={onExpired}
+                fallback={
+                  <section
+                    aria-label={t("推荐奖励")}
+                    className="member-content"
+                  >
+                    <div className="member-heading">
+                      <h2>{t("推荐奖励")}</h2>
+                      <button disabled={busy} onClick={() => load()}>
+                        {t("刷新推荐奖励")}
+                      </button>
+                    </div>
+                    <p>
+                      {t(
+                        "全部条件同时达标后触发一次奖励，核算与审核结果以我的收益为准。",
+                      )}
+                    </p>
+                    <div className="member-grid">
+                      {rewards.map((r) => (
+                        <article className="member-card" key={r.program_id}>
+                          <span className="member-tag">
+                            {t(r.active ? "进行中" : "非活动期")}
+                          </span>
+                          <h3>{r.name}</h3>
+                          <ul>
+                            {r.conditions.map((c: Row) => (
+                              <li key={c.metric}>
+                                {c.metric}
+                                {t("不少于")}
+                                {decimal(c.threshold)} {c.unit}
+                              </li>
+                            ))}
+                          </ul>
+                          <p>
+                            {t("已达标")}
+                            {r.qualified_members}
+                            {t("人 · 已触发")} {r.triggered_members}
+                            {t("人")}
+                          </p>
+                        </article>
+                      ))}
+                    </div>
+                    {!busy && !rewards.length && (
+                      <p className="member-empty">
+                        {t("当前没有已发布的推荐奖励。")}
+                      </p>
+                    )}
+                    {next && (
+                      <button disabled={busy} onClick={() => load(next)}>
+                        {t("下一页奖励")}
+                      </button>
+                    )}
+                  </section>
+                }
+              />
+            )}
+            {tab === "team" && (
+              <section className="member-content">
+                <AgentBusinessReport
+                  member
+                  onExpired={onExpired}
+                  fallback={<AgentDirectory member onExpired={onExpired} />}
+                />
+              </section>
+            )}
+            {tab === "earnings" && (
+              <section className="member-content" aria-label={t("我的收益")}>
+                <div className="member-heading">
+                  <h2>{t("我的收益")}</h2>
+                  <button disabled={busy} onClick={() => load()}>
+                    {t("刷新收益汇总")}
+                  </button>
+                </div>
+                {earnings.map((r) => (
+                  <div className="member-grid" key={r.currency}>
+                    {[
+                      ["target_minor", "累计佣金"],
+                      ["pending_minor", "待审核结算"],
+                      ["available_minor", "已结算余额"],
+                      ["frozen_minor", "冻结余额"],
+                      ["reserved_minor", "领取处理中"],
+                      ["paid_minor", "累计已发放"],
+                      ["recovered_minor", "已追回"],
+                      ["debt_minor", "待抵扣"],
+                    ].map(([field, label]) => (
+                      <article className="member-stat" key={field}>
+                        <small>{t(label)}</small>
+                        <strong>{displayMoney(r[field], r.currency)}</strong>
+                      </article>
+                    ))}
+                  </div>
+                ))}
+                {!earnings.length && !busy && (
+                  <p className="member-empty">{t("暂无佣金收益记录。")}</p>
+                )}
+                <MemberCommissions
+                  session={session}
+                  onExpired={onExpired}
+                  disabled={!enabled}
+                />
+              </section>
+            )}
+            {tab === "rules" && presentation && (
+              <PublishedRules presentation={presentation} />
+            )}
+            {tab === "rules" && !presentation && (
+              <section className="member-content" aria-label={t("代理规则")}>
+                <h2>{t("代理规则")}</h2>
+                {rules.map((r, i) => (
+                  <article className="member-card" key={i}>
+                    <h3>{r.plan_name}</h3>
+                    <p>
+                      {t("最低派发金额：")}
+                      {displayMoney(r.minimum_payout_minor, r.currency)}
+                    </p>
+                    {r.rules.map((rule: Row, j: number) => (
+                      <div key={j}>
+                        <h4>{rule.name}</h4>
+                        <p>{rule.description}</p>
+                      </div>
+                    ))}
+                  </article>
+                ))}
+                {!rules.length && !busy && (
+                  <p className="member-empty">
+                    {t("当前没有生效的代理方案。")}
+                  </p>
+                )}
+              </section>
+            )}
+            {tab === "share" && (
+              <section
+                className="member-content member-share"
+                aria-label={t("分享推广")}
+              >
+                <h2>{t("分享推广")}</h2>
+                {link?.url && new URL(link.url).searchParams.has("ic") && (
+                  <p className="muted">
+                    {t("好友通过链接注册，系统自动确认邀请归属。")}
+                  </p>
+                )}
+                {!isAgent && (
+                  <p>{t("尚未开通代理资格，开通后可生成推广链接。")}</p>
+                )}
+                <p>{t("分享专属链接或二维码，邀请好友进入会员入口。")}</p>
+                <button
+                  disabled={busy || !enabled || !isAgent}
+                  onClick={() =>
+                    guard(async () => {
+                      const r = await request("/v1/me/referral-links", {
+                        method: "POST",
+                        body: {},
+                        csrf: session.csrf,
+                        key: key("create-link"),
+                      });
+                      await showLink(r.data);
+                    })
+                  }
+                >
+                  {link ? t("刷新专属二维码") : t("生成专属邀请链接")}
+                </button>
+                {link && (
+                  <div className="member-card">
+                    {qr && (
+                      <img
+                        className="member-qr"
+                        src={qr}
+                        alt={t("专属邀请二维码")}
+                        width={240}
+                        height={240}
+                      />
+                    )}
+                    <label>
+                      {t("专属邀请链接")}
+                      <input
+                        aria-label={t("专属邀请链接")}
+                        readOnly
+                        value={link.url}
+                      />
+                    </label>
+                    <div className="member-share-actions">
+                      <button
+                        disabled={!enabled || busy || !qr}
+                        onClick={() => guard(savePoster)}
+                      >
+                        {t("保存邀请海报")}
+                      </button>
+                      <button
+                        disabled={!enabled}
+                        onClick={() =>
+                          guard(async () => {
+                            await navigator.clipboard.writeText(link.url);
+                            setNotice(t("邀请链接已复制"));
+                          })
+                        }
+                      >
+                        {t("复制邀请链接")}
+                      </button>
+                      {typeof navigator.share === "function" && (
+                        <button
+                          disabled={!enabled}
+                          onClick={() =>
+                            guard(async () => {
+                              await navigator.share({
+                                title: t("邀请加入我的团队"),
+                                url: link.url,
+                              });
+                            })
+                          }
+                        >
+                          {t("系统分享")}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </section>
+            )}
+          </>
         )}
       </main>
       <footer className="member-footer">

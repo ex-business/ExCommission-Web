@@ -959,5 +959,97 @@
   "非活动期": {
     "en": "Inactive period",
     "es": "Período inactivo"
+  },
+  "已发布代理规则": {
+    "en": "Published affiliate rules",
+    "es": "Reglas de afiliados publicadas"
+  },
+  "配置版本": {
+    "en": "Configuration version",
+    "es": "Versión de configuración"
+  },
+  "自然日": {
+    "en": "Calendar day",
+    "es": "Día natural"
+  },
+  "自然周": {
+    "en": "Calendar week",
+    "es": "Semana natural"
+  },
+  "自然月": {
+    "en": "Calendar month",
+    "es": "Mes natural"
+  },
+  "永久": {
+    "en": "Lifetime",
+    "es": "Permanente"
+  },
+  "同时满足充值与有效投注；等级人数只统计直属，日投注统计下线三层。": {
+    "en": "Both deposit and valid wagering are required. Qualified members count direct referrals; daily volume covers three levels.",
+    "es": "Se requiere depósito y apuestas válidas. Los miembros calificados son referidos directos; el volumen diario abarca tres niveles."
+  },
+  "达标类型": {
+    "en": "Qualification type",
+    "es": "Tipo de requisito"
+  },
+  "代理等级": {
+    "en": "Affiliate grade",
+    "es": "Nivel de afiliado"
+  },
+  "等级与三层返佣比例": {
+    "en": "Grades and three-level commission rates",
+    "es": "Niveles y tasas de comisión de tres capas"
+  },
+  "第{step}档，再推荐{members}人，奖励{reward}": {
+    "en": "Tier {step}: refer {members} more members for {reward}",
+    "es": "Tramo {step}: invita a {members} miembros más para recibir {reward}"
+  },
+  "受邀本人一次性奖励：{reward}": {
+    "en": "One-time invitee reward: {reward}",
+    "es": "Recompensa única del invitado: {reward}"
+  },
+  "奖励无需流水，领取至真金钱包；佣金按当天最终等级结算，次日01:00进入审核。": {
+    "en": "Rewards have no wagering requirement and are claimed to the real-money wallet. Commission uses the final daily grade and enters review at 01:00 the next day.",
+    "es": "Las recompensas no requieren apuestas y se abonan en la cartera de dinero real. La comisión usa el nivel final del día y pasa a revisión a la 01:00 del día siguiente."
+  },
+  "参与游戏场馆类型": {
+    "en": "Eligible game categories",
+    "es": "Categorías de juego elegibles"
+  },
+  "正在读取代理入口配置…": {
+    "en": "Loading affiliate availability…",
+    "es": "Cargando disponibilidad de afiliados…"
+  },
+  "本站代理功能暂未开放。": {
+    "en": "Affiliate features are currently unavailable on this site.",
+    "es": "Las funciones de afiliados no están disponibles en este sitio."
+  },
+  "体育": {
+    "en": "Sports",
+    "es": "Deportes"
+  },
+  "电竞": {
+    "en": "Esports",
+    "es": "Deportes electrónicos"
+  },
+  "真人": {
+    "en": "Live casino",
+    "es": "Casino en vivo"
+  },
+  "彩票": {
+    "en": "Lottery",
+    "es": "Lotería"
+  },
+  "棋牌": {
+    "en": "Table games",
+    "es": "Juegos de mesa"
+  },
+  "电子": {
+    "en": "Slots",
+    "es": "Tragamonedas"
+  },
+  "捕鱼": {
+    "en": "Fishing",
+    "es": "Pesca"
   }
 }

@@ -139,7 +139,11 @@ export default function App() {
         ))}
       </div>
       {op.title === "已授权站点代理配置" ? (
-        <AffiliateSiteCatalog onExpired={() => setSession(null)} />
+        <AffiliateSiteCatalog
+          session={session}
+          onExpired={() => setSession(null)}
+          onApproval={(id) => navigate("审批详情", { params: { id } })}
+        />
       ) : op.section === "代理业务总表" ? (
         <AgentBusinessReport onExpired={() => setSession(null)} />
       ) : op.section === "代理业务奖励" ? (

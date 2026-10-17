@@ -13,7 +13,13 @@ type Level = {
   rates_ppm: number[];
 };
 type Step = { step: number; additional_members: number; reward_minor: string };
-type Config = {
+export type Config = {
+  extension?: {
+    disabled_entry: string;
+    editable_steps: boolean;
+    max_levels: number;
+    max_steps: number;
+  };
   risk_rules?: RiskRule[];
   enabled: boolean;
   currency: string;
@@ -28,7 +34,19 @@ type Config = {
   steps: Step[];
   venue_type_ids: string[];
 };
+const extensionDefaults = {
+  disabled_entry: "PAUSE",
+  editable_steps: false,
+  max_levels: 100,
+  max_steps: 100,
+};
 const blank = (): Config => ({
+  extension: {
+    disabled_entry: "HIDE",
+    editable_steps: false,
+    max_levels: 0,
+    max_steps: 0,
+  },
   enabled: false,
   currency: "MXN",
   currency_scale: 2,
@@ -53,7 +71,9 @@ export function AffiliateConfig({
   session,
   onExpired,
   onApproval,
+  siteTarget,
 }: {
+  siteTarget?: { tenant_id: string; app_id: string };
   session: Session;
   onExpired: () => void;
   onApproval: (id: string) => void;
@@ -81,16 +101,28 @@ export function AffiliateConfig({
       setBusy(false);
     }
   }
+  const siteBase = siteTarget
+    ? `/v1/affiliate/sites/${encodeURIComponent(siteTarget.tenant_id)}/${encodeURIComponent(siteTarget.app_id)}`
+    : "";
   async function load() {
     await run(async () => {
-      const [a, b, c] = await Promise.all([
-        request("/v1/affiliate/config"),
-        request("/v1/affiliate/venue-types"),
-        request("/v1/affiliate/currencies").catch((e) => {
-          if (e instanceof ApiError && e.status === 404) return null;
-          throw e;
-        }),
-      ]);
+      const remote = siteTarget
+        ? (await request(siteBase + "/config")).data
+        : null;
+      const [a, b, c] = remote
+        ? [
+            { data: remote.configuration },
+            { data: { rows: remote.venues } },
+            { data: { rows: remote.currencies } },
+          ]
+        : await Promise.all([
+            request("/v1/affiliate/config"),
+            request("/v1/affiliate/venue-types"),
+            request("/v1/affiliate/currencies").catch((e) => {
+              if (e instanceof ApiError && e.status === 404) return null;
+              throw e;
+            }),
+          ]);
       setState(a.data);
       const next = structuredClone(
         a.data.scheduled?.config || a.data.current?.config || blank(),
@@ -124,12 +156,17 @@ export function AffiliateConfig({
       const text = JSON.stringify(body);
       if (last.current.body !== text)
         last.current = { body: text, key: crypto.randomUUID() };
-      const r = await request("/v1/affiliate/config-requests", {
-        method: "POST",
-        body,
-        csrf: session.csrf,
-        key: last.current.key,
-      });
+      const r = await request(
+        siteBase
+          ? siteBase + "/config-requests"
+          : "/v1/affiliate/config-requests",
+        {
+          method: "POST",
+          body,
+          csrf: session.csrf,
+          key: last.current.key,
+        },
+      );
       setApproval(r.data.approval_id);
       setReviewID(r.data.approval_id);
     });
@@ -139,6 +176,12 @@ export function AffiliateConfig({
   return (
     <section aria-label="推荐返佣配置">
       <h2>推荐返佣配置</h2>
+      {siteTarget && (
+        <p>
+          所属站点：{siteTarget.tenant_id} / {siteTarget.app_id}
+          。审批在目标站点内完成，须使用该站点独立审批身份。
+        </p>
+      )}
       <p>
         配置等级、三层比例及推荐和受邀奖励；金额使用{unit}，例如两位小数时 5000
         表示 50.00。
@@ -157,7 +200,7 @@ export function AffiliateConfig({
           />
         </label>
         <button
-          disabled={busy || !reviewID}
+          disabled={busy || !reviewID || !!siteTarget}
           onClick={() =>
             run(async () => {
               const r = await request(
@@ -202,6 +245,69 @@ export function AffiliateConfig({
             </p>
           )}
           <form onSubmit={save}>
+            <fieldset disabled={busy || !!state.scheduled}>
+              <legend>兼容与运营扩展</legend>
+              <label>
+                站点关闭时入口
+                <select
+                  aria-label="关闭入口策略"
+                  value={config.extension?.disabled_entry || "PAUSE"}
+                  onChange={(e) =>
+                    patch("extension", {
+                      ...extensionDefaults,
+                      ...config.extension,
+                      disabled_entry: e.target.value,
+                    })
+                  }
+                >
+                  <option value="HIDE">隐藏代理入口</option>
+                  <option value="PAUSE">保留入口并暂停（兼容旧站点）</option>
+                </select>
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={config.extension?.editable_steps || false}
+                  onChange={(e) =>
+                    patch("extension", {
+                      ...extensionDefaults,
+                      ...config.extension,
+                      editable_steps: e.target.checked,
+                    })
+                  }
+                />
+                允许编辑未解锁阶梯规则
+              </label>
+              <p>
+                启用后按新版本处理尚未解锁的阶梯，已解锁或已领取的会员人数、金额与账变保持原快照，不重复发放。
+              </p>
+              <p>数量上限可填0表示不限；旧站点默认100项。</p>
+              {(
+                [
+                  ["max_levels", "等级数量上限"],
+                  ["max_steps", "阶梯数量上限"],
+                ] as const
+              ).map(([key, title]) => (
+                <label key={key}>
+                  {title}
+                  <input
+                    aria-label={title}
+                    type="number"
+                    min="0"
+                    max="10000"
+                    required
+                    value={config.extension?.[key] ?? 100}
+                    onChange={(e) =>
+                      patch("extension", {
+                        ...extensionDefaults,
+                        ...config.extension,
+                        [key]: Number(e.target.value),
+                      })
+                    }
+                  />
+                </label>
+              ))}
+            </fieldset>
             <fieldset disabled={busy || !!state.scheduled}>
               <RiskRules
                 value={config.risk_rules || []}
@@ -440,7 +546,10 @@ export function AffiliateConfig({
               </div>
               <button
                 type="button"
-                disabled={config.levels.length >= 100}
+                disabled={
+                  (config.extension?.max_levels ?? 100) > 0 &&
+                  config.levels.length >= (config.extension?.max_levels ?? 100)
+                }
                 onClick={() => {
                   const p = config.levels.at(-1)!;
                   patch("levels", [
@@ -461,7 +570,7 @@ export function AffiliateConfig({
               <legend>推荐奖励阶梯</legend>
               <p>
                 人数是每档新增人数，例如 1、3、8 依次需要累计 1、4、12
-                人。生效的已有阶梯不可改写，可追加。
+                人。默认保留已生效阶梯；可通过运营扩展允许新版本编辑，历史权益不变。
               </p>
               {config.steps.map((s, i) => (
                 <div key={s.step}>
@@ -474,7 +583,10 @@ export function AffiliateConfig({
                       min="1"
                       max="1000000000"
                       required
-                      disabled={i < (state.current?.config.steps.length || 0)}
+                      disabled={
+                        !config.extension?.editable_steps &&
+                        i < (state.current?.config.steps.length || 0)
+                      }
                       value={s.additional_members}
                       onChange={(e) =>
                         patch(
@@ -495,7 +607,10 @@ export function AffiliateConfig({
                     奖励金额
                     <MoneyInput
                       label={`阶梯${s.step}奖励`}
-                      disabled={i < (state.current?.config.steps.length || 0)}
+                      disabled={
+                        !config.extension?.editable_steps &&
+                        i < (state.current?.config.steps.length || 0)
+                      }
                       value={s.reward_minor}
                       scale={config.currency_scale}
                       onChange={(minor) =>
@@ -512,7 +627,10 @@ export function AffiliateConfig({
               ))}
               <button
                 type="button"
-                disabled={config.steps.length >= 100}
+                disabled={
+                  (config.extension?.max_steps ?? 100) > 0 &&
+                  config.steps.length >= (config.extension?.max_steps ?? 100)
+                }
                 onClick={() =>
                   patch("steps", [
                     ...config.steps,
@@ -545,7 +663,7 @@ export function AffiliateConfig({
                 <label key={v.venue_type_id}>
                   <input
                     type="checkbox"
-                    aria-label={`返佣场馆${v.icon_url && <img src={v.icon_url} alt="" width={24} height={24} />} {v.name}`}
+                    aria-label={`返佣场馆${v.name}`}
                     checked={config.venue_type_ids.includes(v.venue_type_id)}
                     onChange={(e) =>
                       patch(
@@ -591,15 +709,23 @@ export function AffiliateConfig({
             >
               提交推荐返佣配置审批
             </button>
+            <button type="button" disabled={busy} onClick={() => void load()}>
+              取消修改并重新读取
+            </button>
           </form>
         </>
       )}
       {approval && (
         <div role="status">
           <p>已提交审批：{approval}，尚未生效。</p>
-          <button onClick={() => onApproval(approval)}>
-            打开推荐返佣配置审批
-          </button>
+          {!siteTarget && (
+            <button onClick={() => onApproval(approval)}>
+              打开推荐返佣配置审批
+            </button>
+          )}
+          {siteTarget && (
+            <p>申请已保存到目标站点，请由该站点独立审批人核对并审批。</p>
+          )}
         </div>
       )}
     </section>

@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { amount } from "./money";
+import type { Session } from "../../auth/Login";
+import { useEffect, useRef, useState } from "react";
 import { request, ApiError } from "../../lib/api";
-import { ConfigSummary } from "./AffiliateConfig";
+import { AffiliateConfig, ConfigSummary } from "./AffiliateConfig";
 import "./business.css";
 type Row = Record<string, any>;
-export function AffiliateSiteCatalog({ onExpired }: { onExpired: () => void }) {
+function LegacyAffiliateSiteCatalog({ onExpired }: { onExpired: () => void }) {
   const [rows, setRows] = useState<Row[]>([]),
     [search, setSearch] = useState(""),
     [detail, setDetail] = useState<Row | null>(null),
@@ -138,6 +140,348 @@ export function AffiliateSiteCatalog({ onExpired }: { onExpired: () => void }) {
             )}
           </section>
         </div>
+      )}
+    </section>
+  );
+}
+
+// 总表管理是新增视图，保留原只读简表，写权限以服务端返回能力为准。
+export function AffiliateSiteCatalog({
+  onExpired,
+  session,
+  onApproval,
+}: {
+  onExpired: () => void;
+  session: Session;
+  onApproval: (id: string) => void;
+}) {
+  const [legacy, setLegacy] = useState(false);
+  return (
+    <section>
+      <button onClick={() => setLegacy(!legacy)}>
+        {legacy ? "切换配置管理总表" : "切换原只读简表"}
+      </button>
+      {legacy ? (
+        <LegacyAffiliateSiteCatalog onExpired={onExpired} />
+      ) : (
+        <SiteManagement
+          session={session}
+          onExpired={onExpired}
+          onApproval={onApproval}
+        />
+      )}
+    </section>
+  );
+}
+function SiteManagement({
+  session,
+  onExpired,
+  onApproval,
+}: {
+  session: Session;
+  onExpired: () => void;
+  onApproval: (id: string) => void;
+}) {
+  const [rows, setRows] = useState<Row[]>([]),
+    [search, setSearch] = useState(""),
+    [status, setStatus] = useState("ALL"),
+    [page, setPage] = useState(1),
+    [size, setSize] = useState(10),
+    [error, setError] = useState(""),
+    [busy, setBusy] = useState(false),
+    [target, setTarget] = useState<Row | null>(null),
+    [selected, setSelected] = useState("");
+  // 查询、重置只接受最新响应，避免慢请求覆盖导出所依据的当前筛选。
+  const requestSerial = useRef(0);
+  async function load(query = search) {
+    const serial = ++requestSerial.current;
+    setBusy(true);
+    setError("");
+    try {
+      const r = await request(
+        "/v1/affiliate/sites?search=" + encodeURIComponent(query),
+      );
+      if (serial !== requestSerial.current) return;
+      setRows(r.data.rows);
+      setSelected("");
+      setPage(1);
+    } catch (e) {
+      if (serial !== requestSerial.current) return;
+      if (e instanceof ApiError && e.status === 401) onExpired();
+      setError((e as Error).message);
+    } finally {
+      if (serial === requestSerial.current) setBusy(false);
+    }
+  }
+  useEffect(() => {
+    void load();
+  }, []);
+  const filtered = rows.filter(
+    (r) =>
+      status === "ALL" ||
+      (status === "ON"
+        ? r.configuration.current?.config.enabled
+        : r.configuration.current && !r.configuration.current.config.enabled),
+  );
+  const pages = Math.max(1, Math.ceil(filtered.length / size)),
+    currentPage = Math.min(page, pages),
+    visible = filtered.slice((currentPage - 1) * size, currentPage * size);
+  const date = (v: string) => (v ? new Date(v).toLocaleString() : "—");
+  const cell = (r: Row) => {
+    const c = r.configuration.current?.config;
+    return [
+      r.tenant_id,
+      r.app_id,
+      c
+        ? c.levels
+            .map(
+              (l: Row) =>
+                `Lv${l.level}: ${l.qualified_members}/${amount(l.daily_valid_bet_minor, c.currency_scale)}`,
+            )
+            .join("；")
+        : "—",
+      c
+        ? `充值 ${amount(c.grade_condition.deposit_minor, c.currency_scale)} / 投注 ${amount(c.grade_condition.valid_bet_minor, c.currency_scale)} ${c.currency}`
+        : "—",
+      c
+        ? c.steps
+            .map(
+              (s: Row) =>
+                `新增${s.additional_members}人/${amount(s.reward_minor, c.currency_scale)} ${c.currency}`,
+            )
+            .join("；")
+        : "—",
+      c
+        ? c.levels
+            .map(
+              (l: Row) =>
+                `Lv${l.level}: ` +
+                l.rates_ppm
+                  .map((v: number) => amount(String(v), 4) + "%")
+                  .join("/"),
+            )
+            .join("；")
+        : "—",
+      c
+        ? c.venue_type_ids
+            .map(
+              (id: string) =>
+                (
+                  ({
+                    SPORTS: "体育",
+                    ESPORTS: "电竞",
+                    LIVE: "真人",
+                    LOTTERY: "彩票",
+                    POKER: "棋牌",
+                    SLOTS: "电子",
+                    FISHING: "捕鱼",
+                  }) as Record<string, string>
+                )[id] || id,
+            )
+            .join("、")
+        : "—",
+      c ? (c.enabled ? "开启" : "关闭") : "未配置",
+      date(r.created_at),
+      date(r.updated_at),
+      r.operator || "—",
+    ];
+  };
+  const headers = [
+    "所属站点",
+    "应用",
+    "代理等级（人数/日投注）",
+    "有效会员条件",
+    "推荐奖励",
+    "返佣比例",
+    "返佣场馆",
+    "状态",
+    "创建时间",
+    "最近操作",
+    "操作人",
+  ];
+  function exportRows() {
+    const safe = (v: unknown) => {
+      let s = String(v ?? "");
+      if (/^[=+\-@\t\r\n]/.test(s)) s = "'" + s;
+      return '"' + s.replaceAll('"', '""') + '"';
+    };
+    const text = [headers, ...filtered.map(cell)]
+      .map((r) => r.map(safe).join(","))
+      .join("\r\n");
+    const url = URL.createObjectURL(
+      new Blob(["\uFEFF" + text], { type: "text/csv;charset=utf-8" }),
+    );
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "站点代理配置.csv";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  }
+  return (
+    <section className="af-admin">
+      <h2>站点代理配置总表</h2>
+      <p>
+        只展示明确授权站点；可写站点还必须具备目标站点配置权限。保存继续走独立审批，不改写历史奖励。
+      </p>
+      <form
+        className="af-filters"
+        onSubmit={(e) => {
+          e.preventDefault();
+          void load();
+        }}
+      >
+        <label>
+          站点名称 / 应用
+          <input
+            aria-label="配置站点搜索"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </label>
+        <label>
+          状态
+          <select
+            aria-label="配置状态筛选"
+            value={status}
+            onChange={(e) => {
+              setStatus(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="ALL">全部</option>
+            <option value="ON">开启</option>
+            <option value="OFF">关闭</option>
+          </select>
+        </label>
+        <button disabled={busy}>查询</button>
+        <button
+          type="button"
+          onClick={() => {
+            setSearch("");
+            setStatus("ALL");
+            void load("");
+          }}
+        >
+          重置
+        </button>
+        <button type="button" disabled={busy} onClick={exportRows}>
+          导出当前条件全部配置
+        </button>
+      </form>
+      <label>
+        所属站点（单选）
+        <select
+          aria-label="配置所属站点"
+          value={selected}
+          onChange={(e) => setSelected(e.target.value)}
+        >
+          <option value="">请选择站点</option>
+          {rows.map((r, i) => (
+            <option value={String(i)} key={r.tenant_id + ":" + r.app_id}>
+              {r.tenant_id} / {r.app_id}
+              {r.writable ? "" : "（只读）"}
+            </option>
+          ))}
+        </select>
+      </label>
+      <button
+        disabled={selected === "" || !rows[Number(selected)]?.writable}
+        onClick={() => setTarget(rows[Number(selected)])}
+      >
+        添加 / 编辑配置
+      </button>
+      {error && <p role="alert">{error}</p>}
+      <div className="af-table">
+        <table>
+          <thead>
+            <tr>
+              <th>序号</th>
+              {headers.map((h) => (
+                <th key={h}>{h}</th>
+              ))}
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            {visible.map((r, i) => (
+              <tr key={r.tenant_id + ":" + r.app_id}>
+                <td>{(currentPage - 1) * size + i + 1}</td>
+                {cell(r).map((v, n) => (
+                  <td key={n}>{v}</td>
+                ))}
+                <td>
+                  <details>
+                    <summary>查看配置</summary>
+                    {r.configuration.current && (
+                      <ConfigSummary config={r.configuration.current.config} />
+                    )}
+                  </details>
+                  <button disabled={!r.writable} onClick={() => setTarget(r)}>
+                    {r.configuration.current ? "编辑" : "添加"}
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p>共 {filtered.length} 条</p>
+      <label>
+        每页
+        <select
+          aria-label="配置每页条数"
+          value={size}
+          onChange={(e) => {
+            setSize(Number(e.target.value));
+            setPage(1);
+          }}
+        >
+          {[10, 20, 50, 100, 200].map((n) => (
+            <option key={n} value={n}>
+              {n}条/页
+            </option>
+          ))}
+        </select>
+      </label>
+      <button
+        disabled={currentPage === 1}
+        onClick={() => setPage(currentPage - 1)}
+      >
+        上一页
+      </button>
+      <span>
+        {currentPage} / {pages}
+      </span>
+      <button
+        disabled={currentPage >= pages}
+        onClick={() => setPage(currentPage + 1)}
+      >
+        下一页
+      </button>
+      <label>
+        前往页
+        <input
+          aria-label="配置前往页"
+          type="number"
+          min="1"
+          max={pages}
+          value={currentPage}
+          onChange={(e) =>
+            setPage(Math.max(1, Math.min(pages, Number(e.target.value) || 1)))
+          }
+        />
+      </label>
+      {target && (
+        <section className="af-card">
+          <button onClick={() => setTarget(null)}>关闭编辑</button>
+          <AffiliateConfig
+            key={target.tenant_id + ":" + target.app_id}
+            siteTarget={{ tenant_id: target.tenant_id, app_id: target.app_id }}
+            session={session}
+            onExpired={onExpired}
+            onApproval={onApproval}
+          />
+        </section>
       )}
     </section>
   );

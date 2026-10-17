@@ -201,4 +201,11 @@ export const financeOperations: string[][] = [
     "GET",
     "/v1/me/affiliate/records",
   ],
+  [
+    "finance",
+    "会员佣金",
+    "本人代理展示配置",
+    "GET",
+    "/v1/me/affiliate/presentation",
+  ],
 ];
