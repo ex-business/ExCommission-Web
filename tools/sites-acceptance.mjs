@@ -37,9 +37,9 @@ try {
       },
     }),
   );
-  await p.route("**/v1/**", (r) => {
+  await p.route("**/api/v1/**", (r) => {
     const req = r.request(),
-      path = new URL(req.url()).pathname;
+      path = new URL(req.url()).pathname.slice(4);
     let data;
     if (req.method() === "POST") {
       submitted = req.postDataJSON();

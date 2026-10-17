@@ -40,9 +40,11 @@ try {
       },
     }),
   );
-  await p.route("**/v1/**", async (route) => {
+  await p.route("**/api/v1/**", async (route) => {
     const req = route.request(),
       url = new URL(req.url());
+    assert.ok(url.pathname.startsWith("/api/v1/"));
+    url.pathname = url.pathname.slice(4);
     if (req.method() === "POST") {
       assert.equal(url.pathname, "/v1/me/commission-orders/i1/claim");
       assert.deepEqual(req.postDataJSON(), { expected_revision: 1 });

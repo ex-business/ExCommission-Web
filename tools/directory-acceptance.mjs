@@ -35,8 +35,10 @@ try {
       json: { data: { role: "operator", subject: "operator", csrf: "csrf" } },
     }),
   );
-  await p.route("**/v1/**", async (r) => {
+  await p.route("**/api/v1/**", async (r) => {
     const u = new URL(r.request().url());
+    assert.ok(u.pathname.startsWith("/api/v1/"));
+    u.pathname = u.pathname.slice(4);
     calls.push(u);
     return r.fulfill({
       json: {

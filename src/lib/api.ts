@@ -29,7 +29,8 @@ export async function request(
   path: string,
   { method = "GET", body, csrf, key, totp }: ApiOptions = {},
 ) {
-  const r = await fetch(path, {
+  const target = path.startsWith("/v1/") ? "/api" + path : path;
+  const r = await fetch(target, {
     method,
     headers: {
       ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
