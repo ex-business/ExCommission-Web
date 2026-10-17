@@ -146,7 +146,7 @@ function MemberContent({
         setRewards(r.data.rows);
         setNext(r.data.next_after_id);
       }
-      if (tab === "earnings") {
+      if (tab === "earnings" && !presentation) {
         const r = await request("/v1/me/earnings");
         setEarnings(r.data.rows);
       }
@@ -367,7 +367,15 @@ function MemberContent({
                 />
               </section>
             )}
-            {tab === "earnings" && (
+            {tab === "earnings" && presentation && (
+              <AffiliateRewards
+                session={session}
+                enabled={enabled}
+                onExpired={onExpired}
+                fallback={null}
+              />
+            )}
+            {tab === "earnings" && !presentation && (
               <section className="member-content" aria-label={t("我的收益")}>
                 <div className="member-heading">
                   <h2>{t("我的收益")}</h2>

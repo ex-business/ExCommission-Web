@@ -44,9 +44,16 @@ export function BusinessRewards({
     [adjustment, setAdjustment] = useState(""),
     [confirmed, setConfirmed] = useState(false);
   const sequence = useRef(0),
-    keys = useRef(new Map<string, string>());
+    keys = useRef(new Map<string, string>()),
+    querySnapshot = useRef<Record<string, string> | null>(null);
   const scale = config?.current?.config.currency_scale ?? 2;
-  function parameters(after = "", snapshot = page) {
+  function parameters(after = "", frozen = false) {
+    // 翻页及导出复用已展示结果的完整查询，输入框未提交的编辑不改变快照。
+    if ((after || frozen) && querySnapshot.current) {
+      const saved = new URLSearchParams(querySnapshot.current);
+      if (after) saved.set("after_id", after);
+      return saved;
+    }
     const q = new URLSearchParams({
       kind,
       limit: "50",
@@ -55,11 +62,6 @@ export function BusinessRewards({
     });
     if (status) q.set("status", status);
     if (user.trim()) q.set("user_id", user.trim());
-    if (after && snapshot) {
-      q.set("after_id", after);
-      q.set("as_of", snapshot.as_of);
-      q.set("snapshot_revision", snapshot.snapshot_revision);
-    }
     return q;
   }
   async function run(action: () => Promise<void>) {
@@ -77,8 +79,13 @@ export function BusinessRewards({
   async function load(after = "") {
     const serial = ++sequence.current;
     await run(async () => {
-      const data = await request("/v1/affiliate/rewards?" + parameters(after));
+      const q = parameters(after);
+      const data = await request("/v1/affiliate/rewards?" + q);
       if (serial === sequence.current) {
+        q.delete("after_id");
+        q.set("as_of", data.data.as_of);
+        q.set("snapshot_revision", String(data.data.snapshot_revision));
+        querySnapshot.current = Object.fromEntries(q);
         setPage(data.data);
         setSelected([]);
       }
@@ -90,6 +97,9 @@ export function BusinessRewards({
     });
   }, []);
   useEffect(() => {
+    querySnapshot.current = null;
+    setPage(null);
+    setSelected([]);
     setDetail(null);
     setDecision("");
     void load();
@@ -162,7 +172,7 @@ export function BusinessRewards({
   }
   async function download() {
     await run(async () => {
-      const q = parameters();
+      const q = parameters("", true);
       if (page) {
         q.set("as_of", page.as_of);
         q.set("snapshot_revision", page.snapshot_revision);
@@ -175,7 +185,7 @@ export function BusinessRewards({
           }),
         );
       link.href = url;
-      link.download = `代理奖励-${kinds[kind]}.csv`;
+      link.download = `代理奖励-${kinds[querySnapshot.current?.kind || kind]}.csv`;
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     });

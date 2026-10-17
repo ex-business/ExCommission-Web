@@ -159,6 +159,20 @@ export function AffiliateRewards({
   ];
   return (
     <div className="affiliate-member">
+      {/* 只汇总已实际领取的不可变奖励金额，待审核与待领取不算已到账收益。 */}
+      <section className="member-card" aria-label={t("已领取收益")}>
+        <h2>{t("已领取收益")}</h2>
+        <strong>
+          {amount(
+            (p?.rewards || [])
+              .filter((r: Row) => r.status === "CLAIMED")
+              .reduce((sum: bigint, r: Row) => sum + BigInt(r.amount_minor), 0n)
+              .toString(),
+            scale,
+          )}{" "}
+          {config.currency}
+        </strong>
+      </section>
       <div className="affiliate-toolbar">
         <span>
           {t("实绩更新于")} {new Date(view.observed_at).toLocaleString(locale)}{" "}

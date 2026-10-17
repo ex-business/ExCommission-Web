@@ -933,8 +933,8 @@
     "es": "Apuestas"
   },
   "有效投注": {
-    "en": "Eligible bets",
-    "es": "Apuestas válidas"
+    "en": "Valid turnover",
+    "es": "Volumen válido"
   },
   "登录IP": {
     "en": "Login IP",
@@ -1051,5 +1051,25 @@
   "捕鱼": {
     "en": "Fishing",
     "es": "Pesca"
+  },
+  "已领取收益": {
+    "en": "Claimed earnings",
+    "es": "Ganancias cobradas"
+  },
+  "佣金比例": {
+    "en": "Commission rate",
+    "es": "Tasa de comisión"
+  },
+  "试算有效投注": {
+    "en": "Calculator turnover",
+    "es": "Volumen para calcular"
+  },
+  "试算佣金比例": {
+    "en": "Calculator commission rate",
+    "es": "Tasa para calcular"
+  },
+  "自定义比例仅用于本地试算，实际佣金以已发布规则和审核结果为准。": {
+    "en": "Custom rates are for local estimates. Actual commissions follow published rules and review results.",
+    "es": "Las tasas personalizadas son estimaciones locales. Las comisiones reales siguen las reglas publicadas y la revisión."
   }
 }
