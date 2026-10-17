@@ -1,4 +1,20 @@
 export const systemOperations: string[][] = [
+  ["system", "推荐返佣", "推荐返佣配置", "GET", "/v1/affiliate/config"],
+  [
+    "system",
+    "推荐返佣",
+    "返佣配置申请明细",
+    "GET",
+    "/v1/affiliate/config-requests/{id}",
+  ],
+  ["system", "推荐返佣", "返佣场馆类型", "GET", "/v1/affiliate/venue-types"],
+  [
+    "system",
+    "推荐返佣",
+    "申请返佣配置",
+    "POST",
+    "/v1/affiliate/config-requests",
+  ],
   [
     "system",
     "权限管理",

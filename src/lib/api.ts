@@ -6,6 +6,10 @@ export type ApiOptions = {
   totp?: string;
 };
 const messages: Record<string, string> = {
+  IMMUTABLE_AFFILIATE_CONFIG: "主货币、统计范围和时区在启用后不可更改。",
+  IMMUTABLE_REWARD_STEPS: "已配置的奖励阶梯不可改写，可追加新阶梯。",
+  SCHEDULED_CONFIG_EXISTS: "已有待生效配置，请等待生效后再修改。",
+  UNKNOWN_VENUE_TYPE: "请选择站点目录中的场馆类型。",
   SITE_AGENT_DISABLED: "代理奖励与领取已暂停，请稍后再试。",
   STATE_CONFLICT: "当前状态不允许此操作，已有邀请归属不能更改。",
   REVISION_CONFLICT: "记录已更新，请刷新后重试。",

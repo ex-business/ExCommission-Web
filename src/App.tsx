@@ -8,6 +8,7 @@ import { Layout } from "./components/Layout";
 import { OperationPanel, type Seed } from "./modules/OperationPanel";
 import { ResourceIndex } from "./modules/ResourceIndex";
 import { CommissionReview } from "./modules/finance/CommissionReview";
+import { AffiliateConfig } from "./modules/affiliate/AffiliateConfig";
 import { SiteAgentConfig } from "./modules/sites/SiteAgentConfig";
 import { AgentDirectory } from "./modules/agents/AgentDirectory";
 import { MemberPortal } from "./modules/member/MemberPortal";
@@ -130,7 +131,13 @@ export default function App() {
           </button>
         ))}
       </div>
-      {op.title === "站点代理配置" ? (
+      {op.title === "推荐返佣配置" ? (
+        <AffiliateConfig
+          session={session}
+          onExpired={() => setSession(null)}
+          onApproval={(id) => navigate("审批详情", { params: { id } })}
+        />
+      ) : op.title === "站点代理配置" ? (
         <SiteAgentConfig
           session={session}
           onExpired={() => setSession(null)}
