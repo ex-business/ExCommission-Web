@@ -1,3 +1,4 @@
+import { refreshOps, opsSiteMatches, OpsError } from "./ops-identity.mjs";
 import { randomBytes, createHmac } from "node:crypto";
 import { json, body } from "./http.mjs";
 import { secretEquals } from "./security.mjs";
@@ -7,6 +8,13 @@ export async function handleProxy(req, res, url, s, routes) {
     return json(res, 401, {
       error: { code: "LOGIN_REQUIRED", message: "登录已过期，请重新登录" },
     });
+  if (s.ops && !opsSiteMatches(req, s))
+    return json(res, 409, {
+      error: {
+        code: "SITE_CONTEXT_CHANGED",
+        message: "站点已切换，请刷新页面后操作",
+      },
+    });
   if (
     !["GET", "HEAD"].includes(req.method) &&
     !secretEquals(req.headers["x-csrf-token"], s.csrf)
@@ -14,7 +22,41 @@ export async function handleProxy(req, res, url, s, routes) {
     return json(res, 403, {
       error: { code: "CSRF_REJECTED", message: "会话校验失败" },
     });
+  // 业务系统保留自己的会话，每次从身份服务确认授权；站点来自页面确认值，不接受浏览器自报权限。
+  if (s.ops) {
+    if (!opsSiteMatches(req, s))
+      return json(res, 409, {
+        error: {
+          code: "SITE_CONTEXT_CHANGED",
+          message: "站点已切换，请刷新页面后操作",
+        },
+      });
+    try {
+      s = await refreshOps(s);
+    } catch (e) {
+      return json(res, e instanceof OpsError ? e.status : 503, {
+        error: {
+          code: "PERMISSION_DENIED",
+          message: e instanceof OpsError ? e.message : "运营身份服务暂不可用",
+        },
+      });
+    }
+  }
   const path = url.pathname.slice(4);
+  if (
+    s.ops &&
+    (/^\/v1\/(me|auth|payment-callbacks)(\/|$)/.test(path) ||
+      [
+        "/v1/affiliate/business-facts",
+        "/v1/affiliate/source-watermarks",
+      ].includes(path))
+  )
+    return json(res, 403, {
+      error: {
+        code: "PERMISSION_DENIED",
+        message: "运营身份不可代会员或业务来源操作",
+      },
+    });
   if (!routes.some((x) => x.method === req.method && x.re.test(path)))
     return json(res, 404, {
       error: { code: "UNKNOWN_OPERATION", message: "接口不在 V1 契约中" },
@@ -56,8 +98,21 @@ export async function handleProxy(req, res, url, s, routes) {
     headers["Idempotency-Key"] = key;
     // 仅为会员本人领取签名；IP取实际连接，身份取服务端会话，绝不透传浏览器伪造的上下文。
     // 签名绑定原始正文和查询路径，后端仍独立校验权限、幂等及奖励状态。
-    if (req.method === "POST" && path === "/v1/me/affiliate/claims" && s.role === "member") {
-      Object.assign(headers, affiliateClaimContext(req, s, path + url.search, raw, headers.Authorization));
+    if (
+      req.method === "POST" &&
+      path === "/v1/me/affiliate/claims" &&
+      s.role === "member"
+    ) {
+      Object.assign(
+        headers,
+        affiliateClaimContext(
+          req,
+          s,
+          path + url.search,
+          raw,
+          headers.Authorization,
+        ),
+      );
     }
     if (path === "/v1/member-statistics") {
       if (s.role !== "operator")

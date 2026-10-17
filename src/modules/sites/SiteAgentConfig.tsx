@@ -147,17 +147,19 @@ export function SiteAgentConfig({
               onChange={(e) => setReason(e.target.value)}
             />
           </label>
-          <label>
-            谷歌验证码
-            <input
-              aria-label="谷歌验证码"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              value={totp}
-              onChange={(e) => setTotp(e.target.value)}
-            />
-          </label>
+          {(!session.ops || session.require_otp) && (
+            <label>
+              谷歌验证码
+              <input
+                aria-label="谷歌验证码"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                maxLength={6}
+                value={totp}
+                onChange={(e) => setTotp(e.target.value)}
+              />
+            </label>
+          )}
           <p>
             提交申请后由独立审批人确认生效。关闭后停止新的奖励与领取，已发生的付款结果仍正常核验。
           </p>
@@ -166,7 +168,8 @@ export function SiteAgentConfig({
               busy ||
               !plan ||
               !reason ||
-              !/^\d{6}$/.test(totp) ||
+              ((!session.ops || session.require_otp) &&
+                !/^\d{6}$/.test(totp)) ||
               (enabled && !venues.length)
             }
             onClick={save}

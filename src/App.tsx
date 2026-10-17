@@ -1,8 +1,9 @@
 import { GuestAffiliate } from "./modules/member/affiliate/GuestAffiliate";
 import { useEffect, useState } from "react";
-import { operations } from "./catalog";
+import { operations as allOperations } from "./catalog";
+const operations = allOperations;
 import { Login, type Session } from "./auth/Login";
-import { request } from "./lib/api";
+import { request, setOpsSite } from "./lib/api";
 import { Layout } from "./components/Layout";
 import { OperationPanel, type Seed } from "./modules/OperationPanel";
 import { CommissionReview } from "./modules/finance/CommissionReview";
@@ -22,12 +23,17 @@ export default function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState<Session | null>(null),
     [loading, setLoading] = useState(true),
-    [op, setOp] = useState(operations[0]),
+    [op, setOp] = useState(
+      operations.find((o) => o.title === "代理业务总表") || operations[0],
+    ),
     [seed, setSeed] = useState<Seed>(),
     [serial, setSerial] = useState(0);
   useEffect(() => {
     request("/auth/session")
-      .then((r) => setSession(r.data))
+      .then((r) => {
+        setOpsSite(r.data.ops ? r.data.site_id || "" : undefined);
+        setSession(r.data);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
@@ -71,7 +77,15 @@ export default function App() {
         }}
       />
     );
-  if (!session) return <Login onLogin={setSession} />;
+  if (!session)
+    return (
+      <Login
+        onLogin={(s) => {
+          setOpsSite(s.ops ? s.site_id || "" : undefined);
+          setSession(s);
+        }}
+      />
+    );
   if (session.role === "member")
     return (
       <MemberPortal

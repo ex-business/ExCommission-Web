@@ -135,19 +135,21 @@ export function AgentRewardSwitch({
               maxLength={128}
             />
           </label>
-          <label>
-            本人谷歌验证码
-            <input
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              value={totp}
-              onChange={(e) =>
-                setTotp(e.target.value.replace(/\D/g, "").slice(0, 6))
-              }
-              pattern="[0-9]{6}"
-              required
-            />
-          </label>
+          {(!session.ops || session.require_otp) && (
+            <label>
+              本人谷歌验证码
+              <input
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                value={totp}
+                onChange={(e) =>
+                  setTotp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
+                pattern="[0-9]{6}"
+                required
+              />
+            </label>
+          )}
           <label>
             <input
               type="checkbox"

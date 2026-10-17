@@ -1,3 +1,4 @@
+import { opsEnabled } from "./ops-identity.mjs";
 import { handleAffiliatePublic } from "./affiliate-public.mjs";
 import http from "node:http";
 import { readFile } from "node:fs/promises";
@@ -107,7 +108,14 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
     "LOCAL_APPROVER_TOKEN",
     "LOCAL_SOURCE_KEY",
   ])
-    if (!process.env[key]) throw new Error("Missing " + key);
+    if (
+      !process.env[key] &&
+      !(
+        opsEnabled() &&
+        ["WEB_OPERATOR_PASSWORD", "WEB_APPROVER_PASSWORD"].includes(key)
+      )
+    )
+      throw new Error("Missing " + key);
   createServer().listen(
     Number(process.env.PORT || 18180),
     process.env.BIND_HOST || "127.0.0.1",

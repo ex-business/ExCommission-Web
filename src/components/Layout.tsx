@@ -15,24 +15,26 @@ export function Layout({
   children: ReactNode;
 }) {
   const group = groups.find((g) => g.id === op.group)!;
+  // 身份接入只决定接口授权，保留原后台全部业务菜单，避免功能入口因登录方式改变而丢失。
+  const navOps = operations;
+  const navGroups = groups;
   return (
     <div className="app-shell">
       <aside className="sidebar">
-        <a className="brand" href="#plans">
+        <a className="brand" href="#agents">
           <span className="logo small-logo">佣</span>
           <span>
-            佣金分润<small>管理系统</small>
+            {session.ops ? "代理业务" : "佣金分润"}
+            <small>管理系统</small>
           </span>
         </a>
         <div className="nav-label">管理后台</div>
         <nav aria-label="主导航">
-          {groups.map((g) => (
+          {navGroups.map((g) => (
             <div className="nav-group" key={g.id}>
               <button
                 className={"nav-main " + (op.group === g.id ? "active" : "")}
-                onClick={() =>
-                  onSelect(operations.find((o) => o.group === g.id)!)
-                }
+                onClick={() => onSelect(navOps.find((o) => o.group === g.id)!)}
               >
                 <span>{g.icon}</span>
                 {g.name}
@@ -44,7 +46,7 @@ export function Layout({
                 <div className="subnav">
                   {[
                     ...new Set(
-                      operations
+                      navOps
                         .filter((o) => o.group === g.id)
                         .map((o) => o.section),
                     ),
@@ -54,7 +56,7 @@ export function Layout({
                       key={section}
                       onClick={() =>
                         onSelect(
-                          operations.find(
+                          navOps.find(
                             (o) => o.group === g.id && o.section === section,
                           )!,
                         )
@@ -68,37 +70,65 @@ export function Layout({
             </div>
           ))}
         </nav>
-        <div className="sidebar-footer">
-          <span className="status-dot" /> 本地测试环境
-          <small>
-            结算时区：UTC
-            <br />
-            付款仅用于测试
-          </small>
-        </div>
       </aside>
       <div className="main-shell">
         <header className="topbar">
           <span>
             管理后台 <span className="muted"> / </span> {group.name}
           </span>
-          <div>
-            <span className="scope-pill">本地应用</span>
+          <div style={session.ops ? { whiteSpace: "nowrap" } : undefined}>
+            {session.ops ? (
+              <select
+                style={{
+                  width: "auto",
+                  maxWidth: "min(40vw, 240px)",
+                  flexShrink: 0,
+                }}
+                aria-label="当前站点"
+                value={session.site_id || ""}
+                onChange={async (e) => {
+                  // 切站由服务端校验并更新独立业务会话，刷新清除原站点结果和表单。
+                  const r = await fetch("/auth/site", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      "X-CSRF-Token": session.csrf,
+                    },
+                    body: JSON.stringify({ site_id: e.target.value }),
+                  });
+                  if (r.ok) location.reload();
+                  else window.alert("切换站点失败，请重新登录");
+                }}
+              >
+                {(session.sites || []).map((site) => (
+                  <option key={site.id} value={site.id}>
+                    {site.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <span className="scope-pill">本地应用</span>
+            )}
             <span className="avatar">
-              {session.role === "operator" ? "申" : "审"}
+              {session.ops
+                ? session.name?.slice(0, 1) || "运"
+                : session.role === "operator"
+                  ? "申"
+                  : "审"}
             </span>
             <span>
-              {session.role === "operator" ? "业务申请人" : "独立审批人"}
+              {session.ops
+                ? session.name
+                : session.role === "operator"
+                  ? "业务申请人"
+                  : "独立审批人"}
             </span>
             <button className="link-button" onClick={onLogout}>
               退出 / 切换身份
             </button>
           </div>
         </header>
-        <main>
-          {children}
-
-        </main>
+        <main>{children}</main>
       </div>
     </div>
   );

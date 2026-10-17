@@ -1,5 +1,7 @@
 # ExCommission-Web
 
+图文说明：[工程职责、系统关系与操作流程](docs/工程说明.md)。
+
 独立 React 19 + TypeScript 5 前端，连接 ExCommission Go V1。沿用 v35 原型的业务导航与浅色蓝灰视觉；V1 标准优先。后端仓库保持独立。本项目不自动创建或推送远程仓库。
 
 ## 启动

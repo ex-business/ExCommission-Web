@@ -1,3 +1,12 @@
+import {
+  opsEnabled,
+  loginOps,
+  refreshOps,
+  logoutOps,
+  opsPublicSettings,
+  opsView,
+  OpsError,
+} from "./ops-identity.mjs";
 import { randomBytes } from "node:crypto";
 import { json, body } from "./http.mjs";
 import { secretEquals } from "./security.mjs";
@@ -17,6 +26,69 @@ export function session(req) {
 }
 
 export async function handleAuth(req, res, url, s) {
+  if (url.pathname === "/auth/config" && req.method === "GET")
+    return json(
+      res,
+      200,
+      url.searchParams.get("role") === "member"
+        ? { ops: opsEnabled(), require_otp: false }
+        : await opsPublicSettings(),
+    );
+  if (s?.ops && !["/auth/login", "/auth/logout"].includes(url.pathname)) {
+    const previous = sessions.get(s.id);
+    try {
+      const next = await refreshOps(s);
+      // 身份查询返回前可能已切站或退出；仅更新仍是原对象的会话，禁止旧响应覆盖新状态。
+      if (sessions.get(s.id) !== previous)
+        return json(res, 409, {
+          error: {
+            code: "SITE_CONTEXT_CHANGED",
+            message: "会话已更新，请刷新页面",
+          },
+        });
+      s = next;
+      sessions.set(s.id, s);
+    } catch (e) {
+      if (
+        sessions.get(s.id) === previous &&
+        e instanceof OpsError &&
+        [401, 403].includes(e.status)
+      )
+        sessions.delete(s.id);
+      return json(res, e instanceof OpsError ? e.status : 503, {
+        error: {
+          code: "LOGIN_REQUIRED",
+          message: e instanceof OpsError ? e.message : "运营身份服务暂不可用",
+        },
+      });
+    }
+  }
+  if (url.pathname === "/auth/site" && req.method === "POST") {
+    if (!s?.ops || !secretEquals(req.headers["x-csrf-token"], s.csrf))
+      return json(res, 403, { error: { code: "CSRF_REJECTED" } });
+    const input = JSON.parse(await body(req));
+    const previous = sessions.get(s.id);
+    try {
+      const next = await refreshOps(s, input.site_id);
+      if (sessions.get(s.id) !== previous)
+        return json(res, 409, {
+          error: {
+            code: "SITE_CONTEXT_CHANGED",
+            message: "会话已更新，请刷新页面",
+          },
+        });
+      next.csrf = randomBytes(24).toString("hex");
+      sessions.set(s.id, next);
+      return json(res, 200, { ok: true });
+    } catch (e) {
+      return json(res, e instanceof OpsError ? e.status : 503, {
+        error: {
+          code: "PERMISSION_DENIED",
+          message: e instanceof OpsError ? e.message : "运营身份服务暂不可用",
+        },
+      });
+    }
+  }
   if (url.pathname === "/auth/login" && req.method === "POST") {
     const ip = req.socket.remoteAddress;
     let attempt = attempts.get(ip);
@@ -30,14 +102,36 @@ export async function handleAuth(req, res, url, s) {
         },
       });
     const input = JSON.parse(await body(req));
-    const role = ["operator", "approver", "member"].includes(input.role)
+    let role = ["operator", "approver", "member"].includes(input.role)
       ? input.role
       : "";
     const password = process.env["WEB_" + role.toUpperCase() + "_PASSWORD"];
     let backendToken,
       subject = "local-" + role;
     let valid =
-      role && role !== "member" && secretEquals(input.password, password);
+      role &&
+      role !== "member" &&
+      !opsEnabled() &&
+      secretEquals(input.password, password);
+    let opsData;
+    if (role && role !== "member" && opsEnabled()) {
+      try {
+        opsData = await loginOps(input);
+        role = opsData.role;
+        subject = opsData.subject;
+        backendToken = opsData.backendToken;
+        valid = true;
+      } catch (e) {
+        attempt.count++;
+        attempts.set(ip, attempt);
+        return json(res, e instanceof OpsError ? e.status : 503, {
+          error: {
+            code: "LOGIN_FAILED",
+            message: e instanceof OpsError ? e.message : "运营身份服务暂不可用",
+          },
+        });
+      }
+    }
     if (
       role === "member" &&
       typeof input.username === "string" &&
@@ -97,6 +191,7 @@ export async function handleAuth(req, res, url, s) {
     const id = randomBytes(32).toString("hex"),
       csrf = randomBytes(24).toString("hex");
     sessions.set(id, {
+      ...opsData,
       role,
       csrf,
       subject,
@@ -108,25 +203,22 @@ export async function handleAuth(req, res, url, s) {
       "Set-Cookie",
       `ec_session=${id}; HttpOnly; SameSite=Strict; Path=/; Max-Age=3600`,
     );
-    return json(res, 200, { role, csrf, subject });
+    return json(res, 200, opsView({ ...opsData, role, csrf, subject }));
   }
   if (url.pathname === "/auth/session") {
     if (!s)
       return json(res, 401, {
         error: { code: "LOGIN_REQUIRED", message: "请先登录" },
       });
-    return json(res, 200, {
-      role: s.role,
-      csrf: s.csrf,
-      subject: s.subject,
-    });
+    return json(res, 200, opsView(s));
   }
   if (url.pathname === "/auth/logout" && req.method === "POST") {
     if (!s || !secretEquals(req.headers["x-csrf-token"], s.csrf))
       return json(res, 403, { error: { code: "CSRF_REJECTED" } });
     sessions.delete(s.id);
     // 无论来源是否暂不可用，本地会话立即失效；令牌本身仍有固定短有效期。
-    await revokeSourceToken(s.backendToken).catch(() => {});
+    if (s.ops) await logoutOps(s).catch(() => {});
+    else await revokeSourceToken(s.backendToken).catch(() => {});
     res.setHeader(
       "Set-Cookie",
       "ec_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0",

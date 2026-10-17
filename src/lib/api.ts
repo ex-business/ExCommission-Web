@@ -1,3 +1,8 @@
+// 运营业务页面的站点由会话响应确认；会员和旧本地身份不设置此值，保持原请求行为。
+let opsSite: string | undefined;
+export function setOpsSite(site: string | undefined) {
+  opsSite = site;
+}
 export type ApiOptions = {
   method?: string;
   body?: unknown;
@@ -6,6 +11,7 @@ export type ApiOptions = {
   totp?: string;
 };
 const messages: Record<string, string> = {
+  SITE_CONTEXT_CHANGED: "站点已切换，请刷新页面后操作。",
   IMMUTABLE_AFFILIATE_CONFIG: "主货币、统计范围和时区在启用后不可更改。",
   IMMUTABLE_REWARD_STEPS: "已配置的奖励阶梯不可改写，可追加新阶梯。",
   SCHEDULED_CONFIG_EXISTS: "已有待生效配置，请等待生效后再修改。",
@@ -37,6 +43,9 @@ export async function request(
   const r = await fetch(target, {
     method,
     headers: {
+      ...(opsSite !== undefined && path.startsWith("/v1/")
+        ? { "X-Ops-Site-ID": opsSite }
+        : {}),
       ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
       ...(csrf ? { "X-CSRF-Token": csrf } : {}),
       ...(key ? { "Idempotency-Key": key } : {}),
