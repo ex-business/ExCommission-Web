@@ -1,3 +1,4 @@
+import { handleAffiliatePublic } from "./affiliate-public.mjs";
 import http from "node:http";
 import { readFile } from "node:fs/promises";
 import { resolve, extname } from "node:path";
@@ -44,6 +45,8 @@ export function createServer() {
             error: { code: "ORIGIN_REJECTED", message: "请求来源不匹配" },
           });
       }
+      if (url.pathname === "/affiliate-public")
+        return await handleAffiliatePublic(req, res, url);
       if (url.pathname.startsWith("/auth/"))
         return await handleAuth(req, res, url, s);
       if (url.pathname.startsWith("/api/"))

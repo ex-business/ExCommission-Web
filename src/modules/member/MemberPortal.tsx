@@ -1,3 +1,5 @@
+import { RewardCommunity, SocialShare } from "./affiliate/Community";
+import { amount } from "../affiliate/money";
 import { PublishedRules } from "./affiliate/PublishedRules";
 import {
   MemberLocaleProvider,
@@ -43,6 +45,8 @@ function MemberContent({
 }) {
   const { t, locale } = useMemberLocale();
   const [tab, setTab] = useState("rewards"),
+    [shareModal, setShareModal] = useState(false),
+    [invitationPrompt, setInvitationPrompt] = useState(false),
     [presentation, setPresentation] = useState<Row | null>(null),
     [presentationReady, setPresentationReady] = useState(false),
     [rewards, setRewards] = useState<Row[]>([]),
@@ -184,6 +188,31 @@ function MemberContent({
               !!r.data.configuration?.config.enabled,
           );
           setPresentationReady(true);
+          // 可选弹窗失败不阻断已加载的会员功能；401仍按原登录过期处理。
+          void request("/v1/me/affiliate/overview")
+            .then((response) => {
+              if (!active) return;
+              const overview = response.data;
+              const marker = "affiliate-invitation-seen:" + session.subject;
+              if (
+                overview.progress?.is_invited ||
+                new URLSearchParams(location.search).has("ic")
+              ) {
+                try {
+                  if (!sessionStorage.getItem(marker)) {
+                    setInvitationPrompt(true);
+                    sessionStorage.setItem(marker, "1");
+                  }
+                } catch {
+                  setInvitationPrompt(true);
+                }
+              }
+            })
+            .catch((e) => {
+              if (active && e instanceof ApiError && e.status === 401)
+                onExpired();
+            });
+
           return;
         }
       } catch (e) {
@@ -248,6 +277,16 @@ function MemberContent({
           <p>{t("邀请同行 · 分享收益")}</p>
           <h1>{t("我的代理中心")}</h1>
           <p>{t("查看团队与奖励，让每一笔佣金清楚可查。")}</p>
+          {presentation?.entry_visible && (
+            <button
+              onClick={() => {
+                setTab("share");
+                setShareModal(true);
+              }}
+            >
+              {t("立即邀请赚钱")}
+            </button>
+          )}
         </section>
         {!presentationReady && (
           <p role="status">{error || t("正在读取代理入口配置…")}</p>
@@ -274,6 +313,49 @@ function MemberContent({
                   {t("确认本人邀请关系")}
                 </button>
                 <button onClick={() => setInvite("")}>{t("暂不确认")}</button>
+              </section>
+            )}
+            {invitationPrompt && presentation && (
+              <section
+                role="dialog"
+                aria-modal="true"
+                aria-label={t("邀请朋友 双方获利")}
+                className="affiliate-site-dialog"
+              >
+                <button onClick={() => setInvitationPrompt(false)}>
+                  {t("关闭")}
+                </button>
+                <h2>{t("邀请朋友 双方获利")}</h2>
+                <p>
+                  {t("邀请最高赚取")}{" "}
+                  {amount(
+                    presentation.configuration.config.steps
+                      .reduce(
+                        (sum: bigint, step: Row) =>
+                          sum + BigInt(step.reward_minor),
+                        0n,
+                      )
+                      .toString(),
+                    presentation.configuration.config.currency_scale,
+                  )}{" "}
+                  {presentation.configuration.config.currency}
+                </p>
+                <p>
+                  {t("你的朋友获得")}{" "}
+                  {amount(
+                    presentation.configuration.config.invitee_reward_minor,
+                    presentation.configuration.config.currency_scale,
+                  )}{" "}
+                  {presentation.configuration.config.currency}
+                </p>
+                <button
+                  onClick={() => {
+                    setInvitationPrompt(false);
+                    setTab("share");
+                  }}
+                >
+                  {t("立即邀请赚钱")}
+                </button>
               </section>
             )}
             <nav className="member-tabs" aria-label={t("会员功能")}>
@@ -442,9 +524,20 @@ function MemberContent({
             )}
             {tab === "share" && (
               <section
-                className="member-content member-share"
+                className={
+                  shareModal
+                    ? "affiliate-site-dialog"
+                    : "member-content member-share"
+                }
+                role={shareModal ? "dialog" : undefined}
+                aria-modal={shareModal || undefined}
                 aria-label={t("分享推广")}
               >
+                {shareModal && (
+                  <button onClick={() => setShareModal(false)}>
+                    {t("关闭")}
+                  </button>
+                )}
                 <h2>{t("分享推广")}</h2>
                 {link?.url && new URL(link.url).searchParams.has("ic") && (
                   <p className="muted">
@@ -490,6 +583,61 @@ function MemberContent({
                         value={link.url}
                       />
                     </label>
+                    <p>
+                      {t("邀请码")}{" "}
+                      {link.code || new URL(link.url).searchParams.get("ic")}
+                    </p>
+                    <button
+                      onClick={() =>
+                        guard(async () => {
+                          await navigator.clipboard.writeText(
+                            link.code ||
+                              new URL(link.url).searchParams.get("ic") ||
+                              "",
+                          );
+                          setNotice(t("邀请码已复制"));
+                        })
+                      }
+                    >
+                      {t("复制邀请码")}
+                    </button>
+                    <SocialShare
+                      social={presentation?.configuration?.config.social}
+                      url={link.url}
+                      text={
+                        presentation
+                          ? t(
+                              "注册可获得{reward}，完成任务最高赚取{maximum}奖励。",
+                              {
+                                reward:
+                                  amount(
+                                    presentation.configuration.config
+                                      .invitee_reward_minor,
+                                    presentation.configuration.config
+                                      .currency_scale,
+                                  ) +
+                                  " " +
+                                  presentation.configuration.config.currency,
+                                maximum:
+                                  amount(
+                                    presentation.configuration.config.steps
+                                      .reduce(
+                                        (sum: bigint, step: Row) =>
+                                          sum + BigInt(step.reward_minor),
+                                        0n,
+                                      )
+                                      .toString(),
+                                    presentation.configuration.config
+                                      .currency_scale,
+                                  ) +
+                                  " " +
+                                  presentation.configuration.config.currency,
+                              },
+                            )
+                          : t("邀请加入我的团队")
+                      }
+                      onNotice={setNotice}
+                    />
                     <div className="member-share-actions">
                       <button
                         disabled={!enabled || busy || !qr}
@@ -529,6 +677,12 @@ function MemberContent({
               </section>
             )}
           </>
+        )}
+        {presentation && presentation.entry_visible && (
+          <RewardCommunity
+            feed={presentation.feed}
+            scale={presentation.configuration.config.currency_scale}
+          />
         )}
       </main>
       <footer className="member-footer">

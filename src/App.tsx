@@ -1,3 +1,4 @@
+import { GuestAffiliate } from "./modules/member/affiliate/GuestAffiliate";
 import { useEffect, useState } from "react";
 import { operations } from "./catalog";
 import { Login, type Session } from "./auth/Login";
@@ -21,6 +22,7 @@ import { AgentDirectory } from "./modules/agents/AgentDirectory";
 import { MemberPortal } from "./modules/member/MemberPortal";
 import { MemberCommissions } from "./modules/finance/MemberCommissions";
 export default function App() {
+  const [showLogin, setShowLogin] = useState(false);
   const [session, setSession] = useState<Session | null>(null),
     [loading, setLoading] = useState(true),
     [op, setOp] = useState(operations[0]),
@@ -59,6 +61,22 @@ export default function App() {
     window.scrollTo({ top: 0 });
   }
   if (loading) return <div className="loading-page">正在读取本地会话…</div>;
+  if (
+    !session &&
+    !showLogin &&
+    (new URLSearchParams(location.search).get("affiliate") === "1" ||
+      new URLSearchParams(location.search).get("role") === "member")
+  )
+    return (
+      <GuestAffiliate
+        onLogin={() => {
+          const u = new URL(location.href);
+          u.searchParams.set("role", "member");
+          history.replaceState(null, "", u);
+          setShowLogin(true);
+        }}
+      />
+    );
   if (!session) return <Login onLogin={setSession} />;
   if (session.role === "member")
     return (

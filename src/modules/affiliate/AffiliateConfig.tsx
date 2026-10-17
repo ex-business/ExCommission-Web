@@ -14,6 +14,7 @@ type Level = {
 };
 type Step = { step: number; additional_members: number; reward_minor: string };
 export type Config = {
+  social?: { platform: string; enabled: boolean }[];
   extension?: {
     disabled_entry: string;
     editable_steps: boolean;
@@ -309,6 +310,31 @@ export function AffiliateConfig({
               ))}
             </fieldset>
             <fieldset disabled={busy || !!state.scheduled}>
+              <fieldset>
+                <legend>站点社媒分享</legend>
+                <p>勾选的平台随本站配置审批发布；图标使用内置资源。</p>
+                {["FACEBOOK", "TELEGRAM", "WHATSAPP", "TIKTOK", "MORE"].map(
+                  (platform) => (
+                    <label key={platform}>
+                      <input
+                        type="checkbox"
+                        checked={(config.social || []).some(
+                          (item) => item.platform === platform && item.enabled,
+                        )}
+                        onChange={(e) =>
+                          patch("social", [
+                            ...(config.social || []).filter(
+                              (item) => item.platform !== platform,
+                            ),
+                            { platform, enabled: e.target.checked },
+                          ])
+                        }
+                      />
+                      {platform}
+                    </label>
+                  ),
+                )}
+              </fieldset>
               <RiskRules
                 value={config.risk_rules || []}
                 onChange={(v) => patch("risk_rules", v)}

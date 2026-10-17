@@ -57,6 +57,7 @@ export function AffiliateRewards({
   fallback: React.ReactNode;
 }) {
   const { t, locale } = useMemberLocale();
+  const [selectedLevel, setSelectedLevel] = useState<number | null>(null);
   const [view, setView] = useState<Row | null>(null),
     [legacy, setLegacy] = useState(false),
     [busy, setBusy] = useState(false),
@@ -298,7 +299,10 @@ export function AffiliateRewards({
               (r: Row) => r.kind === "REFERRAL" && r.step === step.step,
             );
             return (
-              <article key={step.step}>
+              <article
+                className={step.unlocked ? "affiliate-step-complete" : ""}
+                key={step.step}
+              >
                 <div className="affiliate-toolbar">
                   <strong>
                     {t("第{step}档 · 再推荐{members}人", {
@@ -390,6 +394,80 @@ export function AffiliateRewards({
               ))}
             </tbody>
           </table>
+        </div>
+      </section>
+      <section className="member-card">
+        <h2>{t("团队等级预览")}</h2>
+        <label>
+          {t("等级")}
+          <select
+            aria-label={t("团队等级预览")}
+            value={selectedLevel ?? grade.level}
+            onChange={(e) => setSelectedLevel(Number(e.target.value))}
+          >
+            {config.levels.map((level: Row) => (
+              <option key={level.level} value={level.level}>
+                Lv{level.level}
+              </option>
+            ))}
+          </select>
+        </label>
+        <p>
+          {t("最高佣金比例")}{" "}
+          {amount(
+            String(
+              Math.max(
+                ...(config.levels.find(
+                  (level: Row) =>
+                    level.level === (selectedLevel ?? grade.level),
+                )?.rates_ppm || [0]),
+              ),
+            ),
+            4,
+          )}
+          %
+        </p>
+        <p>
+          {t("推荐奖励总额")}{" "}
+          {amount(
+            config.steps
+              .reduce(
+                (sum: bigint, step: Row) => sum + BigInt(step.reward_minor),
+                0n,
+              )
+              .toString(),
+            scale,
+          )}{" "}
+          {config.currency}
+        </p>
+      </section>
+      <section className="member-card">
+        <h2>{t("直属推荐人进度")}</h2>
+        <div className="member-grid">
+          {(view.direct_members || []).map((member: Row) => (
+            <article key={member.user_id}>
+              <strong>ID: {member.user_id}</strong>
+              <p>
+                {t("加入时间")}{" "}
+                {new Date(member.registered_at).toLocaleString(locale)}
+              </p>
+              <Gauge
+                title={t("累计成功充值")}
+                current={member.qualification.deposit_minor}
+                target={config.referral_condition.deposit_minor}
+                scale={scale}
+                currency={config.currency}
+              />
+              <Gauge
+                title={t("累计有效业务量")}
+                current={member.qualification.valid_bet_minor}
+                target={config.referral_condition.valid_bet_minor}
+                scale={scale}
+                currency={config.currency}
+              />
+              {member.qualification.qualified_at && <span>{t("已达标")}</span>}
+            </article>
+          ))}
         </div>
       </section>
       <CommissionCalculator scale={scale} currency={config.currency} />

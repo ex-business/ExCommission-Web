@@ -1071,5 +1071,149 @@
   "自定义比例仅用于本地试算，实际佣金以已发布规则和审核结果为准。": {
     "en": "Custom rates are for local estimates. Actual commissions follow published rules and review results.",
     "es": "Las tasas personalizadas son estimaciones locales. Las comisiones reales siguen las reglas publicadas y la revisión."
+  },
+  "实时发放奖励": {
+    "en": "Live rewards",
+    "es": "Recompensas en vivo"
+  },
+  "总发放奖励": {
+    "en": "Total rewards paid",
+    "es": "Total pagado"
+  },
+  "暂无已领取奖励": {
+    "en": "No rewards claimed yet",
+    "es": "Aún no hay recompensas cobradas"
+  },
+  "常见问题": {
+    "en": "Frequently asked questions",
+    "es": "Preguntas frecuentes"
+  },
+  "参与需要多少费用？": {
+    "en": "Does participation cost anything?",
+    "es": "¿Participar tiene costo?"
+  },
+  "参与代理计划无需支付费用。": {
+    "en": "Joining the affiliate program is free.",
+    "es": "Participar en el programa es gratis."
+  },
+  "能赚多少钱？": {
+    "en": "How much can I earn?",
+    "es": "¿Cuánto puedo ganar?"
+  },
+  "收益由达标人数、有效投注及已发布奖励规则决定。": {
+    "en": "Earnings depend on qualified referrals, valid turnover and published rules.",
+    "es": "Las ganancias dependen de referidos válidos, apuestas válidas y reglas publicadas."
+  },
+  "如何获得奖励？": {
+    "en": "How do I earn rewards?",
+    "es": "¿Cómo gano recompensas?"
+  },
+  "分享专属链接，好友注册并完成充值和投注条件后解锁奖励。": {
+    "en": "Share your link. Rewards unlock when friends register and meet deposit and wagering requirements.",
+    "es": "Comparte tu enlace. Las recompensas se desbloquean al cumplir los requisitos de depósito y apuestas."
+  },
+  "更多": {
+    "en": "More",
+    "es": "Más"
+  },
+  "分享文案和链接已复制，请粘贴到社媒发布页。": {
+    "en": "Text and link copied. Paste them into your social post.",
+    "es": "Texto y enlace copiados. Pégalos en tu publicación."
+  },
+  "分享未完成，请复制邀请链接。": {
+    "en": "Sharing was not completed. Please copy your invitation link.",
+    "es": "No se completó la acción. Copia tu enlace."
+  },
+  "推荐返佣": {
+    "en": "Affiliate",
+    "es": "Afiliado"
+  },
+  "登录": {
+    "en": "Log in",
+    "es": "Iniciar sesión"
+  },
+  "推荐好友计划": {
+    "en": "Refer a friend",
+    "es": "Recomienda a un amigo"
+  },
+  "与朋友分享专属链接，完成条件后双方获得奖励。": {
+    "en": "Share your link with friends. Both receive rewards after meeting the requirements.",
+    "es": "Comparte tu enlace. Ambos reciben recompensas al cumplir los requisitos."
+  },
+  "注册即赚": {
+    "en": "Join and earn",
+    "es": "Regístrate y gana"
+  },
+  "前往会员注册": {
+    "en": "Register a member account",
+    "es": "Crear cuenta de miembro"
+  },
+  "高额佣金比例": {
+    "en": "High commission rates",
+    "es": "Altas tasas de comisión"
+  },
+  "建立团队，按站点已发布规则获得奖励。": {
+    "en": "Build your team and earn according to published site rules.",
+    "es": "Crea tu equipo y gana según las reglas publicadas."
+  },
+  "奖励规则": {
+    "en": "Reward rules",
+    "es": "Reglas de recompensas"
+  },
+  "代理信息暂不可用": {
+    "en": "Affiliate information is temporarily unavailable",
+    "es": "Información de afiliados no disponible"
+  },
+  "邀请朋友 双方获利": {
+    "en": "Invite friends, earn together",
+    "es": "Invita amigos y ganen juntos"
+  },
+  "邀请最高赚取": {
+    "en": "Earn up to",
+    "es": "Gana hasta"
+  },
+  "你的朋友获得": {
+    "en": "Your friend receives",
+    "es": "Tu amigo recibe"
+  },
+  "立即邀请赚钱": {
+    "en": "Invite and earn",
+    "es": "Invita y gana"
+  },
+  "邀请码": {
+    "en": "Invitation code",
+    "es": "Código de invitación"
+  },
+  "复制邀请码": {
+    "en": "Copy invitation code",
+    "es": "Copiar código de invitación"
+  },
+  "邀请码已复制": {
+    "en": "Invitation code copied",
+    "es": "Código copiado"
+  },
+  "注册可获得{reward}，完成任务最高赚取{maximum}奖励。": {
+    "en": "Register to get {reward}. Complete tasks to earn up to {maximum} in rewards.",
+    "es": "Regístrate y recibe {reward}. Completa misiones para ganar hasta {maximum} en recompensas."
+  },
+  "团队等级预览": {
+    "en": "Team level preview",
+    "es": "Vista de nivel de equipo"
+  },
+  "最高佣金比例": {
+    "en": "Maximum commission rate",
+    "es": "Tasa máxima de comisión"
+  },
+  "推荐奖励总额": {
+    "en": "Total referral rewards",
+    "es": "Total de recompensas por referidos"
+  },
+  "直属推荐人进度": {
+    "en": "Direct referral progress",
+    "es": "Progreso de referidos directos"
+  },
+  "加入时间": {
+    "en": "Joined at",
+    "es": "Fecha de registro"
   }
 }
