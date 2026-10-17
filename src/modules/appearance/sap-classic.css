@@ -1,0 +1,122 @@
+/* 经典蓝灰配色依据用户提供的旧SAP Web Administration参考图近似取色；不是Horizon或官方主题包。 */
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"] {
+  --blue: #315f89;
+  --line: #9eafc1;
+  --muted: #536b82;
+  --theme-primary: #386c9c;
+  --theme-primary-hover: #2b577f;
+  --theme-selected: #c5d8e9;
+  --theme-selected-text: #123c63;
+  --theme-line: #9eafc1;
+  color: #243849;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  :is(.main-shell, .admin-content) {
+  background: #f8fbfd;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .topbar {
+  background: linear-gradient(180deg, #e4edf5, #bdcfdf);
+  color: #173e60;
+  border-bottom: 1px solid #91a8be;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .topbar
+  :is(.topbar-location, .appearance-control, .link-button, .muted) {
+  color: #173e60;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .sidebar {
+  background: #d4e2ee;
+  border-right: 1px solid #91a8be;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .brand {
+  background: linear-gradient(180deg, #e4edf5, #bdcfdf);
+  border-bottom: 1px solid #91a8be;
+  color: #173e60;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .logo {
+  background: #315f89;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  :is(.nav-main, .subnav button, .nav-label) {
+  color: #284c6c;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .nav-main {
+  border-radius: 2px;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  :is(.nav-main.active, .subnav .selected, .tabs .selected) {
+  background: #bdd2e4;
+  color: #153f64;
+  border-radius: 2px;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .subnav
+  .selected::before {
+  background: #315f89;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .admin-content
+  :is(.af-filters, .review-filters, .af-summary, .panel, fieldset, .info) {
+  background: #edf4fa;
+  border-color: #a8bbce;
+  border-radius: 2px;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .admin-content
+  :is(th, .panel-heading) {
+  background: #cbddec;
+  color: #203f5c;
+  border-color: #9eafc1;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .admin-content
+  td {
+  background: #edf4fa;
+  border-color: #b8c9d9;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .admin-content
+  tr:nth-child(even)
+  td {
+  background: #e0ebf4;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .admin-content
+  tr:hover
+  td {
+  background: #d2e2ef;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  :is(button, input, select, textarea) {
+  border-radius: 2px;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .topbar
+  :is(select, .menu-toggle) {
+  background: #f4f8fb;
+  color: #173e60;
+  border-color: #879eb4;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .admin-content
+  .primary {
+  background: linear-gradient(#5284b0, #315f89);
+  color: #fff;
+  border-color: #214c72;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .admin-content
+  .primary:hover {
+  background: #315f89;
+}
+.app-shell[data-color-theme="sap"][data-sap-style="classic"][data-appearance="light"]
+  .admin-content
+  :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  background: #fff;
+  border-color: #879eb4;
+}

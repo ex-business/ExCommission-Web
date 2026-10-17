@@ -15,7 +15,7 @@ import { request, ApiError } from "../../lib/api";
 import type { Session } from "../../auth/Login";
 import { AgentDirectory } from "../agents/AgentDirectory";
 import { MemberCommissions } from "../finance/MemberCommissions";
-import { displayMoney } from "../finance/CommissionReview";
+import { displayMoney } from "../../lib/financeMoney";
 type Row = Record<string, any>;
 const tabs = [
   ["rewards", "推荐奖励"],

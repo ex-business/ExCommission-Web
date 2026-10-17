@@ -2,7 +2,7 @@ import { useMemberLocale } from "../member/affiliate/locale";
 import { useRef, useState } from "react";
 import { request, ApiError } from "../../lib/api";
 import type { Session } from "../../auth/Login";
-import { displayMoney } from "./CommissionReview";
+import { displayMoney } from "../../lib/financeMoney";
 type Order = {
   instruction_id: string;
   amount_minor: string;

@@ -1,7 +1,7 @@
 import { useMemberLocale } from "../member/affiliate/locale";
 import { useState } from "react";
 import { request, ApiError } from "../../lib/api";
-import { displayMoney } from "../finance/CommissionReview";
+import { displayMoney } from "../../lib/financeMoney";
 type Row = Record<string, any>;
 export function AgentDirectory({
   onExpired,

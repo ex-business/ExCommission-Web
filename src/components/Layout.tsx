@@ -1,5 +1,11 @@
+import { Sidebar } from "./layout/Sidebar";
+import { AppearanceSelect } from "../modules/appearance/AppearanceSelect";
+import { useAppearance } from "../modules/appearance/useAppearance";
+import "../modules/appearance/appearance.css";
+import "../modules/appearance/palettes.css";
+import "../modules/appearance/sap-classic.css";
 import { useEffect, useState, type ReactNode } from "react";
-import { groups, operations, type Operation } from "../catalog";
+import { groups, type Operation } from "../catalog";
 import { NavigationIcon } from "./NavigationIcon";
 import type { Session } from "../auth/Login";
 export function Layout({
@@ -15,6 +21,8 @@ export function Layout({
   onLogout: () => void;
   children: ReactNode;
 }) {
+  const { appearance, setAppearance, resolved, colorTheme, setColorTheme } =
+    useAppearance();
   const [menuCollapsed, setMenuCollapsed] = useState(false);
   const [expandedGroup, setExpandedGroup] = useState<string | null>(op.group);
   // 导航展开状态与业务选择分离，折叠菜单不跳页、不清空尚未提交的表单。
@@ -22,81 +30,27 @@ export function Layout({
     setExpandedGroup(op.group);
   }, [op.group]);
   const group = groups.find((g) => g.id === op.group)!;
-  // 身份接入只决定接口授权，保留原后台全部业务菜单，避免功能入口因登录方式改变而丢失。
-  const navOps = operations;
-  const navGroups = groups;
   return (
-    <div className={"app-shell" + (menuCollapsed ? " menu-collapsed" : "")}>
-      <aside className="sidebar" id="business-navigation">
-        <a className="brand" href="#agents">
-          <span className="logo small-logo">佣</span>
-          <span className="brand-title">
-            {session.ops ? "代理业务" : "佣金分润"}
-            <small>管理系统</small>
-          </span>
-        </a>
-        <div className="nav-label">管理后台</div>
-        <nav aria-label="主导航">
-          {navGroups.map((g) => (
-            <div className="nav-group" key={g.id}>
-              <button
-                className={"nav-main " + (op.group === g.id ? "active" : "")}
-                aria-label={g.name}
-                title={menuCollapsed ? g.name : undefined}
-                aria-expanded={!menuCollapsed && expandedGroup === g.id}
-                aria-controls={"nav-sections-" + g.id}
-                onClick={() => {
-                  // 收起时保留图标入口，点击图标先展开栏目，不触发业务导航。
-                  if (menuCollapsed) {
-                    setMenuCollapsed(false);
-                    setExpandedGroup(g.id);
-                  } else
-                    setExpandedGroup((current) =>
-                      current === g.id ? null : g.id,
-                    );
-                }}
-              >
-                <span className="nav-icon">
-                  <NavigationIcon name={g.id} />
-                </span>
-                <span className="nav-title">{g.name}</span>
-                <span
-                  className={
-                    "nav-arrow" + (expandedGroup === g.id ? " is-open" : "")
-                  }
-                >
-                  <NavigationIcon name="chevron" />
-                </span>
-              </button>
-              {!menuCollapsed && expandedGroup === g.id && (
-                <div className="subnav" id={"nav-sections-" + g.id}>
-                  {[
-                    ...new Set(
-                      navOps
-                        .filter((o) => o.group === g.id)
-                        .map((o) => o.section),
-                    ),
-                  ].map((section) => (
-                    <button
-                      className={op.section === section ? "selected" : ""}
-                      key={section}
-                      onClick={() =>
-                        onSelect(
-                          navOps.find(
-                            (o) => o.group === g.id && o.section === section,
-                          )!,
-                        )
-                      }
-                    >
-                      {section}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-      </aside>
+    <div
+      className={"app-shell" + (menuCollapsed ? " menu-collapsed" : "")}
+      data-appearance={resolved}
+      data-color-theme={colorTheme === "sap-horizon" ? "sap" : colorTheme}
+      data-sap-style={colorTheme === "sap" ? "classic" : "horizon"}
+    >
+      <Sidebar
+        op={op}
+        collapsed={menuCollapsed}
+        expandedGroup={expandedGroup}
+        brandTitle={session.ops ? "代理业务" : "佣金分润"}
+        onSelect={onSelect}
+        onToggleGroup={(id) => {
+          // 展开菜单不触发业务导航，保留当前页面与未提交草稿。
+          if (menuCollapsed) {
+            setMenuCollapsed(false);
+            setExpandedGroup(id);
+          } else setExpandedGroup((current) => (current === id ? null : id));
+        }}
+      />
       <div className="main-shell">
         <header className="topbar">
           <span className="topbar-location">
@@ -114,6 +68,12 @@ export function Layout({
             管理后台 <span className="muted"> / </span> {group.name}
           </span>
           <div style={session.ops ? { whiteSpace: "nowrap" } : undefined}>
+            <AppearanceSelect
+              value={appearance}
+              onChange={setAppearance}
+              theme={colorTheme}
+              onThemeChange={setColorTheme}
+            />
             {session.ops ? (
               <select
                 style={{

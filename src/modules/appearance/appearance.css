@@ -1,0 +1,145 @@
+/* 后台外观独立作用于业务布局，会员端、登录页与业务状态色保持原职责。 */
+.appearance-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.topbar .appearance-control select {
+  width: auto;
+  min-width: 84px;
+  padding: 6px;
+}
+.app-shell[data-appearance="dark"] {
+  color-scheme: dark;
+  --line: var(--appearance-line, #334155);
+  --muted: var(--appearance-muted, #a7b5ca);
+  --blue: var(--appearance-accent, #80aaff);
+  --surface: var(--appearance-surface, #172235);
+  color: var(--appearance-text, #e2e8f0);
+  background: var(--appearance-background, #0d1524);
+}
+.app-shell[data-appearance="dark"]
+  :is(.sidebar, .topbar, .admin-content, .main-shell) {
+  background: var(--appearance-background, #0d1524);
+  color: var(--appearance-text, #e2e8f0);
+}
+.app-shell[data-appearance="dark"] :is(.sidebar, .topbar) {
+  background: var(--appearance-shell, #111c2e);
+}
+.app-shell[data-appearance="dark"]
+  :is(
+    .admin-content section,
+    .admin-content article,
+    .admin-content fieldset,
+    .admin-content .member-card,
+    .admin-content .result-panel,
+    .admin-content .form-panel,
+    .admin-content .summary-card,
+    .admin-content details
+  ) {
+  background: var(--appearance-surface, #172235);
+  color: var(--appearance-text, #e2e8f0);
+  border-color: var(--appearance-line, #334155);
+}
+.app-shell[data-appearance="dark"]
+  :is(
+    h1,
+    h2,
+    h3,
+    h4,
+    label,
+    legend,
+    summary,
+    .brand,
+    .topbar-location,
+    .nav-title
+  ) {
+  color: inherit;
+}
+.app-shell[data-appearance="dark"]
+  :is(button, input, select, textarea, .menu-toggle) {
+  background: var(--appearance-surface, #172235);
+  color: var(--appearance-text, #e2e8f0);
+  border-color: var(--appearance-input-border, #475569);
+}
+.app-shell[data-appearance="dark"] :is(button:hover, .nav-main:hover) {
+  background: var(--appearance-hover, #263a58);
+}
+.app-shell[data-appearance="dark"]
+  :is(.nav-main.active, .subnav .selected, .tabs .selected) {
+  background: var(--appearance-selected, #233d65);
+  color: var(--appearance-selected-text, #b1cdff);
+}
+.app-shell[data-appearance="dark"]
+  :is(
+    .nav-main,
+    .subnav button,
+    .muted,
+    .nav-label,
+    .admin-content p,
+    .admin-content small,
+    .admin-content th
+  ) {
+  color: var(--appearance-muted, #a7b5ca);
+}
+.app-shell[data-appearance="dark"]
+  :is(.admin-content th, .admin-content pre, .admin-content .summary-box) {
+  background: var(--appearance-shell, #111c2e);
+}
+.app-shell[data-appearance="dark"]
+  :is(.admin-content td, .admin-content tr, .topbar, .sidebar) {
+  border-color: var(--appearance-line, #334155);
+}
+.app-shell[data-appearance="dark"] input:disabled {
+  opacity: 0.65;
+}
+.app-shell[data-appearance="dark"] .nav-main.active .nav-title {
+  color: var(--appearance-selected-text, #b1cdff);
+}
+@media (max-width: 650px) {
+  .appearance-control > span {
+    display: none;
+  }
+  .topbar .appearance-control select {
+    min-width: 66px;
+  }
+}
+.app-shell[data-appearance="dark"]
+  .admin-content
+  :is(
+    .panel,
+    .af-filters,
+    .review-filters,
+    .af-summary,
+    .af-table,
+    .table-wrap,
+    .table-scroll,
+    .nested-result,
+    .resource-index,
+    .info,
+    .empty.small,
+    .ingestion-workspace,
+    .af-card
+  ) {
+  background: var(--appearance-surface, #172235);
+  color: var(--appearance-text, #e2e8f0);
+  border-color: var(--appearance-line, #334155);
+}
+.app-shell[data-appearance="dark"] .admin-content :is(td, tr) {
+  background: var(--appearance-surface, #172235);
+  color: var(--appearance-text, #e2e8f0);
+}
+.app-shell[data-appearance="dark"] .admin-content tr:hover td {
+  background: var(--appearance-hover, #203149);
+}
+.app-shell[data-appearance="dark"]
+  .admin-content
+  :is(.af-summary strong, .result-grid dd) {
+  color: var(--appearance-text, #e2e8f0);
+}
+.app-shell[data-appearance="dark"] .admin-content .primary {
+  background: var(--appearance-primary, #285ac5);
+  color: #fff;
+  border-color: var(--appearance-primary-border, #477eea);
+}
