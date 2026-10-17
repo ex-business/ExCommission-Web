@@ -165,14 +165,10 @@ export function OperationPanel({
       <section className="panel editor">
         <div className="panel-heading">
           <div>
-            <span className="eyebrow">{op.section}</span>
+
             <h2>{op.title}</h2>
           </div>
-          <span
-            className={"badge " + (op.method === "GET" ? "" : "muted-badge")}
-          >
-            {op.method === "GET" ? "查询" : "业务操作"}
-          </span>
+
         </div>
         {notes[op.title] && <div className="info">{notes[op.title]}</div>}
         <form
@@ -274,14 +270,12 @@ export function OperationPanel({
               schema={schema}
               value={body}
               onChange={setBody}
-              name="填写信息"
+              name="参数"
             />
           )}
           {!schema && !parameters.length && (
             <div className="empty">
-              <div className="empty-icon">◎</div>
-              <p>读取当前授权范围内的{op.title}</p>
-              <small>点击查询查看记录</small>
+              <p>点击查询</p>
             </div>
           )}
           {errors.length > 0 && (
@@ -315,24 +309,20 @@ export function OperationPanel({
                 ? "处理中…"
                 : op.method === "GET"
                   ? "查询" + (op.title === "下载快照" ? "并下载" : "")
-                  : "核对并提交"}
+                  : "提交"}
             </button>
             <button type="button" disabled={busy} onClick={reset}>
-              重置输入
+              重置
             </button>
           </div>
-          <small className="muted">
-            {op.method !== "GET"
-              ? "重复提交相同内容不会重复处理。提示版本冲突时，请重新查询后再操作。"
-              : "请输入编号查询记录。"}
-          </small>
+
         </form>
       </section>
       <section className="panel result-panel" aria-live="polite">
         <div className="panel-heading">
           <div>
-            <span className="eyebrow">查询与操作记录</span>
-            <h2>处理结果</h2>
+
+            <h2>结果</h2>
           </div>
           {result && (
             <button onClick={() => setJson(!json)}>
@@ -357,9 +347,7 @@ export function OperationPanel({
           !busy &&
           !error && (
             <div className="empty">
-              <div className="empty-icon">▤</div>
-              <p>等待查询或提交</p>
-              <small>查询或提交后，结果显示在这里</small>
+              <p>暂无数据</p>
             </div>
           )
         )}

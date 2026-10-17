@@ -1,3 +1,4 @@
+import { MemberIdentity } from "../member/affiliate/MemberIdentity";
 import { useEffect, useRef, useState } from "react";
 import { request, ApiError } from "../../lib/api";
 import type { Session } from "../../auth/Login";
@@ -29,6 +30,12 @@ export function BusinessRewards({
   const [kind, setKind] = useState("REFERRAL"),
     [status, setStatus] = useState(""),
     [user, setUser] = useState(""),
+    [rewardID, setRewardID] = useState(""),
+    [claimID, setClaimID] = useState(""),
+    [claimIP, setClaimIP] = useState(""),
+    [businessDay, setBusinessDay] = useState(""),
+    [sort, setSort] = useState("time_desc"),
+    [timeField, setTimeField] = useState("unlocked_at"),
     [from, setFrom] = useState(localInput(new Date(Date.now() - 7 * 86400000))),
     [to, setTo] = useState(localInput(new Date(Date.now() + 60000))),
     [page, setPage] = useState<Row | null>(null),
@@ -47,7 +54,7 @@ export function BusinessRewards({
     keys = useRef(new Map<string, string>()),
     querySnapshot = useRef<Record<string, string> | null>(null);
   const scale = config?.current?.config.currency_scale ?? 2;
-  function parameters(after = "", frozen = false) {
+  function parameters(after = "", frozen = false, initial = false) {
     // 翻页及导出复用已展示结果的完整查询，输入框未提交的编辑不改变快照。
     if ((after || frozen) && querySnapshot.current) {
       const saved = new URLSearchParams(querySnapshot.current);
@@ -56,11 +63,27 @@ export function BusinessRewards({
     }
     const q = new URLSearchParams({
       kind,
+      sort: initial
+        ? kind === "COMMISSION"
+          ? "amount_desc"
+          : "time_desc"
+        : sort,
+      time_field: timeField,
       limit: "50",
       from: new Date(from).toISOString(),
       to: new Date(to).toISOString(),
     });
-    if (status) q.set("status", status);
+    if (initial && kind === "COMMISSION") {
+      q.set("status", "PENDING_REVIEW");
+      q.set("period", "yesterday");
+    } else {
+      if (status) q.set("status", status);
+      if (businessDay && kind === "COMMISSION")
+        q.set("business_day", businessDay);
+    }
+    if (!initial && rewardID.trim()) q.set("reward_id", rewardID.trim());
+    if (!initial && claimID.trim()) q.set("claim_id", claimID.trim());
+    if (!initial && claimIP.trim()) q.set("claim_ip", claimIP.trim());
     if (user.trim()) q.set("user_id", user.trim());
     return q;
   }
@@ -76,10 +99,10 @@ export function BusinessRewards({
       setBusy(false);
     }
   }
-  async function load(after = "") {
+  async function load(after = "", initial = false) {
     const serial = ++sequence.current;
     await run(async () => {
-      const q = parameters(after);
+      const q = parameters(after, false, initial);
       const data = await request("/v1/affiliate/rewards?" + q);
       if (serial === sequence.current) {
         q.delete("after_id");
@@ -102,14 +125,33 @@ export function BusinessRewards({
     setSelected([]);
     setDetail(null);
     setDecision("");
-    void load();
+    setStatus(kind === "COMMISSION" ? "PENDING_REVIEW" : "");
+    setSort(kind === "COMMISSION" ? "amount_desc" : "time_desc");
+    setRewardID("");
+    setClaimID("");
+    setClaimIP("");
+    const today = new Intl.DateTimeFormat("en-CA", {
+      timeZone: config?.current?.config.timezone || "UTC",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    const day = new Date(today + "T12:00:00Z");
+    day.setUTCDate(day.getUTCDate() - 1);
+    setBusinessDay(kind === "COMMISSION" ? day.toISOString().slice(0, 10) : "");
+    void load("", true);
     return () => {
       sequence.current++;
     };
   }, [kind]);
   async function open(row: Row) {
     await run(async () => {
-      setDetail((await request("/v1/affiliate/rewards/" + row.reward_id)).data);
+      const result = (await request("/v1/affiliate/rewards/" + row.reward_id))
+        .data;
+      setDetail({
+        ...result,
+        reward: { ...result.reward, profile: row.profile },
+      });
       setDecision("");
       setReason("");
       setAdjust(false);
@@ -206,10 +248,7 @@ export function BusinessRewards({
   return (
     <div className="af-admin">
       <header>
-        <h2>代理奖励专用记录</h2>
-        <p>
-          推荐、受邀与佣金分别查询；查询结果固定在同一观察时点。时间按浏览器本地时区显示。
-        </p>
+        <h2>奖励记录</h2>
       </header>
       <div className="af-tabs">
         {Object.entries(kinds).map(([id, label]) => (
@@ -229,6 +268,58 @@ export function BusinessRewards({
           void load();
         }}
       >
+        <label>
+          派发 / 解锁订单ID
+          <input
+            aria-label="奖励订单ID"
+            value={rewardID}
+            onChange={(e) => setRewardID(e.target.value)}
+            maxLength={128}
+          />
+        </label>
+        <label>
+          领取订单ID
+          <input
+            value={claimID}
+            onChange={(e) => setClaimID(e.target.value)}
+            maxLength={128}
+          />
+        </label>
+        <label>
+          领取IP
+          <input
+            value={claimIP}
+            onChange={(e) => setClaimIP(e.target.value)}
+            maxLength={64}
+          />
+        </label>
+        {kind === "COMMISSION" && (
+          <label>
+            佣金统计日期
+            <input
+              type="date"
+              value={businessDay}
+              onChange={(e) => setBusinessDay(e.target.value)}
+            />
+          </label>
+        )}
+        <label>
+          查询时间口径
+          <select
+            value={timeField}
+            onChange={(e) => setTimeField(e.target.value)}
+          >
+            <option value="unlocked_at">派发 / 解锁时间</option>
+            <option value="claimed_at">领取时间</option>
+          </select>
+        </label>
+        <label>
+          排序
+          <select value={sort} onChange={(e) => setSort(e.target.value)}>
+            <option value="time_desc">时间倒序</option>
+            <option value="amount_desc">金额从大到小</option>
+          </select>
+        </label>
         <label>
           开始时间
           <input
@@ -321,10 +412,11 @@ export function BusinessRewards({
                       />
                     </td>
                     <td>
-                      <code>{row.user_id}</code>
-                      <small>{row.agent_id}</small>
+                      <MemberIdentity id={row.user_id} profile={row.profile} />
                     </td>
                     <td>
+                      <small>{row.reward_id}</small>
+                      <small>领取：{row.claim_id || "—"}</small>
                       {row.business_day ||
                         (row.step ? `第 ${row.step} 档` : "本人一次奖励")}
                     </td>

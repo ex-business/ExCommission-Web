@@ -3,11 +3,8 @@ import { useEffect, useState } from "react";
 import { operations } from "./catalog";
 import { Login, type Session } from "./auth/Login";
 import { request } from "./lib/api";
-import { resourceLinks } from "./lib/api";
-import { saveIndex } from "./lib/storage";
 import { Layout } from "./components/Layout";
 import { OperationPanel, type Seed } from "./modules/OperationPanel";
-import { ResourceIndex } from "./modules/ResourceIndex";
 import { CommissionReview } from "./modules/finance/CommissionReview";
 import { AffiliateSiteCatalog } from "./modules/affiliate/SiteCatalog";
 import { AgentBusinessReport } from "./modules/affiliate/AgentReport";
@@ -27,9 +24,7 @@ export default function App() {
     [loading, setLoading] = useState(true),
     [op, setOp] = useState(operations[0]),
     [seed, setSeed] = useState<Seed>(),
-    [serial, setSerial] = useState(0),
-    [indexVersion, setIndexVersion] = useState(0),
-    [search, setSearch] = useState("");
+    [serial, setSerial] = useState(0);
   useEffect(() => {
     request("/auth/session")
       .then((r) => setSession(r.data))
@@ -57,7 +52,6 @@ export default function App() {
     setOp(target);
     setSeed(next);
     setSerial((s) => s + 1);
-    setSearch("");
     window.scrollTo({ top: 0 });
   }
   if (loading) return <div className="loading-page">正在读取本地会话…</div>;
@@ -118,33 +112,6 @@ export default function App() {
         }
       }}
     >
-      <div className="workspace-tools">
-        <div className="search-field">
-          <span>⌕</span>
-          <input
-            aria-label="搜索功能"
-            placeholder="搜索功能，如：审批、付款、试算"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-        <span className="muted"></span>
-      </div>
-      {search && (
-        <div className="search-results">
-          {operations
-            .filter((o) => (o.title + o.section).includes(search))
-            .map((o) => (
-              <button key={o.key} onClick={() => navigate(o.title)}>
-                {o.section} / {o.title}
-              </button>
-            ))}
-        </div>
-      )}
-      <ResourceIndex
-        version={indexVersion}
-        onOpen={(e) => navigate(e.title, { params: { id: e.id } })}
-      />
       <div className="tabs" role="navigation" aria-label="业务操作">
         {sectionOps.map((o) => (
           <button
@@ -204,10 +171,7 @@ export default function App() {
           session={session}
           seed={seed}
           onNavigate={navigate}
-          onResult={(data) => {
-            saveIndex(resourceLinks(data));
-            setIndexVersion((v) => v + 1);
-          }}
+          onResult={() => {}}
           onExpired={() => setSession(null)}
         />
       )}

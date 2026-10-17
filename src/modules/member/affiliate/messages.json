@@ -1215,5 +1215,121 @@
   "加入时间": {
     "en": "Joined at",
     "es": "Fecha de registro"
+  },
+  "上一页": {
+    "en": "Previous",
+    "es": "Anterior"
+  },
+  "今日": {
+    "en": "Today",
+    "es": "Hoy"
+  },
+  "昨日": {
+    "en": "Yesterday",
+    "es": "Ayer"
+  },
+  "代理账号 / 展示ID": {
+    "en": "Agent name / public ID",
+    "es": "Nombre del agente / ID público"
+  },
+  "全部": {
+    "en": "All",
+    "es": "Todos"
+  },
+  "共{count}人": {
+    "en": "{count} members",
+    "es": "{count} miembros"
+  },
+  "投注金额 / 有效业务量": {
+    "en": "Bet amount / valid turnover",
+    "es": "Importe apostado / volumen válido"
+  },
+  "明细每页条数": {
+    "en": "Details per page",
+    "es": "Filas por página"
+  },
+  "明细默认昨日，每10分钟更新，按冻结贡献佣金倒序。": {
+    "en": "Details default to yesterday, refresh every 10 minutes and sort by frozen commission contribution.",
+    "es": "Los detalles muestran ayer, se actualizan cada 10 minutos y se ordenan por contribución de comisión."
+  },
+  "最近登录IP": {
+    "en": "Last login IP",
+    "es": "IP del último inicio"
+  },
+  "最近登录时间 / IP": {
+    "en": "Last login / IP",
+    "es": "Último inicio / IP"
+  },
+  "每日结算比例": {
+    "en": "Daily settled rates",
+    "es": "Tasas liquidadas por día"
+  },
+  "团队数据": {
+    "en": "Team statistics",
+    "es": "Estadísticas del equipo"
+  },
+  "VIP未提供": {
+    "en": "VIP not provided",
+    "es": "VIP no proporcionado"
+  },
+  "推荐奖励图标": {
+    "en": "Referral reward icon",
+    "es": "Icono de recompensa"
+  },
+  "完成充值与投注条件后解锁奖励": {
+    "en": "Meet deposit and wagering requirements to unlock rewards",
+    "es": "Cumple los requisitos de depósito y apuestas para desbloquear recompensas"
+  },
+  "今日推荐": {
+    "en": "Referrals today",
+    "es": "Referidos de hoy"
+  },
+  "总推荐人数": {
+    "en": "Total referrals",
+    "es": "Referidos totales"
+  },
+  "今日有效推荐人数": {
+    "en": "Qualified new referrals today",
+    "es": "Nuevos referidos válidos de hoy"
+  },
+  "总有效推荐人数": {
+    "en": "Total qualified referrals",
+    "es": "Referidos válidos totales"
+  },
+  "今日新会员存款": {
+    "en": "New members’ deposits today",
+    "es": "Depósitos de nuevos miembros hoy"
+  },
+  "总存款": {
+    "en": "Total deposits",
+    "es": "Depósitos totales"
+  },
+  "累计已领取": {
+    "en": "Total claimed earnings",
+    "es": "Ganancias cobradas totales"
+  },
+  "统计三层团队；今日存款仅含今日新注册会员，有效人数按已发布统计周期。": {
+    "en": "Covers three team levels. Today’s deposits include new members registered today; qualified counts follow the published period.",
+    "es": "Incluye tres niveles. Los depósitos de hoy son de miembros registrados hoy; los miembros válidos siguen el período publicado."
+  },
+  "会员头像": {
+    "en": "Member avatar",
+    "es": "Avatar del miembro"
+  },
+  "直属 / 团队投注": {
+    "en": "Direct / team bet amounts",
+    "es": "Apuestas directas / del equipo"
+  },
+  "有效会员 / 类型": {
+    "en": "Qualified / type",
+    "es": "Calificado / tipo"
+  },
+  "是": {
+    "en": "Yes",
+    "es": "Sí"
+  },
+  "否": {
+    "en": "No",
+    "es": "No"
   }
 }

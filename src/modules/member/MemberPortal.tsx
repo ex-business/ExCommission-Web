@@ -1,3 +1,4 @@
+import { MemberTeamDashboard } from "./affiliate/TeamDashboard";
 import { RewardCommunity, SocialShare } from "./affiliate/Community";
 import { amount } from "../affiliate/money";
 import { PublishedRules } from "./affiliate/PublishedRules";
@@ -110,12 +111,46 @@ function MemberContent({
     ctx.textAlign = "center";
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 48px sans-serif";
-    ctx.fillText(t("邀请加入我的团队"), 375, 150, 650);
+    ctx.fillText(t("邀请朋友 双方获利"), 375, 95, 650);
     ctx.font = "26px sans-serif";
-    ctx.fillText(t("扫码注册，开启代理之旅"), 375, 220, 650);
+    ctx.fillText(
+      presentation?.profile?.display_name || session.subject,
+      375,
+      150,
+      650,
+    );
+    if (presentation?.configuration) {
+      const c = presentation.configuration.config;
+      const maximum = c.steps.reduce(
+        (sum: bigint, step: Row) => sum + BigInt(step.reward_minor),
+        0n,
+      );
+      ctx.fillText(
+        t("邀请最高赚取") +
+          " " +
+          amount(maximum.toString(), c.currency_scale) +
+          " " +
+          c.currency,
+        375,
+        210,
+        650,
+      );
+      ctx.fillText(
+        t("你的朋友获得") +
+          " " +
+          amount(c.invitee_reward_minor, c.currency_scale) +
+          " " +
+          c.currency,
+        375,
+        260,
+        650,
+      );
+    }
+    ctx.font = "26px sans-serif";
+    ctx.fillText(t("完成充值与投注条件后解锁奖励"), 375, 300, 650);
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(155, 310, 440, 440);
-    ctx.drawImage(image, 175, 330, 400, 400);
+    ctx.fillRect(155, 330, 440, 440);
+    ctx.drawImage(image, 175, 350, 400, 400);
     const code = new URL(link.url).searchParams.get("ic");
     ctx.font = "bold 36px sans-serif";
     if (code) ctx.fillText(t("邀请码：{code}", { code }), 375, 850);
@@ -442,6 +477,7 @@ function MemberContent({
             )}
             {tab === "team" && (
               <section className="member-content">
+                <MemberTeamDashboard onExpired={onExpired} />
                 <AgentBusinessReport
                   member
                   onExpired={onExpired}

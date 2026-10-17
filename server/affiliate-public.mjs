@@ -38,13 +38,23 @@ export async function handleAffiliatePublic(req, res, url) {
       totals: data.feed?.totals || {},
       rows: (data.feed?.rows || [])
         .slice(0, 30)
-        .map(({ member, kind, amount_minor, currency, claimed_at }) => ({
-          member,
-          kind,
-          amount_minor,
-          currency,
-          claimed_at,
-        })),
+        .map(
+          ({
+            member,
+            kind,
+            amount_minor,
+            currency,
+            claimed_at,
+            avatar_url,
+          }) => ({
+            member,
+            kind,
+            amount_minor,
+            currency,
+            claimed_at,
+            avatar_url,
+          }),
+        ),
     };
   }
   if (process.env.MEMBER_REGISTRATION_URL)

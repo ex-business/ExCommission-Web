@@ -294,7 +294,7 @@ export function AffiliateRewards({
           {t("每一档使用新增达标会员；同一会员不会重复占用不同阶梯。")}
         </p>
         <div className="affiliate-steps">
-          {(p?.steps || []).map((step: Row) => {
+          {(p?.steps || []).map((step: Row, stepIndex: number) => {
             const reward = p.rewards.find(
               (r: Row) => r.kind === "REFERRAL" && r.step === step.step,
             );
@@ -303,6 +303,11 @@ export function AffiliateRewards({
                 className={step.unlocked ? "affiliate-step-complete" : ""}
                 key={step.step}
               >
+                <img
+                  className="affiliate-reward-logo"
+                  src={`/affiliate-assets/reward-${Math.min(3, Math.floor((stepIndex * 3) / Math.max(1, p.steps.length)) + 1)}.svg`}
+                  alt={t("推荐奖励图标")}
+                />
                 <div className="affiliate-toolbar">
                   <strong>
                     {t("第{step}档 · 再推荐{members}人", {

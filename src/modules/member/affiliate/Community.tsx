@@ -56,7 +56,13 @@ export function RewardCommunity({
             (_, i) => rows[(offset + i) % rows.length],
           ).map((r: Row, i: number) => (
             <article key={i}>
-              <span aria-hidden="true">● </span>
+              <img
+                className="affiliate-avatar"
+                src={r.avatar_url || "/affiliate-assets/avatar.svg"}
+                alt={t("会员头像")}
+                width={32}
+                height={32}
+              />
               {r.member} ·{" "}
               {t(
                 r.kind === "INVITEE"

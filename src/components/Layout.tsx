@@ -96,17 +96,8 @@ export function Layout({
           </div>
         </header>
         <main>
-          <div className="page-heading">
-            <div>
-              <h1>{op.section}</h1>
-              <p>{group.desc}</p>
-            </div>
-            <span className="badge local-badge">● 测试环境</span>
-          </div>
           {children}
-          <footer>
-            佣金分润管理系统 <span></span>
-          </footer>
+
         </main>
       </div>
     </div>
