@@ -195,3 +195,30 @@
   )[data-appearance="dark"] {
   --blue: var(--appearance-accent);
 }
+
+/* 简洁蓝灰仅调淡浅色后台的交互蓝；文字保留对比度，会员页和深色模式沿用原配色。 */
+.app-shell[data-color-theme="simple"][data-appearance="light"] {
+  --blue: #507ba7;
+}
+.app-shell[data-color-theme="simple"][data-appearance="light"] .logo {
+  background: #628bb5;
+}
+.app-shell[data-color-theme="simple"][data-appearance="light"]
+  :is(.nav-main.active, .subnav .selected, .tabs .selected) {
+  color: #466f98;
+  background: #f0f5fa;
+}
+.app-shell[data-color-theme="simple"][data-appearance="light"] .tabs .selected {
+  border-bottom-color: #8faecb;
+}
+.app-shell[data-color-theme="simple"][data-appearance="light"] .subnav .selected::before {
+  background: #83a3c2;
+}
+.app-shell[data-color-theme="simple"][data-appearance="light"] .admin-content .primary {
+  background: #50779e;
+  border-color: #50779e;
+  color: #fff;
+}
+.app-shell[data-color-theme="simple"][data-appearance="light"] .admin-content .primary:hover {
+  background: #486f96;
+}

@@ -12,8 +12,8 @@ function readColorTheme(): ColorTheme {
     )
       return value;
   } catch {}
-  // SAP为产品默认配色；旧default值或无偏好均自然迁移，显式IBM偏好仍保留。
-  return "sap";
+  // 无有效偏好时使用简洁蓝灰；已明确选择的其他主题继续保留。
+  return "simple";
 }
 export type Appearance = "light" | "dark" | "system";
 const key = "ec-admin-appearance-v1";

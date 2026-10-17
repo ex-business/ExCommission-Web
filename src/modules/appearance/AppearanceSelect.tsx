@@ -19,8 +19,8 @@ export function AppearanceSelect({
           value={theme}
           onChange={(e) => onThemeChange(e.target.value as ColorTheme)}
         >
-          <option value="sap">SAP 经典蓝灰（默认）</option>
-          <option value="simple">简洁蓝灰</option>
+          <option value="sap">SAP 经典蓝灰</option>
+          <option value="simple">简洁蓝灰（默认）</option>
           <option value="sap-horizon">SAP Horizon</option>
           <option value="ibm">IBM Carbon</option>
         </select>
