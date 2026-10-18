@@ -1,3 +1,4 @@
+import {externalFetch} from "./external-gateway.mjs";
 import { secretEquals } from "./security.mjs";
 export function opsEnabled() {
   return !!process.env.OPS_IDENTITY_URL;
@@ -28,7 +29,7 @@ export class OpsError extends Error {
 }
 async function call(path, session, csrf, body) {
   const { endpoint, origin } = config();
-  const r = await fetch(new URL(path, endpoint), {
+  const r = await externalFetch(new URL(path, endpoint), {
     method: body === undefined ? "GET" : "POST",
     headers: {
       ...(session ? { cookie: "ops_session=" + session } : {}),

@@ -1,3 +1,4 @@
+import {externalFetch} from "./external-gateway.mjs";
 import { readFile } from "node:fs/promises";
 
 // 凭据只从服务端私有文件读取；显式沙箱配置仅允许字面量回环地址。
@@ -38,7 +39,7 @@ export async function memberLoginURL() {
   return c;
 }
 export async function sourceLogin(c, username, password) {
-  const result = await fetch(c.login_url, {
+  const result = await externalFetch(c.login_url, {
     method: "POST",
     headers: { Authorization: basic(c), "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
@@ -56,7 +57,7 @@ export async function revokeSourceToken(token) {
   if (!token?.startsWith("ms_")) return;
   const c = await configuration();
   if (!c) return;
-  const result = await fetch(c.revoke_url, {
+  const result = await externalFetch(c.revoke_url, {
     method: "POST",
     headers: {
       Authorization: basic(c),

@@ -1,10 +1,11 @@
+import {externalFetch} from "./external-gateway.mjs";
 import { json } from "./http.mjs";
 // 匿名入口只使用服务端固定身份及固定上游路径，不接收浏览器提供的站点或鉴权头。
 export async function handleAffiliatePublic(req, res, url) {
   if (req.method !== "GET")
     return json(res, 405, { error: { code: "METHOD_NOT_ALLOWED" } });
   if (url.search) return json(res, 400, { error: { code: "INVALID_QUERY" } });
-  const upstream = await fetch(
+  const upstream = await externalFetch(
     new URL(
       "/v1/affiliate/public-presentation",
       process.env.BACKEND_URL || "http://127.0.0.1:18080",

@@ -1,3 +1,4 @@
+import {externalFetch} from "./external-gateway.mjs";
 import { refreshOps, opsSiteMatches, OpsError } from "./ops-identity.mjs";
 import { randomBytes, createHmac } from "node:crypto";
 import { json, body } from "./http.mjs";
@@ -151,7 +152,7 @@ export async function handleProxy(req, res, url, s, routes) {
         .digest("hex");
     }
   }
-  const upstream = await fetch(
+  const upstream = await externalFetch(
     new URL(
       path + url.search,
       process.env.BACKEND_URL || "http://127.0.0.1:18080",

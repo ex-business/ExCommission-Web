@@ -14,7 +14,8 @@
     "ajv-formats": "3.0.1",
     "qrcode": "1.5.4",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "@ex-business/service-router-sdk": "file:vendor/ex-business-service-router-sdk-0.1.0.tgz"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",

@@ -1,3 +1,4 @@
+import {externalFetch} from "./external-gateway.mjs";
 import {
   opsEnabled,
   loginOps,
@@ -146,7 +147,7 @@ export async function handleAuth(req, res, url, s) {
       if (source) {
         token = await sourceLogin(source, input.username, input.password);
       } else {
-        const result = await fetch(new URL("/v1/auth/login", backend), {
+        const result = await externalFetch(new URL("/v1/auth/login", backend), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -159,7 +160,7 @@ export async function handleAuth(req, res, url, s) {
         if (result.ok) token = (await result.json()).access_token;
       }
       if (typeof token === "string") {
-        const me = await fetch(new URL("/v1/auth/me", backend), {
+        const me = await externalFetch(new URL("/v1/auth/me", backend), {
           headers: { Authorization: "Bearer " + token },
           redirect: "error",
           signal: AbortSignal.timeout(10000),
