@@ -17,6 +17,7 @@ const AffiliateReversals = lazy(() =>
     default: m.AffiliateReversals,
   })),
 );
+const ExecutionRouting = lazy(() => import("../modules/executionrouting/ExecutionRouting").then(m => ({default:m.ExecutionRouting})));
 const DataIngestion = lazy(() =>
   import("../modules/ingestion/DataIngestion").then((m) => ({
     default: m.DataIngestion,

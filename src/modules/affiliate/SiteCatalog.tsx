@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import { amount } from "./money";
 import type { Session } from "../../auth/Login";
 import { useEffect, useRef, useState } from "react";
@@ -59,7 +60,7 @@ function LegacyAffiliateSiteCatalog({ onExpired }: { onExpired: () => void }) {
         </p>
       )}
       <div className="af-table">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>站点</th>
@@ -109,7 +110,7 @@ function LegacyAffiliateSiteCatalog({ onExpired }: { onExpired: () => void }) {
               );
             })}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       {detail && (
         <div className="affiliate-overlay" onClick={() => setDetail(null)}>
@@ -392,7 +393,7 @@ function SiteManagement({
       </button>
       {error && <p role="alert">{error}</p>}
       <div className="af-table">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>序号</th>
@@ -423,7 +424,7 @@ function SiteManagement({
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       <p>共 {filtered.length} 条</p>
       <label>

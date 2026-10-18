@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import { useEffect, useRef, useState } from "react";
 import type { Session } from "../../auth/Login";
 import { ApiError, request } from "../../lib/api";
@@ -206,7 +207,7 @@ export function TaskRuns({
               </button>
             </form>
             <div className="table-scroll">
-              <table>
+              <PagedTable>
                 <thead>
                   <tr>
                     <th>方案 / 版本</th>
@@ -266,7 +267,7 @@ export function TaskRuns({
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </PagedTable>
               {!rows.length && (
                 <p>
                   暂无匹配任务。本站 worker

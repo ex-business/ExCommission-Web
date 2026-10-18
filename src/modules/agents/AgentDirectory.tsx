@@ -1,3 +1,5 @@
+import {useCursorPages} from '../../components/useCursorPages';
+import {PagedTable} from '../../components/PagedTable';
 import { useMemberLocale } from "../member/affiliate/locale";
 import { useState } from "react";
 import { request, ApiError } from "../../lib/api";
@@ -11,6 +13,7 @@ export function AgentDirectory({
   member?: boolean;
 }) {
   const { t, locale } = useMemberLocale();
+  const pagination=useCursorPages();
   const [root, setRoot] = useState(""),
     [currency, setCurrency] = useState("USD"),
     [depth, setDepth] = useState(""),
@@ -20,14 +23,14 @@ export function AgentDirectory({
     [asOf, setAsOf] = useState(""),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
-  async function load(after = "") {
+  async function load(after = "",size=pagination.size,reuse=false) {
     setBusy(true);
     setError("");
     try {
-      const q = new URLSearchParams({ currency, limit: "25" });
+      const q = new URLSearchParams({ currency, limit: String(size) });
       if (depth) q.set("depth", depth);
-      if (after) {
-        q.set("after_id", after);
+      if (after||reuse) {
+        if(after)q.set("after_id", after);
         q.set("as_of", asOf);
       }
       const path = member
@@ -37,6 +40,7 @@ export function AgentDirectory({
           : "/v1/agent-directory";
       const r = await request(path + "?" + q);
       setRows(r.data.rows);
+      pagination.record(after);
       setSummary(r.data.summary);
       setNext(r.data.next_after_id);
       setAsOf(r.data.as_of);
@@ -119,7 +123,7 @@ export function AgentDirectory({
         </div>
       )}
       <div className="review-table">
-        <table>
+        <PagedTable paging={{page:pagination.page,size:pagination.size,more:Boolean(next),busy,onNext:()=>void load(next||''),onPrevious:()=>void load(pagination.previous,pagination.size,true),onSize:size=>{pagination.setSize(size);void load('',size)}}}>
           <thead>
             <tr>
               {[
@@ -157,13 +161,8 @@ export function AgentDirectory({
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
-      {next && (
-        <button disabled={busy} onClick={() => load(next)}>
-          {t("下一页团队")}
-        </button>
-      )}
     </section>
   );
 }

@@ -1,3 +1,5 @@
+import {useCursorPages} from '../../components/useCursorPages';
+import {PagedTable} from '../../components/PagedTable';
 import { displayMoney, minorMoney } from "../../lib/financeMoney";
 import { useState, useRef } from "react";
 import { request, ApiError } from "../../lib/api";
@@ -44,6 +46,7 @@ export function CommissionReview({
     [draftRemark, setDraftRemark] = useState(""),
     [deliveryMode, setDeliveryMode] = useState("MEMBER_CLAIM"),
     [channel, setChannel] = useState("wallet");
+  const pagination=useCursorPages();
   const last = useRef({ body: "", key: "" });
   const id = (r: Row) => (tab === "reviews" ? r.approval_id : r.instruction_id);
   async function guarded(action: () => Promise<void>) {
@@ -58,8 +61,8 @@ export function CommissionReview({
       setBusy(false);
     }
   }
-  async function load(after = "", mode = tab) {
-    const q = new URLSearchParams({ limit: "50" });
+  async function load(after = "", mode = tab,size=pagination.size) {
+    const q = new URLSearchParams({ limit: String(size) });
     if (after) q.set("after_id", after);
     if (mode === "reviews") {
       if (status) q.set("approval_status", status);
@@ -73,6 +76,7 @@ export function CommissionReview({
         q,
     );
     setRows(r.data.rows);
+      pagination.record(after);
     setNext(r.data.next_after_id);
     setSelected([]);
   }
@@ -306,7 +310,7 @@ export function CommissionReview({
         </div>
       )}
       <div className="review-table">
-        <table>
+        <PagedTable paging={{page:pagination.page,size:pagination.size,more:Boolean(next),busy,onNext:()=>void guarded(()=>load(next||'')),onPrevious:()=>void guarded(()=>load(pagination.previous)),onSize:size=>{pagination.setSize(size);void guarded(()=>load('',tab,size))}}}>
           <thead>
             <tr>
               <th>选择</th>
@@ -424,14 +428,9 @@ export function CommissionReview({
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
         {!rows.length && <p>暂无记录，请选择条件后查询。</p>}
       </div>
-      {next && (
-        <button disabled={busy} onClick={() => guarded(() => load(next))}>
-          下一页
-        </button>
-      )}
       {draft && (
         <div role="dialog" aria-label="派发金额编辑" className="review-editor">
           <h3>{draft.editing ? "调整派发" : "准备派发"}</h3>

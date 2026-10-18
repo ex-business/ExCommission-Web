@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import { useState, useRef } from "react";
 import { request, ApiError } from "../../lib/api";
 import type { Session } from "../../auth/Login";
@@ -247,7 +248,7 @@ export function BusinessSourceStatus({ onExpired }: { onExpired: () => void }) {
               </p>
             ))}
             <div className="af-table">
-              <table>
+              <PagedTable>
                 <thead>
                   <tr>
                     <th>代理</th>
@@ -280,7 +281,7 @@ export function BusinessSourceStatus({ onExpired }: { onExpired: () => void }) {
                     </tr>
                   ))}
                 </tbody>
-              </table>
+              </PagedTable>
             </div>
           </>
         )}

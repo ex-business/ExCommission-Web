@@ -1,3 +1,4 @@
+import {useCursorPages} from '../components/useCursorPages';
 import { commandKey } from "../lib/idempotency";
 import { steps, PlanStep } from "./plans/PlanStep";
 import { nextActions } from "./workflow";
@@ -54,6 +55,10 @@ export function OperationPanel({
     [json, setJson] = useState(false),
     [requestId, setRequestId] = useState<string | null>(null),
     [totp, setTotp] = useState("");
+  const pages=useCursorPages();
+  const lastQuery=useRef<Record<string,any>>({});
+  const cursorName=parameters.find(p=>p.in==='query'&&['cursor','after_id'].includes(p.name))?.name;
+  const remoteList=op.method==='GET'&&Boolean(cursorName)&&parameters.some(p=>p.in==='query'&&p.name==='limit');
   const mounted = useRef(true);
   useEffect(
     () => () => {
@@ -88,7 +93,8 @@ export function OperationPanel({
     if (op.method === "GET") void execute();
     else setConfirm(true);
   }
-  async function execute() {
+  async function execute(overrides?:Record<string,any>) {
+    const inputs=overrides?{...lastQuery.current,...overrides}:params;
     setConfirm(false);
     setBusy(true);
     setError(undefined);
@@ -97,7 +103,7 @@ export function OperationPanel({
     let path = op.path;
     const query = new URLSearchParams();
     for (const p of parameters) {
-      const v = params[p.name];
+      const raw=inputs[p.name];const v=remoteList&&p.name==="limit"&&(raw===undefined||raw==="")?pages.size:raw;
       if (v !== undefined && v !== "") {
         if (p.in === "path")
           path = path.replace("{" + p.name + "}", encodeURIComponent(v));
@@ -132,6 +138,7 @@ export function OperationPanel({
         URL.revokeObjectURL(url);
         setResult({ status: "DOWNLOADED", message: "固定快照已下载" });
       } else {
+        if(remoteList){const n=Number(inputs.limit);if(Number.isInteger(n)&&n>=1&&n<=100)pages.setSize(n);lastQuery.current={...inputs};if(lastQuery.current.limit===undefined)lastQuery.current.limit=pages.size;pages.record(String(inputs[cursorName!]||''));}
         setResult(r.data);
         onResult(r.data);
       }
@@ -360,7 +367,7 @@ export function OperationPanel({
           json ? (
             <pre>{JSON.stringify(result, null, 2)}</pre>
           ) : (
-            <ResultView value={result} />
+            <ResultView value={result} paging={remoteList?{page:pages.page,size:pages.size,busy,more:Boolean(result.next_cursor||result.next_after_id),onNext:()=>void execute({[cursorName!]:result.next_cursor||result.next_after_id}),onPrevious:()=>void execute({[cursorName!]:pages.previous}),onSize:size=>{pages.setSize(size);void execute({[cursorName!]:'',limit:size})}}:undefined} />
           )
         ) : (
           !busy &&

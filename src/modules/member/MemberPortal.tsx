@@ -1,3 +1,5 @@
+import {PagedList} from '../../components/PagedList';
+import {useCursorPages} from '../../components/useCursorPages';
 import { MemberTeamDashboard } from "./affiliate/TeamDashboard";
 import { RewardCommunity, SocialShare } from "./affiliate/Community";
 import { amount } from "../affiliate/money";
@@ -175,14 +177,15 @@ function MemberContent({
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
     }
   }
-  async function load(after = "") {
+  const rewardPages=useCursorPages();
+  async function load(after = "",size=rewardPages.size) {
     await guard(async () => {
       if (tab === "rewards") {
         const r = await request(
-          "/v1/me/rewards?limit=25" +
+          "/v1/me/rewards?limit="+size +
             (after ? "&after_id=" + encodeURIComponent(after) : ""),
         );
-        setRewards(r.data.rows);
+        setRewards(r.data.rows);rewardPages.record(after);
         setNext(r.data.next_after_id);
       }
       if (tab === "earnings" && !presentation) {
@@ -436,7 +439,7 @@ function MemberContent({
                         "全部条件同时达标后触发一次奖励，核算与审核结果以我的收益为准。",
                       )}
                     </p>
-                    <div className="member-grid">
+                    <PagedList className="member-grid" paging={{page:rewardPages.page,size:rewardPages.size,more:Boolean(next),busy,onNext:()=>void load(next||""),onPrevious:()=>void load(rewardPages.previous),onSize:size=>{rewardPages.setSize(size);void load("",size)}}}>
                       {rewards.map((r) => (
                         <article className="member-card" key={r.program_id}>
                           <span className="member-tag">
@@ -460,16 +463,11 @@ function MemberContent({
                           </p>
                         </article>
                       ))}
-                    </div>
+                    </PagedList>
                     {!busy && !rewards.length && (
                       <p className="member-empty">
                         {t("当前没有已发布的推荐奖励。")}
                       </p>
-                    )}
-                    {next && (
-                      <button disabled={busy} onClick={() => load(next)}>
-                        {t("下一页奖励")}
-                      </button>
                     )}
                   </section>
                 }

@@ -1,3 +1,5 @@
+import {useCursorPages} from '../../../components/useCursorPages';
+import {PagedTable} from '../../../components/PagedTable';
 import { useEffect, useRef, useState } from "react";
 import { request, ApiError } from "../../../lib/api";
 import { amount, rewardScale } from "../../affiliate/money";
@@ -26,6 +28,7 @@ export function RewardHistory({
   onExpired: () => void;
 }) {
   const { t, locale } = useMemberLocale();
+  const pagination=useCursorPages();
   const [from, setFrom] = useState(() =>
     new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10),
   );
@@ -40,21 +43,21 @@ export function RewardHistory({
     snapshot = useRef<Record<string, string> | null>(null),
     filters = useRef({ from, to });
   filters.current = { from, to };
-  async function load(after?: string) {
+  async function load(after = "",size=pagination.size,reuse=false) {
     const current = ++serial.current;
     setBusy(true);
     setError("");
     try {
       // 翻页固定首屏的日期、观察时间与快照版本，避免并发领取或新奖励使历史跨页漂移。
       const query: Record<string, string> =
-        after && snapshot.current
+        (after||reuse) && snapshot.current
           ? { ...snapshot.current }
           : {
               from: filters.current.from + "T00:00:00Z",
               to: filters.current.to + "T00:00:00Z",
             };
       const params = new URLSearchParams(query);
-      params.set("limit", "25");
+      params.set("limit", String(size));
       if (after) params.set("after_id", after);
       const response = await request("/v1/me/affiliate/records?" + params);
       if (current !== serial.current) return;
@@ -66,6 +69,7 @@ export function RewardHistory({
         snapshot_revision: String(data.snapshot_revision),
       };
       setRows(data.rows);
+      pagination.record(after);
       setNext(data.next_after_id || null);
     } catch (e) {
       if (current !== serial.current) return;
@@ -117,7 +121,7 @@ export function RewardHistory({
       </form>
       {error && <p role="alert">{error}</p>}
       <div className="affiliate-table-wrap">
-        <table>
+        <PagedTable paging={{page:pagination.page,size:pagination.size,more:Boolean(next),busy,onNext:()=>void load(next||''),onPrevious:()=>void load(pagination.previous,pagination.size,true),onSize:size=>{pagination.setSize(size);void load('',size)}}}>
           <thead>
             <tr>
               {["方案", "类型", "金额", "状态", "时间", "详情"].map((n) => (
@@ -146,14 +150,9 @@ export function RewardHistory({
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       {!rows.length && !busy && <p className="muted">{t("暂无奖励记录")}</p>}
-      {next && (
-        <button disabled={busy} onClick={() => void load(next)}>
-          {t("下一页奖励")}
-        </button>
-      )}
     </section>
   );
 }

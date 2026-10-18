@@ -1,3 +1,4 @@
+import {PagedTable} from '../../../components/PagedTable';
 import { useEffect, useRef, useState } from "react";
 import { ApiError, request } from "../../../lib/api";
 import type { Session } from "../../../auth/Login";
@@ -74,7 +75,7 @@ export function ProgramRewards({
       {error && <p role="alert">{error}</p>}
       {notice && <p role="status">{notice}</p>}
       <div className="table-scroll">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>{t("方案")}</th>
@@ -112,7 +113,7 @@ export function ProgramRewards({
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
     </section>
   );

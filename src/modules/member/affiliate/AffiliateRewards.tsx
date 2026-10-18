@@ -1,3 +1,5 @@
+import {PagedList} from '../../../components/PagedList';
+import {PagedTable} from '../../../components/PagedTable';
 import { ProgramRewards } from "./ProgramRewards";
 import { CommissionRuleSummary } from "../../affiliate/CommissionRuleSummary";
 import { RewardHistory } from "./RewardHistory";
@@ -382,7 +384,7 @@ export function AffiliateRewards({
           <p>{t("已达到当前规则最高等级")}</p>
         )}
         <div className="affiliate-table-wrap">
-          <table>
+          <PagedTable>
             <thead>
               <tr>
                 <th>{t("等级")}</th>
@@ -420,7 +422,7 @@ export function AffiliateRewards({
                 </tr>
               ))}
             </tbody>
-          </table>
+          </PagedTable>
         </div>
       </section>
       <section className="member-card">
@@ -481,7 +483,7 @@ export function AffiliateRewards({
       </section>
       <section className="member-card">
         <h2>{t("直属推荐人进度")}</h2>
-        <div className="member-grid">
+        <PagedList className="member-grid">
           {(view.direct_members || []).map((member: Row) => (
             <article key={member.user_id}>
               <strong>ID: {member.user_id}</strong>
@@ -506,7 +508,7 @@ export function AffiliateRewards({
               {member.qualification.qualified_at && <span>{t("已达标")}</span>}
             </article>
           ))}
-        </div>
+        </PagedList>
       </section>
       <CommissionCalculator
         key={`${view.configuration.revision}:${config.currency}:${scale}:${config.commission_policy?.depth || 3}`}
@@ -552,7 +554,7 @@ export function AffiliateRewards({
                 {t("领取 IP")}：{detail.claim_ip || "—"}
               </p>
             )}
-            {(detail.member_qualifications || []).map((member: Row) => (
+            <PagedList>            {(detail.member_qualifications || []).map((member: Row) => (
               <div key={member.user_id} className="affiliate-detail-member">
                 <strong>{member.user_id}</strong>
                 <p>
@@ -581,7 +583,7 @@ export function AffiliateRewards({
                     : "—"}
                 </p>
               </div>
-            ))}
+            ))}</PagedList>
           </section>
         </div>
       )}

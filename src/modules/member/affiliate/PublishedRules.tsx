@@ -1,3 +1,4 @@
+import {PagedTable} from '../../../components/PagedTable';
 import { CommissionRuleSummary } from "../../affiliate/CommissionRuleSummary";
 import { useState } from "react";
 import { toMinor } from "../../affiliate/money";
@@ -44,7 +45,7 @@ export function PublishedRules({ presentation }: { presentation: Row }) {
         {t("同时满足充值与有效投注；等级人数只统计直属，日投注统计下线三层。")}
       </p>
       <div className="table-wrap">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>{t("达标类型")}</th>
@@ -65,13 +66,13 @@ export function PublishedRules({ presentation }: { presentation: Row }) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       <h3>
         {t(c.commission_policy ? "等级与返佣规则" : "等级与三层返佣比例")}
       </h3>
       <div className="table-wrap">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>{t("等级")}</th>
@@ -105,7 +106,7 @@ export function PublishedRules({ presentation }: { presentation: Row }) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       <h3>{t("推荐阶梯")}</h3>
       {c.steps.map((s: Row) => (

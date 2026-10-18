@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import { states, programMoney } from "./programModel";
 // 停止方案只读历史仍保留；不同方案和币种逐笔显示，不把待审核视为已到账。
 export function ProgramHistory({
@@ -11,7 +12,7 @@ export function ProgramHistory({
     <section className="panel">
       <h2>版本与运行记录</h2>
       <div className="table-scroll">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>方案</th>
@@ -38,7 +39,7 @@ export function ProgramHistory({
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       <h3>奖励与佣金记录</h3>
       <p>
@@ -48,7 +49,7 @@ export function ProgramHistory({
           : ""}
       </p>
       <div className="table-scroll">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>方案 / 版本</th>
@@ -92,11 +93,11 @@ export function ProgramHistory({
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       <h3>日结记录</h3>
       <div className="table-scroll">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>方案 / 版本</th>
@@ -128,11 +129,11 @@ export function ProgramHistory({
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       <h3>事件命中记录</h3>
       <div className="table-scroll">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>来源 / 原业务单</th>
@@ -167,7 +168,7 @@ export function ProgramHistory({
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
     </section>
   );

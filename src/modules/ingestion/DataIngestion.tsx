@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import { useEffect, useState } from "react";
 import type { Session } from "../../auth/Login";
 import { ApiError, request } from "../../lib/api";
@@ -554,7 +555,7 @@ export function DataIngestion({
             刷新记录
           </button>
           <div className="table-scroll">
-            <table>
+            <PagedTable>
               <thead>
                 <tr>
                   {[
@@ -591,7 +592,7 @@ export function DataIngestion({
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </PagedTable>
             {!records.length && <p>暂无接入记录</p>}
           </div>
         </>

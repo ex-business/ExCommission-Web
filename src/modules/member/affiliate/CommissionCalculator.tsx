@@ -1,3 +1,4 @@
+import {PagedTable} from '../../../components/PagedTable';
 import { useState, useRef } from "react";
 import { request } from "../../../lib/api";
 import { amount } from "../../affiliate/money";
@@ -116,7 +117,7 @@ export function CommissionCalculator({
             {currency}
           </strong>
           <div className="table-wrap">
-            <table>
+            <PagedTable>
               <thead>
                 <tr>
                   <th>{t("层级")}</th>
@@ -164,7 +165,7 @@ export function CommissionCalculator({
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </PagedTable>
           </div>
           {result.estimate.next_level && (
             <p>

@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import { useEffect, useState } from "react";
 import { request, ApiError } from "../../lib/api";
 type Row = {
@@ -81,7 +82,7 @@ export function AffiliateReversals({ onExpired }: { onExpired: () => void }) {
       </div>
       {error && <p role="alert">{error}</p>}
       <div className="table-scroll">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               {[
@@ -123,13 +124,13 @@ export function AffiliateReversals({ onExpired }: { onExpired: () => void }) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       {!busy && !selected.length && <p>暂无冲正记录</p>}
       <details>
         <summary>已接收退款和撤单（{events.length}）</summary>
         <div className="table-scroll">
-          <table>
+          <PagedTable>
             <thead>
               <tr>
                 {[
@@ -160,7 +161,7 @@ export function AffiliateReversals({ onExpired }: { onExpired: () => void }) {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </PagedTable>
         </div>
         <p>
           接收成功的事件可能未产生新的奖励差额，例如同一奖励已被此前退款取消。

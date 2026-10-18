@@ -1,3 +1,5 @@
+import {PagedList} from '../../components/PagedList';
+import {useCursorPages} from '../../components/useCursorPages';
 import { useMemberLocale } from "../member/affiliate/locale";
 import { useRef, useState } from "react";
 import { request, ApiError } from "../../lib/api";
@@ -45,6 +47,8 @@ export function MemberCommissions({
   const [wallets, setWallets] = useState<any[]>([]),
     [entries, setEntries] = useState<any[]>([]),
     [historyKind, setHistoryKind] = useState("");
+  const pagination=useCursorPages(),historyPages=useCursorPages();
+  const [historyNext,setHistoryNext]=useState<string|null>(null),[historyPath,setHistoryPath]=useState("");
   const keys = useRef(new Map<string, string>());
   async function guard(fn: () => Promise<void>) {
     setBusy(true);
@@ -58,14 +62,15 @@ export function MemberCommissions({
       setBusy(false);
     }
   }
-  async function load(after = "") {
+  async function load(after = "",size=pagination.size) {
     const r = await request(
-      "/v1/me/commissions?limit=50" +
+      "/v1/me/commissions?limit="+size +
         (after ? "&after_id=" + encodeURIComponent(after) : ""),
     );
-    setRows(r.data.rows);
+    setRows(r.data.rows);pagination.record(after);
     setNext(r.data.next_after_id);
   }
+  async function loadHistory(kind=historyPath,after='',size=historyPages.size){await guard(async()=>{const q=new URLSearchParams({limit:String(size)});if(after)q.set('after_id',after);const r=await request('/v1/me/'+kind+'?'+q);setEntries(r.data.rows);setHistoryNext(r.data.next_after_id||null);setHistoryPath(kind);setHistoryKind(kind==='wallet-changes'?'账变记录':'交易历史');historyPages.record(after)})}
   async function claim(order: Order) {
     await guard(async () => {
       const fingerprint = order.instruction_id + ":" + order.revision;
@@ -115,11 +120,7 @@ export function MemberCommissions({
           key={kind}
           disabled={busy}
           onClick={() =>
-            guard(async () => {
-              const r = await request("/v1/me/" + kind + "?limit=50");
-              setEntries(r.data.rows);
-              setHistoryKind(label);
-            })
+            void loadHistory(kind)
           }
         >
           {label}
@@ -128,9 +129,9 @@ export function MemberCommissions({
       {historyKind && (
         <section aria-label={historyKind}>
           <h3>
-            {t(historyKind === "wallet-changes" ? "账变记录" : "交易历史")}
+            {t(historyPath === "wallet-changes" ? "账变记录" : "交易历史")}
           </h3>
-          {entries.map((v) => (
+          <PagedList paging={{page:historyPages.page,size:historyPages.size,more:Boolean(historyNext),busy,onNext:()=>void loadHistory(historyPath,historyNext||''),onPrevious:()=>void loadHistory(historyPath,historyPages.previous),onSize:size=>{historyPages.setSize(size);void loadHistory(historyPath,'',size)}}}>{entries.map((v) => (
             <p key={v.transaction_id}>
               {v.created_at} · {displayMoney(v.amount_minor, v.currency)}
               {v.balance_before_minor !== undefined
@@ -140,7 +141,7 @@ export function MemberCommissions({
                   displayMoney(v.balance_after_minor, v.currency)
                 : ""}
             </p>
-          ))}
+          ))}</PagedList>
         </section>
       )}
       <button disabled={busy} onClick={() => guard(() => load())}>
@@ -152,7 +153,7 @@ export function MemberCommissions({
           "仅显示本人佣金。领取受理后请刷新确认结果；结果未知时保留原单核验。",
         )}
       </p>
-      {rows.map((s) => (
+      <PagedList paging={{page:pagination.page,size:pagination.size,more:Boolean(next),busy,onNext:()=>void guard(()=>load(next||'')),onPrevious:()=>void guard(()=>load(pagination.previous)),onSize:size=>{pagination.setSize(size);void guard(()=>load('',size))}}}>{rows.map((s) => (
         <article key={s.statement_id}>
           <h3>
             {s.period} · {displayMoney(s.total_minor, s.currency)}
@@ -175,13 +176,8 @@ export function MemberCommissions({
             </div>
           ))}
         </article>
-      ))}
+      ))}</PagedList>
       {!rows.length && <p>{t("暂无记录，请刷新查询。")}</p>}
-      {next && (
-        <button disabled={busy} onClick={() => guard(() => load(next))}>
-          {t("下一页")}
-        </button>
-      )}
     </section>
   );
 }

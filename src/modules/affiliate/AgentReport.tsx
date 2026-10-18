@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import { useMemberLocale } from "../member/affiliate/locale";
 import { MemberIdentity } from "../member/affiliate/MemberIdentity";
 import { useEffect, useState, useRef } from "react";
@@ -24,7 +25,8 @@ export function AgentBusinessReport({
     [detailFrom, setDetailFrom] = useState(""),
     [detailTo, setDetailTo] = useState(""),
     [detailOffset, setDetailOffset] = useState(0),
-    [detailSize, setDetailSize] = useState(10),
+    [detailSize, setDetailSize] = useState(20),
+    [mainSize,setMainSize]=useState(20),[mainOffset,setMainOffset]=useState(0),
     [sort, setSort] = useState("became_agent_at"),
     [page, setPage] = useState<Row | null>(null),
     [detail, setDetail] = useState<Row | null>(null),
@@ -51,10 +53,10 @@ export function AgentBusinessReport({
       setBusy(false);
     }
   }
-  async function load(offset?: number) {
+  async function load(offset?: number,size=mainSize) {
     const serial = ++requestSerial.current;
     await run(async () => {
-      const q = new URLSearchParams({ limit: "25", sort, descending: "true" });
+      const q = new URLSearchParams({ limit: String(size), sort, descending: "true" });
       if (offset !== undefined && page) {
         q.set("snapshot_id", page.snapshot_id);
         q.set("offset", String(offset));
@@ -72,7 +74,7 @@ export function AgentBusinessReport({
           : "/v1/affiliate/agent-report?") + q,
       );
       if (serial !== requestSerial.current) return;
-      setPage(response.data);
+      setPage(response.data);setMainOffset(offset??0);
       setLegacy(false);
     });
   }
@@ -290,7 +292,7 @@ export function AgentBusinessReport({
             {page.provisional ? t("当前日数据尚未关账。") : ""}
           </p>
           <div className="af-table">
-            <table>
+            <PagedTable paging={{page:Math.floor(mainOffset/mainSize)+1,size:mainSize,more:page.next_offset!==null,busy,onNext:()=>void load(page.next_offset),onPrevious:()=>void load(Math.max(0,mainOffset-mainSize)),onSize:size=>{setMainSize(size);void load(undefined,size)}}}>
               <thead>
                 <tr>
                   <th>{t("会员 / 代理")}</th>
@@ -369,14 +371,9 @@ export function AgentBusinessReport({
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </PagedTable>
           </div>
           {!page.rows.length && <p>{t("暂无有直属会员的代理")}</p>}
-          {page.next_offset !== null && (
-            <button disabled={busy} onClick={() => void load(page.next_offset)}>
-              {t("下一页")}
-            </button>
-          )}
         </>
       )}
       {detail && (
@@ -466,7 +463,7 @@ export function AgentBusinessReport({
               </select>
             </label>
             <div className="af-table">
-              <table>
+              <PagedTable>
                 <thead>
                   <tr>
                     <th>{t("会员")}</th>
@@ -481,9 +478,7 @@ export function AgentBusinessReport({
                   </tr>
                 </thead>
                 <tbody>
-                  {detailMembers
-                    .slice(detailOffset, detailOffset + detailSize)
-                    .map((m: Row) => (
+                  {detailMembers.map((m: Row) => (
                       <tr key={`${m.user_id}:${m.depth}`}>
                         <td>
                           <MemberIdentity id={m.user_id} profile={m.profile} />
@@ -529,39 +524,9 @@ export function AgentBusinessReport({
                       </tr>
                     ))}
                 </tbody>
-              </table>
+              </PagedTable>
             </div>
-            <p>
-              {t("共{count}人", { count: detailMembers.length })}
-              <select
-                aria-label={t("明细每页条数")}
-                value={detailSize}
-                onChange={(e) => {
-                  setDetailSize(Number(e.target.value));
-                  setDetailOffset(0);
-                }}
-              >
-                {[10, 20, 50].map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-              <button
-                disabled={detailOffset === 0}
-                onClick={() =>
-                  setDetailOffset((n) => Math.max(0, n - detailSize))
-                }
-              >
-                {t("上一页")}
-              </button>
-              <button
-                disabled={detailOffset + detailSize >= detailMembers.length}
-                onClick={() => setDetailOffset((n) => n + detailSize)}
-              >
-                {t("下一页")}
-              </button>
-            </p>
+
           </section>
         </div>
       )}

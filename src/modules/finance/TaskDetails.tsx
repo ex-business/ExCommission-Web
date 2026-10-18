@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import type { Task, Attempt } from "./taskModel";
 import { states, phases, time, programName, retryAllowed } from "./taskModel";
 export function TaskDetails({
@@ -86,7 +87,7 @@ export function TaskDetails({
       )}
       <h3>执行历史（最近100次）</h3>
       <div className="table-scroll">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>次数</th>
@@ -118,7 +119,7 @@ export function TaskDetails({
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
     </section>
   );

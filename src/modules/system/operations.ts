@@ -300,4 +300,33 @@ export const systemOperations: string[][] = [
     "POST",
     "/v1/affiliate/config-preview",
   ],
+  ["plans", "执行路由", "执行路由配置", "GET", "/v1/execution-routing/config"],
+  [
+    "system",
+    "扩展接入目录",
+    "申请执行路由配置",
+    "POST",
+    "/v1/execution-routing/config-requests",
+  ],
+  [
+    "system",
+    "扩展接入目录",
+    "读取执行路由申请",
+    "GET",
+    "/v1/execution-routing/config-requests/{id}",
+  ],
+  [
+    "system",
+    "扩展接入目录",
+    "预览业务执行引擎",
+    "POST",
+    "/v1/execution-routing/preview",
+  ],
+  [
+    "system",
+    "扩展接入目录",
+    "执行归属记录",
+    "GET",
+    "/v1/execution-routing/records",
+  ],
 ];

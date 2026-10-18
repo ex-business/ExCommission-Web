@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import { CommissionRuleSummary } from "./CommissionRuleSummary";
 import {
   CommissionPolicyEditor,
@@ -561,7 +562,7 @@ export function AffiliateConfig({
                 ，比例填写百分比（如0.25表示0.25%）。同一业务日全部有效业务量使用当日最终等级结算。
               </p>
               <div className="table-wrap">
-                <table>
+                <PagedTable>
                   <thead>
                     <tr>
                       <th>等级</th>
@@ -662,7 +663,7 @@ export function AffiliateConfig({
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </PagedTable>
               </div>
               <button
                 type="button"
@@ -876,7 +877,7 @@ export function ConfigSummary({ config: c }: { config: Config }) {
       </p>
       <p>金额单位：{c.currency}。</p>
       <div className="table-wrap">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>达标类型</th>
@@ -899,10 +900,10 @@ export function ConfigSummary({ config: c }: { config: Config }) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       <div className="table-wrap">
-        <table>
+        <PagedTable>
           <thead>
             <tr>
               <th>等级</th>
@@ -942,7 +943,7 @@ export function ConfigSummary({ config: c }: { config: Config }) {
               </tr>
             ))}
           </tbody>
-        </table>
+        </PagedTable>
       </div>
       <ul>
         {c.steps.map((s) => (

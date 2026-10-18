@@ -1,3 +1,6 @@
+import type {RemotePaging} from './PagedTable';
+import {PagedList} from './PagedList';
+import {PagedTable} from './PagedTable';
 import { label } from "../catalog";
 import { enumLabel } from "../lib/labels";
 const states: Record<string, string> = {
@@ -20,11 +23,12 @@ const states: Record<string, string> = {
 export function ResultView({
   value,
   depth = 0,
-  field,
+  field,paging,
 }: {
   value: any;
   depth?: number;
   field?: string;
+  paging?:RemotePaging;
 }) {
   if (value === null || value === undefined)
     return <span className="muted">空值</span>;
@@ -51,7 +55,7 @@ export function ResultView({
       const keys = [...new Set(value.flatMap(Object.keys))];
       return (
         <div className="table-scroll">
-          <table>
+          <PagedTable paging={paging}>
             <thead>
               <tr>
                 {keys.map((k) => (
@@ -70,18 +74,18 @@ export function ResultView({
                 </tr>
               ))}
             </tbody>
-          </table>
+          </PagedTable>
         </div>
       );
     }
     return (
-      <div className="value-list">
+      <PagedList className="value-list">
         {value.map((x, i) => (
           <div key={i}>
             <ResultView value={x} depth={depth + 1} />
           </div>
         ))}
-      </div>
+      </PagedList>
     );
   }
   return (
@@ -93,7 +97,7 @@ export function ResultView({
         >
           <dt>{label(k)}</dt>
           <dd>
-            <ResultView value={v} field={k} depth={depth + 1} />
+            <ResultView value={v} field={k} depth={depth + 1} paging={["rows","items","records"].includes(k)?paging:undefined} />
           </dd>
         </div>
       ))}

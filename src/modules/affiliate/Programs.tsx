@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import { programRequest } from "./programRequest";
 import { type Program, states, modes } from "./programModel";
 import { ProgramEditor } from "./ProgramEditor";
@@ -188,7 +189,7 @@ export function Programs({
         )}
         {notice && <p role="status">{notice}</p>}
         <div className="table-scroll">
-          <table>
+          <PagedTable>
             <thead>
               <tr>
                 <th>方案</th>
@@ -245,7 +246,7 @@ export function Programs({
                 </tr>
               ))}
             </tbody>
-          </table>
+          </PagedTable>
           {!data.current.length && (
             <p>暂无生效方案。已发布的未来版本可在下方查看。</p>
           )}

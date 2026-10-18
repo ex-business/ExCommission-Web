@@ -1,3 +1,5 @@
+import {useCursorPages} from '../../components/useCursorPages';
+import {PagedTable} from '../../components/PagedTable';
 import { MemberIdentity } from "../member/affiliate/MemberIdentity";
 import { useEffect, useRef, useState } from "react";
 import { request, ApiError } from "../../lib/api";
@@ -54,7 +56,8 @@ export function BusinessRewards({
     keys = useRef(new Map<string, string>()),
     querySnapshot = useRef<Record<string, string> | null>(null);
   const scale = config?.current?.config.currency_scale ?? 2;
-  function parameters(after = "", frozen = false, initial = false) {
+  const pagination=useCursorPages();
+  function parameters(after = "", frozen = false, initial = false,size=pagination.size) {
     // 翻页及导出复用已展示结果的完整查询，输入框未提交的编辑不改变快照。
     if ((after || frozen) && querySnapshot.current) {
       const saved = new URLSearchParams(querySnapshot.current);
@@ -69,7 +72,7 @@ export function BusinessRewards({
           : "time_desc"
         : sort,
       time_field: timeField,
-      limit: "50",
+      limit: String(size),
       from: new Date(from).toISOString(),
       to: new Date(to).toISOString(),
     });
@@ -99,17 +102,17 @@ export function BusinessRewards({
       setBusy(false);
     }
   }
-  async function load(after = "", initial = false) {
+  async function load(after = "", initial = false,size=pagination.size,frozen=false) {
     const serial = ++sequence.current;
     await run(async () => {
-      const q = parameters(after, false, initial);
+      const q = parameters(after, frozen, initial,size);
       const data = await request("/v1/affiliate/rewards?" + q);
       if (serial === sequence.current) {
         q.delete("after_id");
         q.set("as_of", data.data.as_of);
         q.set("snapshot_revision", String(data.data.snapshot_revision));
         querySnapshot.current = Object.fromEntries(q);
-        setPage(data.data);
+        setPage(data.data);pagination.record(after);
         setSelected([]);
       }
     });
@@ -380,7 +383,7 @@ export function BusinessRewards({
             观察时点 {new Date(page.as_of).toLocaleString()}
           </p>
           <div className="af-table">
-            <table>
+            <PagedTable paging={{page:pagination.page,size:pagination.size,more:Boolean(page.next_after_id),busy,onNext:()=>void load(page.next_after_id||''),onPrevious:()=>void load(pagination.previous,false,pagination.size,true),onSize:size=>{pagination.setSize(size);void load('',false,size)}}}>
               <thead>
                 <tr>
                   <th>选择</th>
@@ -440,17 +443,9 @@ export function BusinessRewards({
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </PagedTable>
           </div>
           {!page.rows.length && <p>暂无符合条件的奖励</p>}
-          {page.next_after_id && (
-            <button
-              disabled={busy}
-              onClick={() => void load(page.next_after_id)}
-            >
-              下一页
-            </button>
-          )}
         </>
       )}
       {kind === "COMMISSION" && selected.length > 0 && (
@@ -601,7 +596,7 @@ export function BusinessRewards({
                 )}
                 <h3>三层贡献明细 · 最终 Lv{detail.daily_calculation.level}</h3>
                 <div className="af-table">
-                  <table>
+                  <PagedTable>
                     <thead>
                       <tr>
                         <th>会员</th>
@@ -632,7 +627,7 @@ export function BusinessRewards({
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  </PagedTable>
                 </div>
               </>
             )}

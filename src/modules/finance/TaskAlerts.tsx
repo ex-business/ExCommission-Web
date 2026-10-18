@@ -1,3 +1,4 @@
+import {PagedTable} from '../../components/PagedTable';
 import { useEffect, useState } from "react";
 import type { Rules, RuleVersion, Alert } from "./taskModel";
 import { time } from "./taskModel";
@@ -104,7 +105,7 @@ export function TaskAlerts({
       <section className="panel">
         <h2>站内告警记录（最近300条）</h2>
         <div className="table-scroll">
-          <table>
+          <PagedTable>
             <thead>
               <tr>
                 <th>类型</th>
@@ -137,7 +138,7 @@ export function TaskAlerts({
                 </tr>
               ))}
             </tbody>
-          </table>
+          </PagedTable>
           {!events.length && <p>暂无告警记录。</p>}
         </div>
       </section>
