@@ -1,0 +1,44 @@
+.programs .program-toolbar,
+.programs .program-row {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.programs .program-toolbar h2 {
+  margin-right: auto;
+}
+.programs .program-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.programs label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.programs small {
+  display: block;
+  color: var(--text-muted, #687888);
+  margin-top: 4px;
+}
+.programs fieldset {
+  min-width: 0;
+  border: 1px solid var(--border, #dde3ea);
+  padding: 16px;
+}
+.programs .program-row label {
+  flex: 1;
+  min-width: 120px;
+}
+.programs .table-scroll {
+  overflow: auto;
+}
+.programs h3 {
+  margin-top: 24px;
+}
+.programs select[multiple] {
+  min-height: 88px;
+}

@@ -1395,5 +1395,33 @@
   "上限": {
     "en": "Cap",
     "es": "Límite"
+  },
+  "独立方案奖励": {
+    "en": "Independent program rewards",
+    "es": "Recompensas de programas independientes"
+  },
+  "原有方案已领取收益": {
+    "en": "Legacy program claimed earnings",
+    "es": "Ganancias cobradas del programa anterior"
+  },
+  "方案": {
+    "en": "Program",
+    "es": "Programa"
+  },
+  "版本": {
+    "en": "Version",
+    "es": "Versión"
+  },
+  "原有方案": {
+    "en": "Legacy program",
+    "es": "Programa anterior"
+  },
+  "领取成功": {
+    "en": "Reward claimed",
+    "es": "Recompensa cobrada"
+  },
+  "操作失败": {
+    "en": "Operation failed",
+    "es": "Error en la operación"
   }
 }

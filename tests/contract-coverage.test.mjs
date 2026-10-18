@@ -35,13 +35,22 @@ test("V1全部操作有管理入口或明确的渠道专用边界", async () => 
   const expected = Object.entries(spec.paths).flatMap(([path, ops]) =>
     Object.keys(ops).map((m) => m.toUpperCase() + " " + path),
   );
-  assert.equal(expected.length, actual.length + 3);
+  assert.equal(expected.length, actual.length + 12);
   assert.deepEqual(
     expected.filter((x) => !actual.includes(x)).sort(),
     [
+      "GET /v1/affiliate/task-runs/{id}",
+      "POST /v1/affiliate/task-runs/{id}/retry-requests",
+      "GET /v1/affiliate/task-alerts",
+      "POST /v1/affiliate/task-alert-config-requests",
       "POST /v1/payment-callbacks/{channel_id}",
+      "POST /v1/affiliate/reversals",
       "GET /v1/affiliate/public-presentation",
       "GET /v1/me/affiliate/calculator",
+      "GET /v1/me/affiliate/program-rewards",
+      "POST /v1/affiliate/programs/preview",
+      "POST /v1/affiliate/programs/requests",
+      "POST /v1/affiliate/programs/simulate",
     ].sort(),
   );
   assert.ok(actual.every((x) => expected.includes(x)));

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { amount } from "../../affiliate/money";
+import { amount, currencyScale } from "../../affiliate/money";
 import { useMemberLocale } from "./locale";
 type Row = Record<string, any>;
 export function RewardCommunity({
@@ -45,7 +45,8 @@ export function RewardCommunity({
         {t("总发放奖励")}{" "}
         {Object.entries(currentFeed?.totals || {}).map(([currency, value]) => (
           <strong key={currency}>
-            {amount(String(value), scale)} {currency}{" "}
+            {amount(String(value), currencyScale(currency, scale))}{" "}
+            {currency}{" "}
           </strong>
         ))}
       </p>
@@ -71,7 +72,8 @@ export function RewardCommunity({
                     ? "推荐奖励"
                     : "每日佣金",
               )}{" "}
-              · {amount(r.amount_minor, scale)} {r.currency}
+              · {amount(r.amount_minor, currencyScale(r.currency, scale))}{" "}
+              {r.currency}
             </article>
           ))
         ) : (

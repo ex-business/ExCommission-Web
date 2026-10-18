@@ -4,6 +4,19 @@ import type { Session } from "../auth/Login";
 import { operations, type Operation } from "../catalog";
 import type { Seed } from "../modules/OperationPanel";
 import { planTemplate } from "../modules/plans/template";
+const TaskRuns = lazy(() =>
+  import("../modules/finance/TaskRuns").then((m) => ({ default: m.TaskRuns })),
+);
+const Programs = lazy(() =>
+  import("../modules/affiliate/Programs").then((m) => ({
+    default: m.Programs,
+  })),
+);
+const AffiliateReversals = lazy(() =>
+  import("../modules/finance/AffiliateReversals").then((m) => ({
+    default: m.AffiliateReversals,
+  })),
+);
 const DataIngestion = lazy(() =>
   import("../modules/ingestion/DataIngestion").then((m) => ({
     default: m.DataIngestion,
@@ -103,7 +116,21 @@ export function AdminWorkspace({
             </button>
           ))}
         </div>
-        {op.title === "数据接入配置" ? (
+        {op.section === "任务运行管理" ? (
+          <TaskRuns
+            session={session}
+            onExpired={onExpired}
+            onApproval={(id) => onNavigate("审批详情", { params: { id } })}
+          />
+        ) : op.section === "方案发布与运行" ? (
+          <Programs
+            session={session}
+            onExpired={onExpired}
+            onApproval={(id) => onNavigate("审批详情", { params: { id } })}
+          />
+        ) : op.title === "代理冲正记录" ? (
+          <AffiliateReversals onExpired={onExpired} />
+        ) : op.title === "数据接入配置" ? (
           <DataIngestion
             session={session}
             onExpired={onExpired}

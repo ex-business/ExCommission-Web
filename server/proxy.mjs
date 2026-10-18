@@ -43,6 +43,12 @@ export async function handleProxy(req, res, url, s, routes) {
     }
   }
   const path = url.pathname.slice(4);
+  // 退款撤单必须由受信业务来源验签直连；管理端只读取冲正结果，禁止代来源签发。
+  if (path === "/v1/affiliate/reversals" && req.method === "POST")
+    return json(res, 403, {
+      error: { code: "CHANNEL_ONLY", message: "冲正事件仅由受信业务来源提交" },
+    });
+
   if (
     s.ops &&
     (/^\/v1\/(me|auth|payment-callbacks)(\/|$)/.test(path) ||

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { request, ApiError } from "../../../lib/api";
-import { amount } from "../../affiliate/money";
+import { amount, rewardScale } from "../../affiliate/money";
 import { useMemberLocale } from "./locale";
 type Row = Record<string, any>;
 const kinds: Record<string, string> = {
@@ -120,7 +120,7 @@ export function RewardHistory({
         <table>
           <thead>
             <tr>
-              {["类型", "金额", "状态", "时间", "详情"].map((n) => (
+              {["方案", "类型", "金额", "状态", "时间", "详情"].map((n) => (
                 <th key={n}>{t(n)}</th>
               ))}
             </tr>
@@ -128,9 +128,11 @@ export function RewardHistory({
           <tbody>
             {rows.map((row) => (
               <tr key={row.reward_id}>
+                <td>{row.program_id || t("原有方案")}</td>
                 <td>{t(kinds[row.kind] || row.kind)}</td>
                 <td>
-                  {amount(row.amount_minor, scale)} {row.currency}
+                  {amount(row.amount_minor, rewardScale(row, scale))}{" "}
+                  {row.currency}
                 </td>
                 <td>{t(statuses[row.status] || row.status)}</td>
                 <td>

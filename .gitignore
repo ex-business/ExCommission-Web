@@ -8,3 +8,5 @@ AGENTS.md
 playwright-report/
 test-results/
 src/generated/
+
+/node_modules

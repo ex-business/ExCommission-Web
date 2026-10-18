@@ -21,3 +21,15 @@ export function progressPercent(current: string, target: string) {
     t = BigInt(target || "1");
   return t === 0n ? 100 : Number((c * 100n) / t > 100n ? 100n : (c * 100n) / t);
 }
+
+// 并行方案逐笔采用冻结币种精度；公开投影无快照时兼容现有支持的币种，不能统一套用本站主币精度。
+export function currencyScale(currency: string, fallback = 2) {
+  const known: Record<string, number> = { USD: 2, BTC: 8, POINT: 0 };
+  return known[currency] ?? fallback;
+}
+export function rewardScale(reward: Record<string, any>, fallback = 2) {
+  return (
+    reward.program_configuration?.config?.currency_scale ??
+    currencyScale(reward.currency, fallback)
+  );
+}

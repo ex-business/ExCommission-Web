@@ -1,4 +1,5 @@
 export const plansOperations: string[][] = [
+  ["plans", "方案发布与运行", "独立代理方案", "GET", "/v1/affiliate/programs"],
   ["plans", "方案管理", "创建方案", "POST", "/v1/plans"],
   ["plans", "方案管理", "读取方案", "GET", "/v1/plans/{id}"],
   ["plans", "方案管理", "读取草稿", "GET", "/v1/plans/{id}/draft"],

@@ -1,11 +1,5 @@
 export const financeOperations: string[][] = [
-  [
-    "finance",
-    "会员佣金",
-    "佣金计算器",
-    "GET",
-    "/v1/affiliate/calculator",
-  ],
+  ["finance", "会员佣金", "佣金计算器", "GET", "/v1/affiliate/calculator"],
   ["finance", "佣金审核", "佣金审核与派发", "GET", "/v1/commission-reviews"],
   [
     "finance",
@@ -72,6 +66,7 @@ export const financeOperations: string[][] = [
     "POST",
     "/v1/approvals/{id}/execution-retries",
   ],
+  ["finance", "退款与调整", "代理冲正记录", "GET", "/v1/affiliate/reversals"],
   ["finance", "退款与调整", "提交累计退款", "POST", "/v1/refunds"],
   ["finance", "退款与调整", "退款详情", "GET", "/v1/refunds/{id}"],
   ["finance", "退款与调整", "债务详情", "GET", "/v1/debts/{id}"],
@@ -208,4 +203,5 @@ export const financeOperations: string[][] = [
     "GET",
     "/v1/me/affiliate/presentation",
   ],
+  ["finance", "任务运行管理", "代理日结任务", "GET", "/v1/affiliate/task-runs"],
 ];

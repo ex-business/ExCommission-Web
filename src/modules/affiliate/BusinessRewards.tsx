@@ -2,7 +2,7 @@ import { MemberIdentity } from "../member/affiliate/MemberIdentity";
 import { useEffect, useRef, useState } from "react";
 import { request, ApiError } from "../../lib/api";
 import type { Session } from "../../auth/Login";
-import { amount, toMinor } from "./money";
+import { amount, toMinor, rewardScale, currencyScale } from "./money";
 import "./business.css";
 type Row = Record<string, any>;
 const kinds: Record<string, string> = {
@@ -182,7 +182,7 @@ export function BusinessRewards({
             reason: reason.trim(),
           };
           if (decision === "APPROVE" && adjust && allowAdjustment)
-            body.amount_minor = toMinor(adjustment, scale);
+            body.amount_minor = toMinor(adjustment, rewardScale(row, scale));
           await request(
             "/v1/affiliate/commissions/" + row.reward_id + "/review",
             {
@@ -237,10 +237,12 @@ export function BusinessRewards({
       <strong>{label}</strong>
       {values?.map((v) => (
         <span key={v.currency}>
-          {v.count} 笔 · 待领 {amount(v.claimable_minor, scale)} · 已领{" "}
-          {amount(v.claimed_minor, scale)} · 待审核{" "}
-          {amount(v.pending_review_minor, scale)} · 已取消{" "}
-          {amount(v.cancelled_minor, scale)} {v.currency}
+          {v.count} 笔 · 待领{" "}
+          {amount(v.claimable_minor, currencyScale(v.currency, scale))} · 已领{" "}
+          {amount(v.claimed_minor, currencyScale(v.currency, scale))} · 待审核{" "}
+          {amount(v.pending_review_minor, currencyScale(v.currency, scale))} ·
+          已取消 {amount(v.cancelled_minor, currencyScale(v.currency, scale))}{" "}
+          {v.currency}
         </span>
       ))}
     </div>
@@ -421,7 +423,8 @@ export function BusinessRewards({
                         (row.step ? `第 ${row.step} 档` : "本人一次奖励")}
                     </td>
                     <td>
-                      {amount(row.amount_minor, scale)} {row.currency}
+                      {amount(row.amount_minor, rewardScale(row, scale))}{" "}
+                      {row.currency}
                     </td>
                     <td>{statuses[row.status]}</td>
                     <td>
@@ -505,7 +508,10 @@ export function BusinessRewards({
             </div>
             <p>
               {statuses[detail.reward.status]} ·{" "}
-              {amount(detail.reward.amount_minor, scale)}{" "}
+              {amount(
+                detail.reward.amount_minor,
+                rewardScale(detail.reward, scale),
+              )}{" "}
               {detail.reward.currency}
             </p>
             <dl>
@@ -514,7 +520,12 @@ export function BusinessRewards({
               <dt>配置版本</dt>
               <dd>{detail.reward.config_revision}</dd>
               <dt>原计算金额</dt>
-              <dd>{amount(detail.reward.calculated_minor, scale)}</dd>
+              <dd>
+                {amount(
+                  detail.reward.calculated_minor,
+                  rewardScale(detail.reward, scale),
+                )}
+              </dd>
               <dt>审核人 / 时间</dt>
               <dd>
                 {detail.reward.reviewer_id || "—"} /{" "}
@@ -540,13 +551,13 @@ export function BusinessRewards({
                   {amount(
                     m[detail.reward.kind === "INVITEE" ? "invitee" : "referral"]
                       .deposit_minor,
-                    scale,
+                    rewardScale(detail.reward, scale),
                   )}{" "}
                   · 有效业务量{" "}
                   {amount(
                     m[detail.reward.kind === "INVITEE" ? "invitee" : "referral"]
                       .valid_bet_minor,
-                    scale,
+                    rewardScale(detail.reward, scale),
                   )}
                 </p>
                 <p>
@@ -605,9 +616,19 @@ export function BusinessRewards({
                         <tr key={`${c.user_id}:${c.depth}`}>
                           <td>{c.user_id}</td>
                           <td>{c.depth}</td>
-                          <td>{amount(c.valid_bet_minor, scale)}</td>
+                          <td>
+                            {amount(
+                              c.valid_bet_minor,
+                              rewardScale(detail.reward, scale),
+                            )}
+                          </td>
                           <td>{amount(String(c.rate_ppm), 4)}%</td>
-                          <td>{amount(c.commission_minor, scale)}</td>
+                          <td>
+                            {amount(
+                              c.commission_minor,
+                              rewardScale(detail.reward, scale),
+                            )}
+                          </td>
                         </tr>
                       ))}
                     </tbody>

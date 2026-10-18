@@ -1,0 +1,64 @@
+.task-manager .task-toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+.task-manager .task-toolbar h2 {
+  margin-right: auto;
+}
+.task-manager label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.task-manager .task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.task-manager small {
+  display: block;
+  color: var(--text-muted, #687888);
+  margin-top: 5px;
+}
+.task-manager .table-scroll {
+  overflow: auto;
+}
+.task-manager fieldset {
+  border: 0;
+  padding: 0;
+}
+.task-manager .task-check {
+  flex-direction: row;
+  align-items: center;
+}
+.task-manager input[type="checkbox"] {
+  width: auto;
+}
+.task-manager dl {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 10px;
+}
+.task-manager dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.task-manager th,
+.task-manager td {
+  vertical-align: top;
+}
+.task-manager td button {
+  margin-right: 6px;
+}
+@media (max-width: 600px) {
+  .task-manager dl {
+    grid-template-columns: 1fr;
+  }
+  .task-manager dt {
+    font-weight: 600;
+  }
+}

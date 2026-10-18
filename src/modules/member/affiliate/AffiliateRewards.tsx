@@ -1,3 +1,4 @@
+import { ProgramRewards } from "./ProgramRewards";
 import { CommissionRuleSummary } from "../../affiliate/CommissionRuleSummary";
 import { RewardHistory } from "./RewardHistory";
 import { useMemberLocale } from "./locale";
@@ -6,7 +7,11 @@ import { useEffect, useRef, useState } from "react";
 import { request, ApiError } from "../../../lib/api";
 import type { Session } from "../../../auth/Login";
 import "./affiliate.css";
-import { amount, progressPercent as ratio } from "../../affiliate/money";
+import {
+  amount,
+  rewardScale,
+  progressPercent as ratio,
+} from "../../affiliate/money";
 export { amount } from "../../affiliate/money";
 type Row = Record<string, any>;
 const names: Record<string, string> = {
@@ -161,9 +166,10 @@ export function AffiliateRewards({
   ];
   return (
     <div className="affiliate-member">
+      <ProgramRewards session={session} onExpired={onExpired} />
       {/* 只汇总已实际领取的不可变奖励金额，待审核与待领取不算已到账收益。 */}
-      <section className="member-card" aria-label={t("已领取收益")}>
-        <h2>{t("已领取收益")}</h2>
+      <section className="member-card" aria-label={t("原有方案已领取收益")}>
+        <h2>{t("原有方案已领取收益")}</h2>
         <strong>
           {amount(
             (p?.rewards || [])
@@ -531,7 +537,8 @@ export function AffiliateRewards({
               <button onClick={() => setDetail(null)}>{t("关闭")}</button>
             </div>
             <p>
-              {t(states[detail.status])} · {amount(detail.amount_minor, scale)}{" "}
+              {t(states[detail.status])} ·{" "}
+              {amount(detail.amount_minor, rewardScale(detail, scale))}{" "}
               {detail.currency}
             </p>
             <p className="muted">
@@ -553,13 +560,13 @@ export function AffiliateRewards({
                   {amount(
                     member[detail.kind === "INVITEE" ? "invitee" : "referral"]
                       .deposit_minor,
-                    scale,
+                    rewardScale(detail, scale),
                   )}
                   ，{t("有效业务量")}{" "}
                   {amount(
                     member[detail.kind === "INVITEE" ? "invitee" : "referral"]
                       .valid_bet_minor,
-                    scale,
+                    rewardScale(detail, scale),
                   )}
                 </p>
                 <p>
