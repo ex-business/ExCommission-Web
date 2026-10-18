@@ -91,7 +91,7 @@ export async function handleAuth(req, res, url, s) {
     }
   }
   if (url.pathname === "/auth/login" && req.method === "POST") {
-    const ip = req.socket.remoteAddress;
+    const ip = req.entryClientIP || req.socket.remoteAddress;
     let attempt = attempts.get(ip);
     if (!attempt || attempt.until < Date.now())
       attempt = { count: 0, until: Date.now() + 60000 };

@@ -6,7 +6,7 @@ export function affiliateClaimContext(req, session, uri, raw, authorization) {
   const key = process.env.AFFILIATE_CLIENT_CONTEXT_KEY;
   const tenant = process.env.LOCAL_TENANT,
     app = process.env.LOCAL_APP;
-  const ip = req.socket.remoteAddress;
+  const ip = req.entryClientIP || req.socket.remoteAddress;
   if (
     !key ||
     key.length < 32 ||

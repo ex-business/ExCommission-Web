@@ -1,3 +1,4 @@
+import {verifyEntry} from "./entry-proof.mjs";
 import { opsEnabled } from "./ops-identity.mjs";
 import { handleAffiliatePublic } from "./affiliate-public.mjs";
 import http from "node:http";
@@ -37,6 +38,7 @@ export function createServer() {
       "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'",
     );
     try {
+      try {await verifyEntry(req,{response:res})} catch {return json(res,403,{error:{code:"ENTRY_PROOF_REJECTED",message:"请求须经受信网关入口"}})}
       const url = new URL(req.url, "http://localhost");
       const s = session(req);
       if (!["GET", "HEAD"].includes(req.method)) {
