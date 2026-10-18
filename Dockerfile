@@ -1,15 +1,20 @@
-FROM node:24-alpine AS build
+FROM node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f AS build
 WORKDIR /app
 COPY package*.json ./
+COPY vendor ./vendor
 RUN npm ci --no-audit --no-fund
 COPY index.html tsconfig.json vite.config.ts ./
 COPY src ./src
+COPY public ./public
 COPY tools/generate-validators.mjs ./tools/generate-validators.mjs
 COPY contracts ./contracts
 RUN npm run build
-FROM node:24-alpine
+FROM node:24-alpine@sha256:44fce696f38ba8c987c4db89954051000bbd05ffd8d8659ba15ed4a8602e937f
 WORKDIR /app
 ENV NODE_ENV=production BIND_HOST=0.0.0.0 PORT=18180
+COPY package*.json ./
+COPY vendor ./vendor
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
 COPY --from=build --chown=node:node /app/dist ./dist
 COPY --chown=node:node server ./server
 COPY --chown=node:node contracts ./contracts
