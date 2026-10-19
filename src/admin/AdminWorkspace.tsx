@@ -33,6 +33,7 @@ const AgentBusinessReport = lazy(() =>
     default: m.AgentBusinessReport,
   })),
 );
+const AffiliateClaimDeliveries = lazy(() => import("../modules/finance/AffiliateClaimDeliveries").then(m => ({default:m.AffiliateClaimDeliveries})));
 const BusinessRewards = lazy(() =>
   import("../modules/affiliate/BusinessRewards").then((m) => ({
     default: m.BusinessRewards,
@@ -145,6 +146,8 @@ export function AdminWorkspace({
           />
         ) : op.section === "代理业务总表" ? (
           <AgentBusinessReport onExpired={onExpired} />
+        ) : op.title === "代理领取派发记录" ? (
+          <AffiliateClaimDeliveries onExpired={onExpired} />
         ) : op.section === "代理业务奖励" ? (
           <BusinessRewards session={session} onExpired={onExpired} />
         ) : op.section === "代理日结" ? (

@@ -6,6 +6,7 @@ import { notes, defaults } from "./formDefaults";
 import { useEffect, useRef, useState } from "react";
 import { type Operation, type Schema, label } from "../catalog";
 import { SchemaField } from "../components/SchemaField";
+import { WalletReconciliationResult } from "./finance/WalletReconciliationResult";
 import { ResultView } from "../components/ResultView";
 import { request, resourceLinks, ApiError } from "../lib/api";
 import { validate } from "../lib/validation";
@@ -366,6 +367,8 @@ export function OperationPanel({
         {result ? (
           json ? (
             <pre>{JSON.stringify(result, null, 2)}</pre>
+          ) : op.path === "/v1/reconciliation-runs" && result.affiliate_wallet ? (
+            <WalletReconciliationResult value={result} />
           ) : (
             <ResultView value={result} paging={remoteList?{page:pages.page,size:pages.size,busy,more:Boolean(result.next_cursor||result.next_after_id),onNext:()=>void execute({[cursorName!]:result.next_cursor||result.next_after_id}),onPrevious:()=>void execute({[cursorName!]:pages.previous}),onSize:size=>{pages.setSize(size);void execute({[cursorName!]:'',limit:size})}}:undefined} />
           )
