@@ -12,6 +12,7 @@ const names: Record<string, string> = {
 const states: Record<string, string> = {
   CLAIMABLE: "待领取",
   CLAIMED: "已领取",
+  CLAIMING: "领取处理中",
   PENDING_REVIEW: "待审核",
   CANCELLED: "已取消",
 };
@@ -39,6 +40,25 @@ export function ProgramRewards({
       setError(e.message);
     });
   }, []);
+  const pendingDelivery = rows.some((r) => r.status === "CLAIMING");
+  useEffect(() => {
+    if (!pendingDelivery) return;
+    // 串行刷新，防止慢响应覆盖后续状态或在离开页面后继续调度。
+    let stopped = false;
+    let timer: number;
+    const poll = async () => {
+      try { await load(); }
+      catch (e) {
+        if (!stopped) {
+          if (e instanceof ApiError && e.status === 401) onExpired();
+          setError((e as Error).message);
+        }
+      }
+      if (!stopped) timer = window.setTimeout(poll, 3000);
+    };
+    timer = window.setTimeout(poll, 3000);
+    return () => { stopped = true; window.clearTimeout(timer); };
+  }, [pendingDelivery]);
   async function claim(program: string, kind: string) {
     const fingerprint = program + ":" + kind;
     let key = keys.current.get(fingerprint);
@@ -50,14 +70,14 @@ export function ProgramRewards({
     setError("");
     setNotice("");
     try {
-      await request("/v1/me/affiliate/claims", {
+      const result = await request("/v1/me/affiliate/claims", {
         method: "POST",
         body: { kind, program_id: program },
         key,
         csrf: session.csrf,
       });
       keys.current.delete(fingerprint);
-      setNotice(t("领取成功"));
+      setNotice(t(result.data.delivery_status === "PENDING" ? "领取已受理，钱包确认后到账" : "领取成功"));
       await load();
     } catch (e) {
       if (e instanceof ApiError && e.status === 401) onExpired();

@@ -204,4 +204,6 @@ export const financeOperations: string[][] = [
     "/v1/me/affiliate/presentation",
   ],
   ["finance", "任务运行管理", "代理日结任务", "GET", "/v1/affiliate/task-runs"],
+  ["finance", "代理业务奖励", "代理领取派发记录", "GET", "/v1/affiliate/claim-deliveries"],
+  ["finance", "会员佣金", "本人领取派发记录", "GET", "/v1/me/affiliate/claim-deliveries"],
 ];

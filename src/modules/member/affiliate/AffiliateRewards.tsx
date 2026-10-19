@@ -25,6 +25,7 @@ const names: Record<string, string> = {
 const states: Record<string, string> = {
   CLAIMABLE: "待领取",
   CLAIMED: "已领取",
+  CLAIMING: "领取处理中",
   PENDING_REVIEW: "待审核",
   CANCELLED: "已取消",
 };
@@ -98,6 +99,19 @@ export function AffiliateRewards({
       generation.current++;
     };
   }, []);
+  const pendingDelivery = (view?.progress?.rewards || []).some((r: Row) => r.status === "CLAIMING");
+  useEffect(() => {
+    if (!pendingDelivery) return;
+    // 上一轮完成后再等待，避免慢请求被下一轮刷新淘汰；离开页面不再发起请求。
+    let stopped = false;
+    let timer: number;
+    const poll = async () => {
+      await load();
+      if (!stopped) timer = window.setTimeout(poll, 3000);
+    };
+    timer = window.setTimeout(poll, 3000);
+    return () => { stopped = true; window.clearTimeout(timer); };
+  }, [pendingDelivery]);
   async function claim(kind: string) {
     setBusy(true);
     setError("");
@@ -115,7 +129,7 @@ export function AffiliateRewards({
         csrf: session.csrf,
       });
       setNotice(
-        t("到账提示", {
+        result.data.delivery_status === "PENDING" ? t("领取已受理，钱包确认后到账") : t("到账提示", {
           kind: t(names[kind]),
           count: result.data.rewards.length,
         }),
@@ -169,6 +183,7 @@ export function AffiliateRewards({
   return (
     <div className="affiliate-member">
       <ProgramRewards session={session} onExpired={onExpired} />
+      {(view.progress?.rewards || []).some((r: Row) => r.wallet_destination === "wallet-sandbox") && <p className="muted">{t("领取款项转入独立钱包，到账以钱包回执为准。")}</p>}
       {/* 只汇总已实际领取的不可变奖励金额，待审核与待领取不算已到账收益。 */}
       <section className="member-card" aria-label={t("原有方案已领取收益")}>
         <h2>{t("原有方案已领取收益")}</h2>
@@ -538,6 +553,8 @@ export function AffiliateRewards({
               </h2>
               <button onClick={() => setDetail(null)}>{t("关闭")}</button>
             </div>
+            {detail.wallet_delivery_id && <p>{t("独立钱包派发编号")}: {detail.wallet_delivery_id}</p>}
+            {detail.wallet_receipt_ref && <p>{t("独立钱包回执")}: {detail.wallet_receipt_ref}</p>}
             <p>
               {t(states[detail.status])} ·{" "}
               {amount(detail.amount_minor, rewardScale(detail, scale))}{" "}

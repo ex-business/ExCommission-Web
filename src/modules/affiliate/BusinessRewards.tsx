@@ -16,6 +16,7 @@ const statuses: Record<string, string> = {
   PENDING_REVIEW: "待审核",
   CLAIMABLE: "待领取",
   CLAIMED: "已领取",
+  CLAIMING: "领取处理中",
   CANCELLED: "已取消",
 };
 const localInput = (d: Date) =>

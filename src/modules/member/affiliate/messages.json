@@ -1423,5 +1423,21 @@
   "操作失败": {
     "en": "Operation failed",
     "es": "Error en la operación"
+  },
+  "领取已受理，钱包确认后到账": {
+    "en": "Claim accepted. Funds arrive after wallet confirmation.",
+    "es": "Cobro aceptado. Los fondos llegan tras la confirmación de la cartera."
+  },
+  "独立钱包派发编号": {
+    "en": "External wallet delivery ID",
+    "es": "ID del envío a la cartera externa"
+  },
+  "独立钱包回执": {
+    "en": "External wallet receipt",
+    "es": "Comprobante de la cartera externa"
+  },
+  "领取款项转入独立钱包，到账以钱包回执为准。": {
+    "en": "Claims are sent to your external wallet. Arrival is confirmed by the wallet receipt.",
+    "es": "Los cobros se envían a tu cartera externa. El comprobante confirma la recepción."
   }
 }

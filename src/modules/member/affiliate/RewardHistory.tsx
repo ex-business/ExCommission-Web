@@ -13,6 +13,7 @@ const kinds: Record<string, string> = {
 const statuses: Record<string, string> = {
   CLAIMABLE: "待领取",
   CLAIMED: "已领取",
+  CLAIMING: "领取处理中",
   PENDING_REVIEW: "待审核",
   CANCELLED: "已取消",
 };
